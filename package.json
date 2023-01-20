@@ -1,0 +1,48 @@
+{
+  "name": "ha-windrose-card-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "http-server": "http-server ./",
+    "build-watch": "rollup -c --watch",
+    "build": "rimraf build && tsc && rollup -c",
+    "rollup": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "hass",
+    "automation",
+    "lovelace",
+    "custom-cards",
+    "windrose",
+    "weatherstation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@open-wc/building-rollup": "^2.2.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-multi-entry": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "deepmerge": "^4.2.2",
+    "eslint": "^8.32.0",
+    "http-server": "^14.1.1",
+    "rimraf": "^3.0.2",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@lit-labs/scoped-registry-mixin": "^1.0.1",
+    "@material/mwc-formfield": "^0.27.0",
+    "@material/mwc-textfield": "^0.27.0",
+    "custom-card-helpers": "^1.9.0",
+    "lit": "^2.2.8"
+  }
+}

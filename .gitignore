@@ -1,0 +1,5 @@
+# Project exclude paths
+/build/
+/node_modules/
+.idea
+/ha-windrose-card-project.iml
