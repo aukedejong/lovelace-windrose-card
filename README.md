@@ -5,7 +5,7 @@
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
 
-![Preview](https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-dark.png?raw=true)
+<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-dark.png?raw=true" width="482"/>
 
 ## Install
 
