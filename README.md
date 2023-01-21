@@ -2,9 +2,8 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-A minimalistic and customizable graph card for [Home Assistant](https://github.com/home-assistant/home-assistant) Lovelace UI.
+A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
-The card works with entities from within the **sensor** & **binary_sensor** domain and displays the sensors current state as well as a line graph representation of the history.
 
 ![Preview](https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-dark.png?raw=true)
 
@@ -17,7 +16,7 @@ This card is available in [HACS](https://hacs.xyz/) (Home Assistant Community St
 
 ### Manual install
 
-1. Download and copy `windrose-card.js` from the [latest release](https://github.com/kalkih/mini-graph-card/releases/latest) into your `config/www` directory.
+1. Download and copy `windrose-card.js` from the [latest release](https://github.com/aukedejong/ha-windrose-card/releases/latest) into your `config/www` directory.
 
 2. Add the resource reference as decribed below.
 
@@ -72,7 +71,7 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 ## Getting errors?
 Make sure you have `javascript_version: latest` in your `configuration.yaml` under `frontend:`.
 
-Make sure you have the latest versions of `mini-graph-card.js` & `mini-graph-lib.js`.
+Make sure you have the latest versions of `windrose-card.js`.
 
 If you have issues after updating the card, try clearing your browser cache.
 
