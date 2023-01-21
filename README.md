@@ -1,9 +1,12 @@
 # Lovelace Windrose card
+
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+
 A minimalistic and customizable graph card for [Home Assistant](https://github.com/home-assistant/home-assistant) Lovelace UI.
 
 The card works with entities from within the **sensor** & **binary_sensor** domain and displays the sensors current state as well as a line graph representation of the history.
 
-![Preview](https://user-images.githubusercontent.com/457678/52977264-edf34980-33cc-11e9-903b-cee43b307ed8.png)
+![Preview](https://github.com/aukedejong/ha-windrose-card/blob/main/windrose-example-dark.png?raw=true)
 
 ## Install
 
