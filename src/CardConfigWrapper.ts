@@ -12,6 +12,7 @@ export class CardConfigWrapper {
     directionCompensation: number;
     windspeedBarLocation: string;
     cardinalDirectionLetters: string;
+    windDirectionCount: number;
 
     entities: string[];
     filterEntitiesQueryParameter: string;
@@ -45,6 +46,7 @@ export class CardConfigWrapper {
         this.directionCompensation = this.checkDirectionCompensation();
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
+        this.windDirectionCount = this.checkWindDirectionCount();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.entities = this.createEntitiesArray();
     }
@@ -120,11 +122,22 @@ export class CardConfigWrapper {
     private checkCardinalDirectionLetters(): string {
         if (this.cardConfig.cardinal_direction_letters) {
             if (this.cardConfig.cardinal_direction_letters.length !== 4) {
-                throw new Error("Cardinal direction letters option shoud contain 4 letters.");
+                throw new Error("Cardinal direction letters option should contain 4 letters.");
             }
             return this.cardConfig.cardinal_direction_letters;
         }
         return GlobalConfig.defaultCardinalDirectionLetters;
+    }
+
+    private checkWindDirectionCount(): number {
+        if (this.cardConfig.wind_direction_count) {
+            if (isNaN(this.cardConfig.wind_direction_count) || this.cardConfig.wind_direction_count < 4 ||
+                    this.cardConfig.wind_direction_count > 32) {
+                throw new Error("Wind direction count can a number between 4 and 32");
+            }
+            return this.cardConfig.wind_direction_count;
+        }
+        return GlobalConfig.defaultWindDirectionCount;
     }
 
     private createEntitiesQueryParameter() {

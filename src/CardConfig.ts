@@ -11,4 +11,5 @@ export interface CardConfig {
     direction_compensation: number;
     windspeed_bar_location: string;
     cardinal_direction_letters: string;
+    wind_direction_count: number;
 }

@@ -23,8 +23,8 @@ export class WindRoseConfigFactory {
             25,
             this.roseCenterX,
             this.roseCenterY,
-            GlobalConfig.leaveCount,
-            (360 / GlobalConfig.leaveCount) - 5,
+            this.cardConfig.windDirectionCount,
+            (360 / this.cardConfig.windDirectionCount) - 5,
             this.cardConfig.cardinalDirectionLetters,
             this.cardConfig.directionCompensation);
     }

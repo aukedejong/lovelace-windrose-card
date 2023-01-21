@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "http-server": "http-server ./",
+    "lint": "npx  eslint .",
     "build-watch": "rollup -c --watch",
     "build": "rimraf build && tsc && rollup -c",
     "rollup": "rollup -c",

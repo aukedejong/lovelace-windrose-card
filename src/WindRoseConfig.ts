@@ -5,7 +5,7 @@ export class WindRoseConfig {
         public centerRadius: number,
         public centerX: number,
         public centerY: number,
-        public leaveCount: number,
+        public windDirectionCount: number,
         public leaveArc: number,
         public cardinalDirectionLetters: string,
         public directionCompensation: number) {

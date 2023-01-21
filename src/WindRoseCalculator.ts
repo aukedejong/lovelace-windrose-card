@@ -16,8 +16,8 @@ export class WindRoseCalculator {
 
     constructor(config: WindRoseConfig) {
         this.config = config;
-        const leaveDegrees = 360 / config.leaveCount;
-        for (let i = 0; i < config.leaveCount; i++) {
+        const leaveDegrees = 360 / config.windDirectionCount;
+        for (let i = 0; i < config.windDirectionCount; i++) {
             const degrees = (i * leaveDegrees);
             const minDegrees = degrees - (leaveDegrees / 2);
             const maxDegrees = degrees + (leaveDegrees / 2);

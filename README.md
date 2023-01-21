@@ -54,18 +54,25 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 
 ### Card options
 
-| Name                                      |  Type  | Default | Since  | Description                                                          |
-|-------------------------------------------|:------:|:-------:|:------:|----------------------------------------------------------------------|
-| type ***(required)***                     | string |         | v0.0.1 | `custom:windrose-card`.                                              |
-| title                                     | string |         | v0.0.1 | The card title.                                                      |
-| wind_direction_entity ***(required)***    | string |         | v0.0.1 | The wind direction entity, having directing in degrees as the state. |
-| average_windspeed_entity ***(required)*** | string |         | v0.0.1 | The everage windspeed entity, windspeed as state. TODO unit info.    |
-| gust_windspeed_entity                     | string |         | v0.0.1 | The gust windspeed entity, widnspeed as state.                       |
-| hours_to_show                             | number |    4    | v0.0.1 | Show winddata for the last number of hours.                          |
-| max_width                                 | number |  null   | v0.0.1 | Use to limit the with (and height) of the windrose.                  |
-| windspeed_bar_location                    | string | bottom  | v0.0.1 | Location of the speed bar graph: `bottom`, `right`                   |
-| direction_compensation                    | number |   0     | v0.0.1 | Compensate the measured direction in degrees.                        |
-| cardinal_direction_letters                | string | NESW    | v0.0.1 | The cardinal letters used in the windrose.                           |
+| Name                       |  Type  | Default | Required | Description                                                                         |
+|----------------------------|:------:|:-------:|:--------:|-------------------------------------------------------------------------------------|
+| type                       | string |         |    x     | `custom:windrose-card`.                                                             |
+| title                      | string |         |    -     | The card title.                                                                     |
+| wind_direction_entity      | string |         |    x     | The wind direction entity, having directing in degrees as the state.                |
+| windspeed_entities         | object |         |    x     | One are more windspeed entities. Only the first is used for the windrose. (for now) |
+| hours_to_show              | number |    4    |    -     | Show winddata for the last number of hours.                                         |
+| max_width                  | number |  null   |    -     | Use to limit the with (and height) of the windrose.                                 |
+| windspeed_bar_location     | string | bottom  |    -     | Location of the speed bar graph: `bottom`, `right`                                  |
+| direction_compensation     | number |    0    |    -     | Compensate the measured direction in degrees.                                       |
+| cardinal_direction_letters | string |  NESW   |    -     | The cardinal letters used in the windrose.                                          |
+| wind_direction_count       | string |   16    |    -     | How many wind direction the windrose can display, min. 4 max. 32                    |
+
+#### Object windspeed_entities
+
+| Name   |  Type  | Default | Required | Description       |
+|--------|:------:|:-------:|:--------:|-------------------|
+| entity | string |         |    x     | Wind speed entity |
+| name   | string |         |    x     | Label             |
 
 
 ## Getting errors?
