@@ -1,4 +1,5 @@
 {
   "name": "windrose-card",
-  "render_readme": true
+  "render_readme": true,
+  "filename": "windrose-card.js"
 }
