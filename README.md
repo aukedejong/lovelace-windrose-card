@@ -6,7 +6,7 @@ A minimalistic and customizable graph card for [Home Assistant](https://github.c
 
 The card works with entities from within the **sensor** & **binary_sensor** domain and displays the sensors current state as well as a line graph representation of the history.
 
-![Preview](https://github.com/aukedejong/ha-windrose-card/blob/main/windrose-example-dark.png?raw=true)
+![Preview](https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-dark.png?raw=true)
 
 ## Install
 
