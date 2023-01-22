@@ -28,7 +28,7 @@ This card is available in [HACS](https://hacs.xyz/) (Home Assistant Community St
 2. Grab `windrose-card.js`:
 
   ```
-  $ wget https://github.com/kalkih/mini-graph-card/releases/download/v0.11.0/mini-graph-card-bundle.js
+  $ wget https://github.com/aukedejong/lovelace-windrose-card/releases/download/latest/windrose-card.js
   ```
 
 3. Add the resource reference as decribed below.
