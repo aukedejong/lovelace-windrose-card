@@ -2,9 +2,13 @@ import {WindRoseConfig} from "./WindRoseConfig";
 import {WindDirectionCalculator} from "./WindDirectionCalculator";
 import {WindRoseData} from "./WindRoseData";
 import {WindSpeedConverter} from "./WindSpeedConverter";
+import {WindDirectionConverter} from "./WindDirectionConverter";
 
 export class WindRoseCalculator {
+
     readonly windSpeedConverter = new WindSpeedConverter();
+    readonly windDirectionConverter = new WindDirectionConverter();
+
     data = new WindRoseData();
     windDirections: WindDirectionCalculator[] = [];
     config: WindRoseConfig;
@@ -35,17 +39,26 @@ export class WindRoseCalculator {
         }
     }
 
-    addDataPoint(direction: number, speed: number): void {
+    addDataPoint(direction: number | string, speed: number): void {
+        let degrees = 0;
+        if (this.config.windDirectionUnit === 'letters') {
+            degrees = this.windDirectionConverter.getDirection(direction as string);
+            if (isNaN(degrees)) {
+                throw new Error("Could not convert direction " + direction + " to degrees.");
+            }
+        } else {
+            degrees = direction as number;
+        }
         if (this.config.directionCompensation !== 0) {
-            direction = +direction + this.config.directionCompensation;
-            if (direction < 0) {
-                direction = 360 + direction;
-            } else if (direction >= 360) {
-                direction = direction - 360;
+            degrees = +degrees + this.config.directionCompensation;
+            if (degrees < 0) {
+                degrees = 360 + degrees;
+            } else if (degrees >= 360) {
+                degrees = degrees - 360;
             }
         }
         for(const windDirection of this.windDirections) {
-            if (windDirection.checkDirection(direction)) {
+            if (windDirection.checkDirection(degrees)) {
                 windDirection.addSpeed(speed);
                 this.totalMeasurements++;
             }

@@ -11,6 +11,7 @@ export class GlobalConfig {
     static defaultHoursToShow = 4;
     static defaultRefreshInterval = 300;
     static defaultWindDirectionCount = 16;
+    static defaultWindDirectionUnit = 'degrees';
 
     static verticalBarHeight = 16;
     static horizontalBarHeight = 15;

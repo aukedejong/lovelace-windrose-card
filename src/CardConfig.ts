@@ -7,6 +7,7 @@ export interface CardConfig {
     max_width: number;
     wind_direction_entity: string;
     windspeed_entities: {entity: string, name: string}[];
+    wind_direction_unit: string;
 
     direction_compensation: number;
     windspeed_bar_location: string;

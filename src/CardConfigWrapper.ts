@@ -13,6 +13,7 @@ export class CardConfigWrapper {
     windspeedBarLocation: string;
     cardinalDirectionLetters: string;
     windDirectionCount: number;
+    windDirectionUnit: string;
 
     entities: string[];
     filterEntitiesQueryParameter: string;
@@ -31,6 +32,7 @@ export class CardConfigWrapper {
                     name: ''
                 }
             ],
+            wind_direction_unit: GlobalConfig.defaultWindDirectionUnit,
             direction_compensation: 0,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters
         };
@@ -47,6 +49,7 @@ export class CardConfigWrapper {
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
         this.windDirectionCount = this.checkWindDirectionCount();
+        this.windDirectionUnit = this.checkWindDirectionUnit();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.entities = this.createEntitiesArray();
     }
@@ -111,7 +114,7 @@ export class CardConfigWrapper {
         if (this.cardConfig.windspeed_bar_location) {
 
             if (this.cardConfig.windspeed_bar_location !== 'bottom' && this.cardConfig.windspeed_bar_location !== 'right') {
-                throw new Error('WindRoseCard: Invalid windspeed bar location ' + this.cardConfig.windspeed_bar_location +
+                throw new Error('Invalid windspeed bar location ' + this.cardConfig.windspeed_bar_location +
                     '. Valid options: bottom, right');
             }
             return this.cardConfig.windspeed_bar_location;
@@ -138,6 +141,18 @@ export class CardConfigWrapper {
             return this.cardConfig.wind_direction_count;
         }
         return GlobalConfig.defaultWindDirectionCount;
+    }
+
+    private checkWindDirectionUnit(): string {
+        if (this.cardConfig.wind_direction_unit) {
+            if (this.cardConfig.wind_direction_unit !== 'degrees'
+                && this.cardConfig.wind_direction_unit !== 'letters') {
+                throw new Error('Invalid wind direction unit configured: ' + this.cardConfig.wind_direction_unit +
+                    '. Valid options: degrees, letters');
+            }
+            return this.cardConfig.wind_direction_unit;
+        }
+        return GlobalConfig.defaultWindDirectionUnit;
     }
 
     private createEntitiesQueryParameter() {
