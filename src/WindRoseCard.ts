@@ -51,7 +51,7 @@ export class WindRoseCard extends LitElement {
 
     constructor() {
         super();
-        console.log("constructor()");
+        // console.log("constructor()");
     }
 
     set hass(hass: HomeAssistant) {
@@ -168,7 +168,9 @@ export class WindRoseCard extends LitElement {
         this.getHistory().then((history: any) => {
             const directionData = history[this.cardConfig.windDirectionEntity];
             const firstSpeedData = history[this.cardConfig.windspeedEntities[0].entity];
-
+            if (directionData.length !== firstSpeedData.length) {
+                throw new Error("The direction and speed entities should have the same number of measurements for a period.");
+            }
             console.log('Historie', history)
 
             this.windRoseCalculator?.clear();
@@ -205,7 +207,7 @@ export class WindRoseCard extends LitElement {
     }
 
     private updateCanvasSize(canvasWidth: number) {
-        console.log('updateCanvasSize()', canvasWidth);
+        // console.log('updateCanvasSize()', canvasWidth);
 
         this.canvas.width = canvasWidth;
         this.canvas.height = this.windRoseConfigFactory.canvasHeight as number;

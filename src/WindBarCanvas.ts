@@ -15,7 +15,7 @@ export class WindBarCanvas {
 
     drawWindBar(windBarData: WindBarData, canvasContext: CanvasRenderingContext2D) {
 
-        console.log('Data', windBarData);
+        // console.log('Data', windBarData);
         if (this.config.orientation === 'horizontal') {
             this.drawBarLegendHorizontal(windBarData.speedRangePercentages, canvasContext);
 
