@@ -9,6 +9,7 @@ import {WindRoseData} from "./WindRoseData";
 import {WindBarData} from "./WindBarData";
 import {customElement, query} from "lit/decorators"
 import {CardConfigWrapper} from "./CardConfigWrapper";
+import {MeasurementMatcher} from "./MeasurementMatcher";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -37,7 +38,7 @@ export class WindRoseCard extends LitElement {
     windRoseCanvas: WindRoseCanvas | undefined;
     windBarCanvases: WindBarCanvas[] = [];
 
-    windRoseCalculator: WindRoseCalculator | undefined;
+    windRoseCalculator!: WindRoseCalculator;
     windBarCalculators: WindBarCalculator[] = [];
     windRoseData: WindRoseData | undefined;
     windBarsData: WindBarData[] = [];
@@ -168,20 +169,20 @@ export class WindRoseCard extends LitElement {
         this.getHistory().then((history: any) => {
             const directionData = history[this.cardConfig.windDirectionEntity];
             const firstSpeedData = history[this.cardConfig.windspeedEntities[0].entity];
-            if (directionData.length !== firstSpeedData.length) {
-                throw new Error("The direction and speed entities should have the same number of measurements for a period.");
-            }
-            console.log('Historie', history)
 
-            this.windRoseCalculator?.clear();
-            for (let i = 0; i < directionData.length; i++) {
-                this.windRoseCalculator?.addDataPoint(directionData[i].s, firstSpeedData[i].s);
+            console.log('Historie', history)
+            const directionSpeedData = new MeasurementMatcher(directionData, firstSpeedData).match();
+            console.log('Matched measurements', directionSpeedData.length);
+
+            this.windRoseCalculator.clear();
+            for (const directionSpeed of directionSpeedData) {
+                this.windRoseCalculator.addDataPoint(directionSpeed.direction, +directionSpeed.speed);
             }
             for (let i = 0; i < this.cardConfig.windBarCount(); i++) {
                 this.windBarCalculators[i].addSpeeds(
                     history[this.cardConfig.windspeedEntities[i].entity].map((point: any) => point.s));
             }
-            this.windRoseData = this.windRoseCalculator?.calculate();
+            this.windRoseData = this.windRoseCalculator.calculate();
             for (let i = 0; i < this.cardConfig.windBarCount(); i++) {
                 this.windBarsData[i] = this.windBarCalculators[i].calculate();
             }
