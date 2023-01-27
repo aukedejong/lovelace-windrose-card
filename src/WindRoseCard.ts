@@ -108,11 +108,8 @@ export class WindRoseCard extends LitElement {
           :host {
             display: block;
           }
-          ha-card {
-            background-color: var(--card-background-color);
-          }
           canvas {
-            background-color: var(--card-background-color);
+            background-color: var(--ha-card-background);
             max-height: var(--chart-max-height);
           }`;
     }
