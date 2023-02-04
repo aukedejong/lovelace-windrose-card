@@ -9,9 +9,15 @@ export class WindDirectionCalculator {
     speedRangeCounts: number[] = [];
     config: WindRoseConfig;
 
+    speedRangeFunction: (speed: number) => number;
+    speedConverterFunction: (speed: number) => number;
+
     constructor(minDegrees: number, centerDegrees: number, maxDegrees: number, config: WindRoseConfig) {
         this.data.centerDegrees = centerDegrees;
         this.config = config;
+        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction(this.config.outputUnit);
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(this.config.inputUnit,
+            this.config.outputUnit);
         if (minDegrees < 0) {
             this.data.minDegrees = minDegrees + 360;
         } else {
@@ -45,9 +51,9 @@ export class WindDirectionCalculator {
         const speedRangeCounts = Array(13).fill(0);
         let speedAboveZeroCount = 0;
         for (const speed of this.speeds) {
-            const windBft = this.windSpeedConverter.getByMeterPerSecond(speed)?.getBft();
-            if (windBft !== undefined && windBft > 0) {
-                speedRangeCounts[windBft]++;
+            const speedRange = this.speedRangeFunction(speed);
+            if (speedRange !== undefined && speedRange > 0) {
+                speedRangeCounts[speedRange]++;
                 speedAboveZeroCount++;
             }
         }

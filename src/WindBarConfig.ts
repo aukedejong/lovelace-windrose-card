@@ -7,6 +7,9 @@ export class WindBarConfig {
         public posY: number,
         public height: number,
         public length: number,
-        public orientation: string) {
+        public orientation: string,
+        public full: boolean,
+        public inputUnit: string,
+        public outputUnit: string) {
     }
 }

@@ -18,8 +18,14 @@ export class WindRoseCalculator {
     maxMeasurementsDirection = 0;
     calmSpeedMeasurements = 0;
 
+    speedRangeFunction: (speed: number) => number;
+    speedConverterFunction: (speed: number) => number;
+
     constructor(config: WindRoseConfig) {
         this.config = config;
+        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction(this.config.outputUnit);
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(this.config.inputUnit,
+            this.config.outputUnit);
         const leaveDegrees = 360 / config.windDirectionCount;
         for (let i = 0; i < config.windDirectionCount; i++) {
             const degrees = (i * leaveDegrees);
@@ -40,6 +46,7 @@ export class WindRoseCalculator {
     }
 
     addDataPoint(direction: number | string, speed: number): void {
+        const convertedSpeed = this.speedConverterFunction(speed);
         let degrees = 0;
         if (this.config.windDirectionUnit === 'letters') {
             degrees = this.windDirectionConverter.getDirection(direction as string);
@@ -59,11 +66,11 @@ export class WindRoseCalculator {
         }
         for(const windDirection of this.windDirections) {
             if (windDirection.checkDirection(degrees)) {
-                windDirection.addSpeed(speed);
+                windDirection.addSpeed(convertedSpeed);
                 this.totalMeasurements++;
             }
         }
-        if (this.windSpeedConverter.getByMeterPerSecond(speed)?.getBft() == 0) {
+        if (this.speedRangeFunction(convertedSpeed) == 0) {
             this.calmSpeedMeasurements++;
         }
         this.modified = true;
@@ -79,6 +86,7 @@ export class WindRoseCalculator {
         this.calculateWindRosePercentages();
 
         this.data.windDirections = this.windDirections.map(windDirection => windDirection.data);
+        //console.log(this.calmSpeedMeasurements, this.totalMeasurements);
         this.data.calmSpeedPercentage = this.calmSpeedMeasurements / (this.totalMeasurements / 100);
         return this.data;
     }

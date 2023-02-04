@@ -27,7 +27,9 @@ export class WindRoseConfigFactory {
             this.cardConfig.windDirectionUnit,
             (360 / this.cardConfig.windDirectionCount) - 5,
             this.cardConfig.cardinalDirectionLetters,
-            this.cardConfig.directionCompensation);
+            this.cardConfig.directionCompensation,
+            this.cardConfig.inputSpeedUnit,
+            this.cardConfig.outputSpeedUnit);
     }
 
     createWindBarConfigs(canvasWidth: number): WindBarConfig[] {
@@ -43,20 +45,26 @@ export class WindRoseConfigFactory {
                 windBarConfig = new WindBarConfig(
                     entity.name,
                     this.offsetWidth + 5,
-                    this.roseCenterY + this.outerRadius + 30 + ((GlobalConfig.horizontalBarHeight + 20) * i),
+                    this.roseCenterY + this.outerRadius + 30 + ((GlobalConfig.horizontalBarHeight + 40) * i),
                     GlobalConfig.horizontalBarHeight,
                     ((this.outerRadius + 30) * 2),
-                    'horizontal');
+                    'horizontal',
+                    this.cardConfig.windspeedBarFull,
+                    this.cardConfig.inputSpeedUnit,
+                    this.cardConfig.outputSpeedUnit);
 
             } else if (this.cardConfig.windspeedBarLocation === 'right') {
 
                 windBarConfig = new WindBarConfig(
                     entity.name,
-                    this.roseCenterX + this.outerRadius + 35 + ((GlobalConfig.horizontalBarHeight + 20) * i),
+                    this.roseCenterX + this.outerRadius + 35 + ((GlobalConfig.verticalBarHeight + 60) * i),
                     this.roseCenterY + this.outerRadius + 20,
                     GlobalConfig.verticalBarHeight,
                     this.outerRadius * 2 + 40,
-                    'vertical');
+                    'vertical',
+                    this.cardConfig.windspeedBarFull,
+                    this.cardConfig.inputSpeedUnit,
+                    this.cardConfig.outputSpeedUnit);
 
             } else {
                 throw Error('Unknown windspeed bar location: ' + this.cardConfig.windspeedBarLocation);
@@ -76,8 +84,8 @@ export class WindRoseConfigFactory {
             this.offsetWidth = (canvasWidth - roseWidth) / 2;
         }
         if (this.cardConfig.windspeedBarLocation == 'right') {
-            roseWidth = roseWidth - ((16 + 12) * this.cardConfig.windBarCount());
-            this.offsetWidth = (canvasWidth - roseWidth - ((16 + 12) * this.cardConfig.windBarCount())) / 2;
+            roseWidth = roseWidth - ((60 + 12) * this.cardConfig.windBarCount());
+            this.offsetWidth = (canvasWidth - roseWidth - ((60 + 12) * this.cardConfig.windBarCount())) / 2;
         }
         this.outerRadius = (roseWidth / 2) - 35;
         this.roseCenterX = this.offsetWidth + (roseWidth / 2);
@@ -86,7 +94,7 @@ export class WindRoseConfigFactory {
         if (this.cardConfig.windspeedBarLocation === 'right') {
             this.canvasHeight = this.roseCenterY + this.outerRadius + 25;
         } else if (this.cardConfig.windspeedBarLocation === 'bottom') {
-            this.canvasHeight = this.roseCenterY + this.outerRadius + (30 * this.cardConfig.windBarCount()) + 35;
+            this.canvasHeight = this.roseCenterY + this.outerRadius + (40 * this.cardConfig.windBarCount()) + 35;
         } else {
             console.log('Unknown windspeed bar location', this.cardConfig.windspeedBarLocation);
         }

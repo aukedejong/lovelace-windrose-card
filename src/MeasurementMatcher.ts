@@ -7,7 +7,7 @@ export class MeasurementMatcher {
     match(): DirectionSpeed[] {
         const matchedData: DirectionSpeed[] = [];
         this.directionData.forEach((direction) => {
-            let speed = this.findMatchingSpeed(direction.lu);
+            const speed = this.findMatchingSpeed(direction.lu);
             if (speed) {
                 matchedData.push(new DirectionSpeed(direction.s, speed.s));
             }

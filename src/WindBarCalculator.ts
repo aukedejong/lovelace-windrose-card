@@ -1,16 +1,32 @@
-import {WindSpeedConverter} from "./WindSpeedConverter";
+import {SpeedUnits, WindSpeedConverter} from "./WindSpeedConverter";
 import {WindBarData} from "./WindBarData";
+import {WindBarConfig} from "./WindBarConfig";
 
 export class WindBarCalculator {
 
     readonly windSpeedConverter = new WindSpeedConverter();
+    readonly config: WindBarConfig;
     speeds: number[] = [];
     modified = false;
 
     speedRangePercentages: number[] = []
 
+    speedRangeFunction: (speed: number) => number;
+    speedConverterFunction: (speed: number) => number;
+    rangeCount: number;
+
+    constructor(config: WindBarConfig) {
+        this.config = config;
+        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction(this.config.outputUnit);
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(this.config.inputUnit,
+            this.config.outputUnit);
+        this.rangeCount = SpeedUnits.getSpeedUnit(this.config.outputUnit).speedRanges.length;
+    }
+
     addSpeeds(speeds: number[]) {
-        this.speeds = this.speeds.concat(speeds);
+        for (const speed of speeds) {
+            this.speeds.push(this.speedConverterFunction(speed));
+        }
         this.modified = true;
     }
 
@@ -22,9 +38,9 @@ export class WindBarCalculator {
     }
 
     private calculateSpeedRangePercentages(): void {
-        const speedRangeCounts = Array(13).fill(0);
+        const speedRangeCounts = Array(this.rangeCount).fill(0);
         for (const speed of this.speeds) {
-            const windBft = this.windSpeedConverter.getByMeterPerSecond(speed)?.getBft();
+            const windBft = this.speedRangeFunction(speed);
             if (windBft !== undefined && windBft >= 0) {
                 speedRangeCounts[windBft]++;
             } else {
@@ -35,6 +51,5 @@ export class WindBarCalculator {
         for (const speedRangeCount of speedRangeCounts) {
             this.speedRangePercentages.push(speedRangeCount / (this.speeds.length / 100));
         }
-        // console.log('BAR - Calculated speed range percentages', this.speedRangePercentages, this.speeds);
     }
 }

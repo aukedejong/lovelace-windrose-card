@@ -11,9 +11,12 @@ export class CardConfigWrapper {
     windspeedEntities: {entity: string, name: string}[];
     directionCompensation: number;
     windspeedBarLocation: string;
+    windspeedBarFull: boolean;
     cardinalDirectionLetters: string;
     windDirectionCount: number;
     windDirectionUnit: string;
+    inputSpeedUnit: string;
+    outputSpeedUnit: string;
 
     entities: string[];
     filterEntitiesQueryParameter: string;
@@ -25,6 +28,7 @@ export class CardConfigWrapper {
             max_width: 400,
             refresh_interval: GlobalConfig.defaultRefreshInterval,
             windspeed_bar_location: GlobalConfig.defaultWindspeedBarLocation,
+            windspeed_bar_full: 'true',
             wind_direction_entity: '',
             windspeed_entities: [
                 {
@@ -33,6 +37,8 @@ export class CardConfigWrapper {
                 }
             ],
             wind_direction_unit: GlobalConfig.defaultWindDirectionUnit,
+            input_speed_unit: GlobalConfig.defaultInputSpeedUnit,
+            output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
             direction_compensation: 0,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters
         };
@@ -47,9 +53,12 @@ export class CardConfigWrapper {
         this.windspeedEntities = this.checkWindspeedEntities();
         this.directionCompensation = this.checkDirectionCompensation();
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
+        this.windspeedBarFull = this.checkWindspeedBarFull();
         this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
         this.windDirectionCount = this.checkWindDirectionCount();
         this.windDirectionUnit = this.checkWindDirectionUnit();
+        this.inputSpeedUnit = this.checkInputSpeedUnit();
+        this.outputSpeedUnit = this.checkOutputSpeedUnit();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.entities = this.createEntitiesArray();
     }
@@ -112,7 +121,6 @@ export class CardConfigWrapper {
 
     private checkWindspeedBarLocation(): string {
         if (this.cardConfig.windspeed_bar_location) {
-
             if (this.cardConfig.windspeed_bar_location !== 'bottom' && this.cardConfig.windspeed_bar_location !== 'right') {
                 throw new Error('Invalid windspeed bar location ' + this.cardConfig.windspeed_bar_location +
                     '. Valid options: bottom, right');
@@ -120,6 +128,18 @@ export class CardConfigWrapper {
             return this.cardConfig.windspeed_bar_location;
         }
         return GlobalConfig.defaultWindspeedBarLocation;
+    }
+
+    private checkWindspeedBarFull(): boolean {
+        return this.cardConfig.windspeed_bar_full;
+        // if (this.cardConfig.windspeed_bar_full) {
+        //     // if (this.cardConfig.windspeed_bar_full !== 'true' && this.cardConfig.windspeed_bar_full !== 'false') {
+        //     //     throw new Error('Invalid windspeed bar full config ' + this.cardConfig.windspeed_bar_full +
+        //     //         '. Valid options: true, false');
+        //     // }
+        //     return this.cardConfig.windspeed_bar_full === 'true';
+        // }
+        // return GlobalConfig.defaultWindspeedBarFull;
     }
 
     private checkCardinalDirectionLetters(): string {
@@ -153,6 +173,37 @@ export class CardConfigWrapper {
             return this.cardConfig.wind_direction_unit;
         }
         return GlobalConfig.defaultWindDirectionUnit;
+    }
+    
+    private checkInputSpeedUnit(): string {
+        if (this.cardConfig.input_speed_unit) {
+            if (this.cardConfig.input_speed_unit !== 'mps'
+                && this.cardConfig.input_speed_unit !== 'kph'
+                && this.cardConfig.input_speed_unit !== 'mph'
+                && this.cardConfig.input_speed_unit !== 'fps'
+                && this.cardConfig.input_speed_unit !== 'knots') {
+                throw new Error('Invalid input windspeed unit configured: ' + this.cardConfig.input_speed_unit +
+                    '. Valid options: mps, fps, kph, mph, knots');
+            }
+            return this.cardConfig.input_speed_unit;
+        }
+        return GlobalConfig.defaultInputSpeedUnit;
+    }
+
+    private checkOutputSpeedUnit(): string {
+        if (this.cardConfig.output_speed_unit) {
+            if (this.cardConfig.output_speed_unit !== 'mps'
+                && this.cardConfig.output_speed_unit !== 'kph'
+                && this.cardConfig.output_speed_unit !== 'mph'
+                && this.cardConfig.output_speed_unit !== 'fps'
+                && this.cardConfig.output_speed_unit !== 'knots'
+                && this.cardConfig.output_speed_unit !== 'bft') {
+                throw new Error('Invalid output windspeed unit configured: ' + this.cardConfig.output_speed_unit +
+                    '. Valid options: mps, fps, kph, mph, knots, bft');
+            }
+            return this.cardConfig.output_speed_unit;
+        }
+        return GlobalConfig.defaultOutputSpeedUnit;
     }
 
     private createEntitiesQueryParameter() {

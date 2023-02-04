@@ -18,6 +18,12 @@ import {MeasurementMatcher} from "./MeasurementMatcher";
     description: 'A card to show wind speed and direction in a windrose.',
 });
 
+/* eslint no-console: 0 */
+console.info(
+    `%c  WINROSE-CARD  %c Version 0.3.0 `,
+    'color: orange; font-weight: bold; background: black',
+    'color: white; font-weight: bold; background: dimgray',
+);
 
 @customElement('windrose-card')
 export class WindRoseCard extends LitElement {
@@ -156,7 +162,7 @@ export class WindRoseCard extends LitElement {
         this.windBarCalculators = [];
         this.windBarCanvases = [];
         for (let i = 0; i < this.cardConfig.windBarCount(); i++) {
-            this.windBarCalculators.push(new WindBarCalculator());
+            this.windBarCalculators.push(new WindBarCalculator(windBarConfigs[i]));
             this.windBarCanvases.push(new WindBarCanvas(windBarConfigs[i]));
         }
     }
@@ -166,10 +172,7 @@ export class WindRoseCard extends LitElement {
         this.getHistory().then((history: any) => {
             const directionData = history[this.cardConfig.windDirectionEntity];
             const firstSpeedData = history[this.cardConfig.windspeedEntities[0].entity];
-
-            console.log('Historie', history)
             const directionSpeedData = new MeasurementMatcher(directionData, firstSpeedData).match();
-            console.log('Matched measurements', directionSpeedData.length);
 
             this.windRoseCalculator.clear();
             for (const directionSpeed of directionSpeedData) {

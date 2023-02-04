@@ -9,7 +9,9 @@ export class WindRoseConfig {
         public windDirectionUnit: string,
         public leaveArc: number,
         public cardinalDirectionLetters: string,
-        public directionCompensation: number) {
+        public directionCompensation: number,
+        public inputUnit: string,
+        public outputUnit: string) {
     }
 
 }

@@ -12,8 +12,11 @@ export class GlobalConfig {
     static defaultRefreshInterval = 300;
     static defaultWindDirectionCount = 16;
     static defaultWindDirectionUnit = 'degrees';
+    static defaultInputSpeedUnit = 'mps';
+    static defaultOutputSpeedUnit = 'bft';
+    static defaultWindspeedBarFull = true;
 
-    static verticalBarHeight = 16;
+    static verticalBarHeight = 30;
     static horizontalBarHeight = 15;
 
     static getTextColor() {

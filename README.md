@@ -54,20 +54,23 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 
 ### Card options
 
-| Name                       |  Type  | Default | Required | Description                                                                                        |
-|----------------------------|:------:|:-------:|:--------:|----------------------------------------------------------------------------------------------------|
-| type                       | string |         |    x     | `custom:windrose-card`.                                                                            |
-| title                      | string |         |    -     | The card title.                                                                                    |
-| wind_direction_entity      | string |         |    x     | The wind direction entity, having directing in degrees as the state.                               |
-| windspeed_entities         | object |         |    x     | One are more windspeed entities. Only the first is used for the windrose. (for now)                |
-| refresh_interval           | number |   300   |    -     | Refresh interval in seconds                                                                        |
-| hours_to_show              | number |    4    |    -     | Show winddata for the last number of hours.                                                        |
-| max_width                  | number |  null   |    -     | Use to limit the with (and height) of the windrose.                                                |
-| windspeed_bar_location     | string | bottom  |    -     | Location of the speed bar graph: `bottom`, `right`                                                 |
-| wind_direction_unit        | string | degrees |    -     | Wind direction unit, options: `degrees`, `letters`.  Where letters being N, NE upto 32 directions. |
-| direction_compensation     | number |    0    |    -     | Compensate the measured direction in degrees.                                                      |
-| cardinal_direction_letters | string |  NESW   |    -     | The cardinal letters used in the windrose.                                                         |
-| wind_direction_count       | string |   16    |    -     | How many wind direction the windrose can display, min. 4 max. 32                                   |
+| Name                       |  Type   | Default | Required | Description                                                                                          |
+|----------------------------|:-------:|:-------:|:--------:|------------------------------------------------------------------------------------------------------|
+| type                       | string  |         |    x     | `custom:windrose-card`.                                                                              |
+| title                      | string  |         |    -     | The card title.                                                                                      |
+| wind_direction_entity      | string  |         |    x     | The wind direction entity, having directing in degrees as the state.                                 |
+| windspeed_entities         | object  |         |    x     | One are more windspeed entities. Only the first is used for the windrose. (for now)                  |
+| refresh_interval           | number  |   300   |    -     | Refresh interval in seconds                                                                          |
+| hours_to_show              | number  |    4    |    -     | Show winddata for the last number of hours.                                                          |
+| max_width                  | number  |  null   |    -     | Use to limit the with (and height) of the windrose.                                                  |
+| windspeed_bar_location     | string  | bottom  |    -     | Location of the speed bar graph: `bottom`, `right`                                                   |
+| windspeed_bar_full         | boolean |  true   |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements. |
+| wind_direction_unit        | string  | degrees |    -     | Wind direction unit, options: `degrees`, `letters`.  Where letters being N, NE upto 32 directions.   |
+| input_speed_unit           | string  |   mps   |    -     | Windspeed unit of measurement, options: `mps`, `kph`, `mph`, `knots`.                                |
+| output_speed_unit          | string  |   bft   |    -     | Windspeed unit used on card, options: `mps`, `kph`, `mph`, `knots`, `bft`.                           |
+| direction_compensation     | number  |    0    |    -     | Compensate the measured direction in degrees.                                                        |
+| cardinal_direction_letters | string  |  NESW   |    -     | The cardinal letters used in the windrose.                                                           |
+| wind_direction_count       | string  |   16    |    -     | How many wind direction the windrose can display, min. 4 max. 32                                     |
 
 #### Object windspeed_entities
 
