@@ -20,7 +20,7 @@ import {MeasurementMatcher} from "./MeasurementMatcher";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 0.3.0 `,
+    `%c  WINROSE-CARD  %c Version 0.3.1 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -176,7 +176,7 @@ export class WindRoseCard extends LitElement {
 
             this.windRoseCalculator.clear();
             for (const directionSpeed of directionSpeedData) {
-                this.windRoseCalculator.addDataPoint(directionSpeed.direction, +directionSpeed.speed);
+                this.windRoseCalculator.addDataPoint(directionSpeed.direction, directionSpeed.speed);
             }
             for (let i = 0; i < this.cardConfig.windBarCount(); i++) {
                 this.windBarCalculators[i].addSpeeds(
