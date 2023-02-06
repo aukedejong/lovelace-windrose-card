@@ -9,7 +9,7 @@ export class MeasurementMatcher {
         this.directionData.forEach((direction) => {
             const speed = this.findMatchingSpeed(direction.lu);
             if (speed) {
-                if (Number.isNaN(speed.s)) {
+                if (speed.s === '' || speed.s === null || isNaN(+speed.s)) {
                     console.log("Speed " + speed.s + " at timestamp " + speed.lu + " is not a number.");
                 } else {
                     matchedData.push(new DirectionSpeed(direction.s, +speed.s));
