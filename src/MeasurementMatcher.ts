@@ -1,7 +1,8 @@
 export class MeasurementMatcher {
 
     constructor(private readonly directionData: HistoryData[],
-                private readonly speedData: HistoryData[]) {
+                private readonly speedData: HistoryData[],
+                private readonly timeDiff: number) {
     }
 
     match(): DirectionSpeed[] {
@@ -22,7 +23,8 @@ export class MeasurementMatcher {
     }
 
     private findMatchingSpeed(timestamp: number): HistoryData | undefined {
-        return this.speedData.find((speed) => speed.lu > timestamp - 1 && speed.lu < timestamp + 1);
+        return this.speedData.find(
+            (speed) => speed.lu > timestamp - this.timeDiff && speed.lu < timestamp + this.timeDiff);
     }
 
 }

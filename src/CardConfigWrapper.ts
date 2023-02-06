@@ -17,6 +17,7 @@ export class CardConfigWrapper {
     windDirectionUnit: string;
     inputSpeedUnit: string;
     outputSpeedUnit: string;
+    directionSpeedTimeDiff: number;
 
     entities: string[];
     filterEntitiesQueryParameter: string;
@@ -40,7 +41,8 @@ export class CardConfigWrapper {
             input_speed_unit: GlobalConfig.defaultInputSpeedUnit,
             output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
             direction_compensation: 0,
-            cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters
+            cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
+            direction_speed_time_diff: GlobalConfig.defaultDirectionSpeedTimeDiff
         };
     }
 
@@ -59,6 +61,7 @@ export class CardConfigWrapper {
         this.windDirectionUnit = this.checkWindDirectionUnit();
         this.inputSpeedUnit = this.checkInputSpeedUnit();
         this.outputSpeedUnit = this.checkOutputSpeedUnit();
+        this.directionSpeedTimeDiff = this.checkDirectionSpeedTimeDiff();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.entities = this.createEntitiesArray();
     }
@@ -205,6 +208,18 @@ export class CardConfigWrapper {
         }
         return GlobalConfig.defaultOutputSpeedUnit;
     }
+
+    private checkDirectionSpeedTimeDiff(): number {
+        if (this.cardConfig.direction_speed_time_diff) {
+            if (isNaN(this.cardConfig.direction_speed_time_diff)) {
+                throw new Error("Direction speed time difference is not a number: " +
+                    this.cardConfig.direction_speed_time_diff);
+            }
+            return this.cardConfig.direction_speed_time_diff;
+        }
+        return GlobalConfig.defaultDirectionSpeedTimeDiff;
+    }
+
 
     private createEntitiesQueryParameter() {
         return this.windDirectionEntity + ',' + this.windspeedEntities
