@@ -121,9 +121,10 @@ export class WindBarCanvas {
         canvasContext.stroke();
 
         canvasContext.beginPath();
-        canvasContext.textAlign = 'left';
+        canvasContext.textAlign = 'center';
+        canvasContext.textBaseline = 'bottom';
         canvasContext.fillStyle = GlobalConfig.getTextColor();
-        canvasContext.fillText(this.speedUnit.name, this.config.posX + this.config.height + 5, this.config.posY - this.config.length + 7);
+        canvasContext.fillText(this.speedUnit.name, this.config.posX + (this.config.height / 2), this.config.posY - this.config.length - 2);
         canvasContext.fill();
     }
 

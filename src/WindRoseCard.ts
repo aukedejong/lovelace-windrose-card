@@ -20,7 +20,7 @@ import {MeasurementMatcher} from "./MeasurementMatcher";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 0.4.1 `,
+    `%c  WINROSE-CARD  %c Version 0.4.2 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );

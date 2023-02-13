@@ -62,19 +62,19 @@ export class SpeedUnits {
         new SpeedRange(12, 32.7, -1)
     ];
     static speedRangesMps = [
-        new SpeedRange(0, 0, 0.3),
-        new SpeedRange(1, 0.3, 1.6),
-        new SpeedRange(2, 1.6, 3.4),
-        new SpeedRange(3, 3.4, 5.5),
-        new SpeedRange(4, 5.5, 8),
-        new SpeedRange(5, 8, 10.8),
-        new SpeedRange(6, 10.8, 13.9),
-        new SpeedRange(7, 13.9, 17.2),
-        new SpeedRange(8, 17.2, 20.8),
-        new SpeedRange(9, 20.8, 24.5),
-        new SpeedRange(10, 24.5, 28.5),
-        new SpeedRange(11, 28.5, 32.7),
-        new SpeedRange(12, 32.7, -1)
+        new SpeedRange(0, 0, 1),
+        new SpeedRange(1, 1, 2),
+        new SpeedRange(2, 2, 4),
+        new SpeedRange(3, 4, 6),
+        new SpeedRange(4, 6, 8),
+        new SpeedRange(5, 8, 11),
+        new SpeedRange(6, 11, 14),
+        new SpeedRange(7, 14, 17),
+        new SpeedRange(8, 17, 20),
+        new SpeedRange(9, 20, 25),
+        new SpeedRange(10, 25, 29),
+        new SpeedRange(11, 29, 33),
+        new SpeedRange(12, 33, -1)
     ];
     static speedRangesMph = [
         new SpeedRange(0, 0, 5),
@@ -124,7 +124,7 @@ export class SpeedUnits {
         new SpeedRange(8, 60, -1),
     ];
 
-    static bft = new SpeedUnit("bft",
+    static bft = new SpeedUnit("Beaufort",
         (speed: number) => speed,
         (speed: number) => speed,
         SpeedUnits.speedRangesBft

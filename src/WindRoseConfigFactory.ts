@@ -60,7 +60,7 @@ export class WindRoseConfigFactory {
                     this.roseCenterX + this.outerRadius + 35 + ((GlobalConfig.verticalBarHeight + 60) * i),
                     this.roseCenterY + this.outerRadius + 20,
                     GlobalConfig.verticalBarHeight,
-                    this.outerRadius * 2 + 40,
+                    this.outerRadius * 2 + 24,
                     'vertical',
                     this.cardConfig.windspeedBarFull,
                     this.cardConfig.inputSpeedUnit,
