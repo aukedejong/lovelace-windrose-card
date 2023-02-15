@@ -37,6 +37,8 @@ export class WindRoseCalculator {
 
     clear() {
         this.totalMeasurements = 0;
+        this.maxMeasurementsDirection = 0;
+        this.calmSpeedMeasurements = 0;
         this.data.percentagePerCircle = 0;
         this.data.numberOfCircles = 0;
         this.data.calmSpeedPercentage = 0;
