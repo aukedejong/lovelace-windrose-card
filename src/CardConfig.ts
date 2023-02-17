@@ -16,5 +16,6 @@ export interface CardConfig {
     windspeed_bar_full: boolean;
     cardinal_direction_letters: string;
     wind_direction_count: number;
+    matching_strategy: string;
     direction_speed_time_diff: number;
 }

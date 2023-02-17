@@ -17,6 +17,7 @@ export class CardConfigWrapper {
     windDirectionUnit: string;
     inputSpeedUnit: string;
     outputSpeedUnit: string;
+    matchingStrategy: string;
     directionSpeedTimeDiff: number;
 
     entities: string[];
@@ -29,7 +30,7 @@ export class CardConfigWrapper {
             max_width: 400,
             refresh_interval: GlobalConfig.defaultRefreshInterval,
             windspeed_bar_location: GlobalConfig.defaultWindspeedBarLocation,
-            windspeed_bar_full: 'true',
+            windspeed_bar_full: GlobalConfig.defaultWindspeedBarFull,
             wind_direction_entity: '',
             windspeed_entities: [
                 {
@@ -42,6 +43,7 @@ export class CardConfigWrapper {
             output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
             direction_compensation: 0,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
+            matching_strategy: GlobalConfig.defaultMatchingStategy,
             direction_speed_time_diff: GlobalConfig.defaultDirectionSpeedTimeDiff
         };
     }
@@ -61,6 +63,7 @@ export class CardConfigWrapper {
         this.windDirectionUnit = this.checkWindDirectionUnit();
         this.inputSpeedUnit = this.checkInputSpeedUnit();
         this.outputSpeedUnit = this.checkOutputSpeedUnit();
+        this.matchingStrategy = this.checkMatchingStrategy();
         this.directionSpeedTimeDiff = this.checkDirectionSpeedTimeDiff();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.entities = this.createEntitiesArray();
@@ -135,14 +138,6 @@ export class CardConfigWrapper {
 
     private checkWindspeedBarFull(): boolean {
         return this.cardConfig.windspeed_bar_full;
-        // if (this.cardConfig.windspeed_bar_full) {
-        //     // if (this.cardConfig.windspeed_bar_full !== 'true' && this.cardConfig.windspeed_bar_full !== 'false') {
-        //     //     throw new Error('Invalid windspeed bar full config ' + this.cardConfig.windspeed_bar_full +
-        //     //         '. Valid options: true, false');
-        //     // }
-        //     return this.cardConfig.windspeed_bar_full === 'true';
-        // }
-        // return GlobalConfig.defaultWindspeedBarFull;
     }
 
     private checkCardinalDirectionLetters(): string {
@@ -209,6 +204,17 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultOutputSpeedUnit;
     }
 
+    private checkMatchingStrategy(): string {
+        if (this.cardConfig.matching_strategy) {
+            if (this.cardConfig.matching_strategy !== 'direction-first' && this.cardConfig.matching_strategy !== 'speed-first') {
+                throw new Error('Invalid matching stategy ' + this.cardConfig.matching_strategy +
+                    '. Valid options: direction-first, speed-first');
+            }
+            return this.cardConfig.matching_strategy;
+        }
+        return GlobalConfig.defaultMatchingStategy;
+    }
+
     private checkDirectionSpeedTimeDiff(): number {
         if (this.cardConfig.direction_speed_time_diff) {
             if (isNaN(this.cardConfig.direction_speed_time_diff)) {
@@ -232,6 +238,4 @@ export class CardConfigWrapper {
         entities.push(this.windDirectionEntity);
         return entities.concat(this.windspeedEntities.map(config => config.entity));
     }
-
-
 }

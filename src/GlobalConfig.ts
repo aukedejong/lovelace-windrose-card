@@ -15,6 +15,7 @@ export class GlobalConfig {
     static defaultInputSpeedUnit = 'mps';
     static defaultOutputSpeedUnit = 'bft';
     static defaultWindspeedBarFull = true;
+    static defaultMatchingStategy = 'direction-first';
     static defaultDirectionSpeedTimeDiff = 1;
 
     static verticalBarHeight = 30;
