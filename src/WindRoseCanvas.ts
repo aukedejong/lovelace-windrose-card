@@ -4,17 +4,19 @@ import {DrawUtil} from "./DrawUtil";
 import {WindDirectionData} from "./WindDirectionData";
 import {ColorUtil} from "./ColorUtil";
 import {GlobalConfig} from "./GlobalConfig";
-import {SpeedUnits} from "./WindSpeedConverter";
+import {WindSpeedConverter} from "./WindSpeedConverter";
 
 export class WindRoseCanvas {
     readonly colorUtil: ColorUtil;
     readonly config: WindRoseConfig;
+    readonly windSpeedConverter: WindSpeedConverter;
     readonly rangeCount: number;
     windRoseData!: WindRoseData;
 
-    constructor(config: WindRoseConfig) {
+    constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
-        this.rangeCount = SpeedUnits.getSpeedUnit(this.config.outputUnit).speedRanges.length;
+        this.windSpeedConverter = windSpeedConverter;
+        this.rangeCount = this.windSpeedConverter.getRangeCount();
         this.colorUtil = new ColorUtil(this.rangeCount);
     }
 

@@ -10,6 +10,7 @@ import {WindBarData} from "./WindBarData";
 import {customElement, query} from "lit/decorators"
 import {CardConfigWrapper} from "./CardConfigWrapper";
 import {MeasurementMatcher} from "./MeasurementMatcher";
+import {WindSpeedConverter} from "./WindSpeedConverter";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -20,7 +21,7 @@ import {MeasurementMatcher} from "./MeasurementMatcher";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 0.5.0 `,
+    `%c  WINROSE-CARD  %c Version 0.6.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -41,6 +42,7 @@ export class WindRoseCard extends LitElement {
     @query('.card-content') parentDiv!: HTMLDivElement;
 
     windRoseConfigFactory!: WindRoseConfigFactory;
+    windSpeedConverter!: WindSpeedConverter;
     windRoseCanvas: WindRoseCanvas | undefined;
     windBarCanvases: WindBarCanvas[] = [];
 
@@ -155,15 +157,17 @@ export class WindRoseCard extends LitElement {
         this.windRoseConfigFactory = new WindRoseConfigFactory(cardConfig);
 
         const windRoseConfig = this.windRoseConfigFactory.createWindRoseConfig(canvasWidth);
-        this.windRoseCalculator = new WindRoseCalculator(windRoseConfig);
-        this.windRoseCanvas = new WindRoseCanvas(windRoseConfig);
+        this.windSpeedConverter = new WindSpeedConverter(this.cardConfig.inputSpeedUnit,
+            this.cardConfig.outputSpeedUnit, this.cardConfig.speedRangeStep, this.cardConfig.speedRangeMax);
+        this.windRoseCalculator = new WindRoseCalculator(windRoseConfig, this.windSpeedConverter);
+        this.windRoseCanvas = new WindRoseCanvas(windRoseConfig, this.windSpeedConverter);
 
         const windBarConfigs = this.windRoseConfigFactory.createWindBarConfigs(canvasWidth);
         this.windBarCalculators = [];
         this.windBarCanvases = [];
         for (let i = 0; i < this.cardConfig.windBarCount(); i++) {
-            this.windBarCalculators.push(new WindBarCalculator(windBarConfigs[i]));
-            this.windBarCanvases.push(new WindBarCanvas(windBarConfigs[i]));
+            this.windBarCalculators.push(new WindBarCalculator(windBarConfigs[i], this.windSpeedConverter));
+            this.windBarCanvases.push(new WindBarCanvas(windBarConfigs[i], this.windSpeedConverter));
         }
     }
 
@@ -216,12 +220,12 @@ export class WindRoseCard extends LitElement {
         this.canvas.width = canvasWidth;
         this.canvas.height = this.windRoseConfigFactory.canvasHeight as number;
         const windRoseConfig = this.windRoseConfigFactory.createWindRoseConfig(canvasWidth);
-        this.windRoseCanvas = new WindRoseCanvas(windRoseConfig);
+        this.windRoseCanvas = new WindRoseCanvas(windRoseConfig, this.windSpeedConverter);
 
         const windBarConfigs = this.windRoseConfigFactory.createWindBarConfigs(canvasWidth);
         this.windBarCanvases = [];
         for (const windBarConfig of windBarConfigs) {
-            this.windBarCanvases.push(new WindBarCanvas(windBarConfig));
+            this.windBarCanvases.push(new WindBarCanvas(windBarConfig, this.windSpeedConverter));
         }
     }
 

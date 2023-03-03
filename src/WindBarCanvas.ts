@@ -3,19 +3,21 @@ import {ColorUtil} from "./ColorUtil";
 import {WindBarData} from "./WindBarData";
 import {WindBarConfig} from "./WindBarConfig";
 import {GlobalConfig} from "./GlobalConfig";
-import {SpeedRange, SpeedUnit, SpeedUnits} from "./WindSpeedConverter";
+import {SpeedRange, WindSpeedConverter} from "./WindSpeedConverter";
 
 export class WindBarCanvas {
 
     readonly colorUtil: ColorUtil;
     readonly config: WindBarConfig;
-    readonly speedUnit: SpeedUnit;
+    readonly windSpeedConverter: WindSpeedConverter;
+    readonly outputUnitName: string;
     readonly speedRanges: SpeedRange[];
 
-    constructor(config: WindBarConfig) {
+    constructor(config: WindBarConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
-        this.speedUnit = SpeedUnits.getSpeedUnit(this.config.outputUnit)
-        this.speedRanges = this.speedUnit.speedRanges;
+        this.windSpeedConverter = windSpeedConverter;
+        this.outputUnitName = this.windSpeedConverter.getOutputSpeedUnit().name;
+        this.speedRanges = this.windSpeedConverter.getOutputSpeedUnit().speedRanges;
         this.colorUtil = new ColorUtil(this.speedRanges.length);
     }
 
@@ -124,7 +126,7 @@ export class WindBarCanvas {
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'bottom';
         canvasContext.fillStyle = GlobalConfig.getTextColor();
-        canvasContext.fillText(this.speedUnit.name, this.config.posX + (this.config.height / 2), this.config.posY - this.config.length - 2);
+        canvasContext.fillText(this.outputUnitName, this.config.posX + (this.config.height / 2), this.config.posY - this.config.length - 2);
         canvasContext.fill();
     }
 
@@ -187,7 +189,7 @@ export class WindBarCanvas {
         canvasContext.textAlign = 'right';
         canvasContext.textBaseline = 'bottom';
         canvasContext.fillStyle = GlobalConfig.getTextColor();
-        canvasContext.fillText(this.speedUnit.name, this.config.posX + this.config.length, this.config.posY);
+        canvasContext.fillText(this.outputUnitName, this.config.posX + this.config.length, this.config.posY);
         canvasContext.fill();
     }
 

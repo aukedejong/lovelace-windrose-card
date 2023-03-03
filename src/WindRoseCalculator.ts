@@ -6,7 +6,7 @@ import {WindDirectionConverter} from "./WindDirectionConverter";
 
 export class WindRoseCalculator {
 
-    readonly windSpeedConverter = new WindSpeedConverter();
+    readonly windSpeedConverter: WindSpeedConverter;
     readonly windDirectionConverter = new WindDirectionConverter();
 
     data = new WindRoseData();
@@ -21,17 +21,18 @@ export class WindRoseCalculator {
     speedRangeFunction: (speed: number) => number;
     speedConverterFunction: (speed: number) => number;
 
-    constructor(config: WindRoseConfig) {
+    constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
-        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction(this.config.outputUnit);
-        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(this.config.inputUnit,
-            this.config.outputUnit);
+        this.windSpeedConverter = windSpeedConverter;
+        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction();
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter();
         const leaveDegrees = 360 / config.windDirectionCount;
         for (let i = 0; i < config.windDirectionCount; i++) {
             const degrees = (i * leaveDegrees);
             const minDegrees = degrees - (leaveDegrees / 2);
             const maxDegrees = degrees + (leaveDegrees / 2);
-            this.windDirections.push(new WindDirectionCalculator(minDegrees, degrees, maxDegrees, this.config));
+            this.windDirections.push(new WindDirectionCalculator(minDegrees, degrees, maxDegrees, this.config,
+                windSpeedConverter));
         }
     }
 

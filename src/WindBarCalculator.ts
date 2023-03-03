@@ -1,10 +1,10 @@
-import {SpeedUnits, WindSpeedConverter} from "./WindSpeedConverter";
+import {WindSpeedConverter} from "./WindSpeedConverter";
 import {WindBarData} from "./WindBarData";
 import {WindBarConfig} from "./WindBarConfig";
 
 export class WindBarCalculator {
 
-    readonly windSpeedConverter = new WindSpeedConverter();
+    readonly windSpeedConverter: WindSpeedConverter;
     readonly config: WindBarConfig;
     speeds: number[] = [];
     modified = false;
@@ -15,12 +15,12 @@ export class WindBarCalculator {
     speedConverterFunction: (speed: number) => number;
     rangeCount: number;
 
-    constructor(config: WindBarConfig) {
+    constructor(config: WindBarConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
-        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction(this.config.outputUnit);
-        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(this.config.inputUnit,
-            this.config.outputUnit);
-        this.rangeCount = SpeedUnits.getSpeedUnit(this.config.outputUnit).speedRanges.length;
+        this.windSpeedConverter = windSpeedConverter;
+        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction()
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter();
+        this.rangeCount = this.windSpeedConverter.getRangeCount();
     }
 
     addSpeeds(speeds: number[]) {

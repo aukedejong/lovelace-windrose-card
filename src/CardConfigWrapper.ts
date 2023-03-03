@@ -17,6 +17,8 @@ export class CardConfigWrapper {
     windDirectionUnit: string;
     inputSpeedUnit: string;
     outputSpeedUnit: string;
+    speedRangeStep: number | undefined;
+    speedRangeMax: number | undefined;
     matchingStrategy: string;
     directionSpeedTimeDiff: number;
 
@@ -41,6 +43,8 @@ export class CardConfigWrapper {
             wind_direction_unit: GlobalConfig.defaultWindDirectionUnit,
             input_speed_unit: GlobalConfig.defaultInputSpeedUnit,
             output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
+            speed_range_step: undefined,
+            speed_range_max: undefined,
             direction_compensation: 0,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
@@ -63,6 +67,9 @@ export class CardConfigWrapper {
         this.windDirectionUnit = this.checkWindDirectionUnit();
         this.inputSpeedUnit = this.checkInputSpeedUnit();
         this.outputSpeedUnit = this.checkOutputSpeedUnit();
+        this.speedRangeStep = this.checkSpeedRangeStep();
+        this.speedRangeMax = this.checkSpeedRangeMax();
+        this.checkSpeedRangeCombi();
         this.matchingStrategy = this.checkMatchingStrategy();
         this.directionSpeedTimeDiff = this.checkDirectionSpeedTimeDiff();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
@@ -202,6 +209,38 @@ export class CardConfigWrapper {
             return this.cardConfig.output_speed_unit;
         }
         return GlobalConfig.defaultOutputSpeedUnit;
+    }
+
+    private checkSpeedRangeStep(): number | undefined {
+        if (this.cardConfig.speed_range_step && isNaN(this.cardConfig.speed_range_step)) {
+            throw new Error('WindRoseCard: Invalid speed_range_step, should be a positive number.');
+        } else if (this.cardConfig.max_width <= 0) {
+            throw new Error('WindRoseCard: Invalid speed_range_step, should be a positive number.')
+        } else if (this.cardConfig.speed_range_step) {
+            return this.cardConfig.speed_range_step;
+        }
+        return undefined;
+    }
+
+    private checkSpeedRangeMax(): number | undefined {
+        if (this.cardConfig.speed_range_max && isNaN(this.cardConfig.speed_range_max)) {
+            throw new Error('WindRoseCard: Invalid speed_range_max, should be a positive number.');
+        } else if (this.cardConfig.max_width <= 0) {
+            throw new Error('WindRoseCard: Invalid speed_range_max, should be a positive number.')
+        } else if (this.cardConfig.speed_range_max) {
+            return this.cardConfig.speed_range_max;
+        }
+        return undefined;
+    }
+
+    private checkSpeedRangeCombi(): void {
+        if (this.outputSpeedUnit === 'bft' && (this.speedRangeStep || this.speedRangeMax)) {
+            throw new Error("WindRoseCard: speed_range_step and/or speed_range_max should not be set when using output " +
+                "speed unit Beaufort (bft). Beaufort uses fixed speed ranges.");
+        }
+        if ((this.speedRangeStep && !this.speedRangeMax) || (!this.speedRangeStep && this.speedRangeMax)) {
+            throw new Error("WindRoseCard: speed_range_step and speed_range_max should both be set.")
+        }
     }
 
     private checkMatchingStrategy(): string {

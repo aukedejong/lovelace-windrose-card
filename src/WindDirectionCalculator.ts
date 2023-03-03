@@ -3,7 +3,7 @@ import {WindDirectionData} from "./WindDirectionData";
 import {WindSpeedConverter} from "./WindSpeedConverter";
 
 export class WindDirectionCalculator {
-    readonly windSpeedConverter = new WindSpeedConverter();
+    readonly windSpeedConverter: WindSpeedConverter;
     data = new WindDirectionData();
     speeds: number[] = [];
     speedRangeCounts: number[] = [];
@@ -12,12 +12,13 @@ export class WindDirectionCalculator {
     speedRangeFunction: (speed: number) => number;
     speedConverterFunction: (speed: number) => number;
 
-    constructor(minDegrees: number, centerDegrees: number, maxDegrees: number, config: WindRoseConfig) {
+    constructor(minDegrees: number, centerDegrees: number, maxDegrees: number, config: WindRoseConfig,
+                windSpeedConverter: WindSpeedConverter) {
         this.data.centerDegrees = centerDegrees;
         this.config = config;
-        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction(this.config.outputUnit);
-        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(this.config.inputUnit,
-            this.config.outputUnit);
+        this.windSpeedConverter = windSpeedConverter;
+        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction();
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter();
         if (minDegrees < 0) {
             this.data.minDegrees = minDegrees + 360;
         } else {

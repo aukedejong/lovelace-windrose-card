@@ -10,6 +10,8 @@ export interface CardConfig {
     wind_direction_unit: string;
     input_speed_unit: string;
     output_speed_unit: string;
+    speed_range_step: number;
+    speed_range_max: number;
 
     direction_compensation: number;
     windspeed_bar_location: string;
