@@ -1,5 +1,4 @@
 import {DrawUtil} from "./DrawUtil";
-import {ColorUtil} from "./ColorUtil";
 import {WindBarData} from "./WindBarData";
 import {WindBarConfig} from "./WindBarConfig";
 import {GlobalConfig} from "./GlobalConfig";
@@ -7,7 +6,6 @@ import {SpeedRange, WindSpeedConverter} from "./WindSpeedConverter";
 
 export class WindBarCanvas {
 
-    readonly colorUtil: ColorUtil;
     readonly config: WindBarConfig;
     readonly windSpeedConverter: WindSpeedConverter;
     readonly outputUnitName: string;
@@ -18,7 +16,6 @@ export class WindBarCanvas {
         this.windSpeedConverter = windSpeedConverter;
         this.outputUnitName = this.windSpeedConverter.getOutputSpeedUnit().name;
         this.speedRanges = this.windSpeedConverter.getOutputSpeedUnit().speedRanges;
-        this.colorUtil = new ColorUtil(this.speedRanges.length);
     }
 
     drawWindBar(windBarData: WindBarData, canvasContext: CanvasRenderingContext2D) {
@@ -49,7 +46,7 @@ export class WindBarCanvas {
 
                 canvasContext.beginPath();
                 canvasContext.strokeStyle = GlobalConfig.barBorderColor;
-                canvasContext.fillStyle = this.colorUtil.colors[i];
+                canvasContext.fillStyle = this.speedRanges[i].color;
                 canvasContext.rect(posX, this.config.posY + 6, length, this.config.height);
                 canvasContext.fill();
 
@@ -91,7 +88,7 @@ export class WindBarCanvas {
             }
 
             canvasContext.beginPath();
-            canvasContext.fillStyle = this.colorUtil.colors[i];
+            canvasContext.fillStyle = this.speedRanges[i].color;
             canvasContext.fillRect(this.config.posX, posY, this.config.height, length);
             canvasContext.fill();
 
@@ -158,7 +155,7 @@ export class WindBarCanvas {
             }
 
             canvasContext.beginPath();
-            canvasContext.fillStyle = this.colorUtil.colors[i];
+            canvasContext.fillStyle = this.speedRanges[i].color;
             canvasContext.fillRect(posX, this.config.posY, length, this.config.height);
             canvasContext.fill();
 

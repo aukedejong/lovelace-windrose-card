@@ -12,6 +12,7 @@ export interface CardConfig {
     output_speed_unit: string;
     speed_range_step: number;
     speed_range_max: number;
+    speed_ranges: CardConfigSpeedRange[];
 
     direction_compensation: number;
     windspeed_bar_location: string;
@@ -20,4 +21,9 @@ export interface CardConfig {
     wind_direction_count: number;
     matching_strategy: string;
     direction_speed_time_diff: number;
+}
+
+export interface CardConfigSpeedRange {
+    from_value: number;
+    color: string;
 }

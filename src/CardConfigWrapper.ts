@@ -1,5 +1,6 @@
 import {GlobalConfig} from "./GlobalConfig";
 import {CardConfig} from "./CardConfig";
+import {SpeedRange} from "./WindSpeedConverter";
 
 export class CardConfigWrapper {
 
@@ -19,6 +20,7 @@ export class CardConfigWrapper {
     outputSpeedUnit: string;
     speedRangeStep: number | undefined;
     speedRangeMax: number | undefined;
+    speedRanges: SpeedRange[] = [];
     matchingStrategy: string;
     directionSpeedTimeDiff: number;
 
@@ -45,6 +47,7 @@ export class CardConfigWrapper {
             output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
             speed_range_step: undefined,
             speed_range_max: undefined,
+            speed_ranges: undefined,
             direction_compensation: 0,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
@@ -69,6 +72,7 @@ export class CardConfigWrapper {
         this.outputSpeedUnit = this.checkOutputSpeedUnit();
         this.speedRangeStep = this.checkSpeedRangeStep();
         this.speedRangeMax = this.checkSpeedRangeMax();
+        this.speedRanges = this.checkSpeedRanges();
         this.checkSpeedRangeCombi();
         this.matchingStrategy = this.checkMatchingStrategy();
         this.directionSpeedTimeDiff = this.checkDirectionSpeedTimeDiff();
@@ -231,6 +235,26 @@ export class CardConfigWrapper {
             return this.cardConfig.speed_range_max;
         }
         return undefined;
+    }
+
+    private checkSpeedRanges(): SpeedRange[] {
+        const speedRangeConfigs: SpeedRange[] = [];
+        if (this.cardConfig.speed_ranges && this.cardConfig.speed_ranges.length > 0) {
+            const sortSpeedRanges = this.cardConfig.speed_ranges.slice();
+            sortSpeedRanges.sort((a, b) => a.from_value - b.from_value)
+            const lastIndex = sortSpeedRanges.length - 1;
+            for (let i = 0; i < lastIndex; i++) {
+                speedRangeConfigs.push(new SpeedRange(i,
+                    sortSpeedRanges[i].from_value,
+                    sortSpeedRanges[i + 1].from_value,
+                    sortSpeedRanges[i].color));
+            }
+            speedRangeConfigs.push(new SpeedRange(lastIndex,
+                sortSpeedRanges[lastIndex].from_value,
+                -1,
+                sortSpeedRanges[lastIndex].color))
+        }
+        return speedRangeConfigs;
     }
 
     private checkSpeedRangeCombi(): void {

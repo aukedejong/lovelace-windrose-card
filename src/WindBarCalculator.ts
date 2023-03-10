@@ -20,7 +20,7 @@ export class WindBarCalculator {
         this.windSpeedConverter = windSpeedConverter;
         this.speedRangeFunction = this.windSpeedConverter.getRangeFunction()
         this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter();
-        this.rangeCount = this.windSpeedConverter.getRangeCount();
+        this.rangeCount = this.windSpeedConverter.getSpeedRanges().length;
     }
 
     addSpeeds(speeds: number[]) {

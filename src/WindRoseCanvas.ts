@@ -2,22 +2,21 @@ import {WindRoseConfig} from "./WindRoseConfig";
 import {WindRoseData} from "./WindRoseData";
 import {DrawUtil} from "./DrawUtil";
 import {WindDirectionData} from "./WindDirectionData";
-import {ColorUtil} from "./ColorUtil";
 import {GlobalConfig} from "./GlobalConfig";
-import {WindSpeedConverter} from "./WindSpeedConverter";
+import {SpeedRange, WindSpeedConverter} from "./WindSpeedConverter";
 
 export class WindRoseCanvas {
-    readonly colorUtil: ColorUtil;
     readonly config: WindRoseConfig;
     readonly windSpeedConverter: WindSpeedConverter;
+    readonly speedRanges: SpeedRange[];
     readonly rangeCount: number;
     windRoseData!: WindRoseData;
 
     constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
         this.windSpeedConverter = windSpeedConverter;
-        this.rangeCount = this.windSpeedConverter.getRangeCount();
-        this.colorUtil = new ColorUtil(this.rangeCount);
+        this.speedRanges = this.windSpeedConverter.getSpeedRanges();
+        this.rangeCount = this.speedRanges.length;
     }
 
     drawWindRose(windRoseData: WindRoseData, canvasContext: CanvasRenderingContext2D) {
@@ -49,12 +48,11 @@ export class WindRoseCanvas {
             }
         }
         const maxRadius = (this.config.outerRadius - this.config.centerRadius) * (windDirection.directionPercentage / 100);
-
-        for (let i = 12; i >= 1; i--) {
+        for (let i = this.speedRanges.length - 1; i >= 1; i--) {
             this.drawSpeedPart(canvasContext,
                 windDirection.centerDegrees - 90,
                 (maxRadius * (percentages[i] / 100)) + this.config.centerRadius,
-                this.colorUtil.colors[i]);
+                this.speedRanges[i].color);
         }
     }
 
@@ -138,7 +136,7 @@ export class WindRoseCanvas {
         canvasContext.beginPath();
         canvasContext.arc(this.config.centerX, this.config.centerY, this.config.centerRadius, 0, 2 * Math.PI);
         canvasContext.stroke();
-        canvasContext.fillStyle = this.colorUtil.colors[0];
+        canvasContext.fillStyle = this.speedRanges[0].color;
         canvasContext.fill();
         canvasContext.font = '12px Arial';
         canvasContext.textAlign = 'center';
