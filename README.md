@@ -98,7 +98,7 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 
 Uses speed_range_step and speed_range_max.
 
-<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/speedbar_step_5_max_25.png?raw=true" width="482"/>
+<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/speedbar_step_5_max_25.png?raw=true" width="415"/>
 
 ```yaml
 type: custom:windrose-card
@@ -123,7 +123,7 @@ Always make sure there is a speedrange starting from 0, otherwise you can the th
 
 ```Speed is not in a speedrange: 0.6 unit: mps```
 
-<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/speedbar_speed_ranges_custom.png?raw=true" width="482"/>
+<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/speedbar_speed_ranges_custom.png?raw=true" width="412"/>
 
 ```yaml
 type: custom:windrose-card
