@@ -5,7 +5,7 @@
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
 
-<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-dark.png?raw=true" width="482"/>
+<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-dark.png?raw=true" width="482"/>
 
 ## Install
 
@@ -74,6 +74,7 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 | direction_compensation     | number  |              0               |    -     | Compensate the measured direction in degrees.                                                                                                                         |
 | cardinal_direction_letters | string  |             NESW             |    -     | The cardinal letters used in the windrose.                                                                                                                            |
 | wind_direction_count       | string  |              16              |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                                      |
+| windrose_draw_north_offset | number  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                   |
 | matching_strategy          | string  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-frist`, `speed-first` |
 | direction_speed_time_diff  | string  |              1               |    -     | How many seconds a speed measurement time can be earlier or later then the direction measurement time. Or the other way around, depending on thie matching_strategy   |
 

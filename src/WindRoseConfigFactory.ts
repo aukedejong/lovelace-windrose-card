@@ -29,7 +29,8 @@ export class WindRoseConfigFactory {
             this.cardConfig.cardinalDirectionLetters,
             this.cardConfig.directionCompensation,
             this.cardConfig.inputSpeedUnit,
-            this.cardConfig.outputSpeedUnit);
+            this.cardConfig.outputSpeedUnit,
+            this.cardConfig.windRoseDrawNorthOffset);
     }
 
     createWindBarConfigs(canvasWidth: number): WindBarConfig[] {
@@ -71,8 +72,6 @@ export class WindRoseConfigFactory {
             }
             windBarConfigs.push(windBarConfig);
         }
-
-
         return windBarConfigs;
     }
 

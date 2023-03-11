@@ -14,6 +14,7 @@ export interface CardConfig {
     speed_range_max: number;
     speed_ranges: CardConfigSpeedRange[];
 
+    windrose_draw_north_offset: number;
     direction_compensation: number;
     windspeed_bar_location: string;
     windspeed_bar_full: boolean;

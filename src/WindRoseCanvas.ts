@@ -23,10 +23,14 @@ export class WindRoseCanvas {
         // console.log('Drawing windrose', this.config.outerRadius);
         this.windRoseData = windRoseData;
         canvasContext.clearRect(0, 0, 700, 500);
+        canvasContext.save();
+        canvasContext.translate(this.config.centerX, this.config.centerY);
+        canvasContext.rotate(DrawUtil.toRadians(this.config.windRoseDrawNorthOffset));
         this.drawBackground(canvasContext);
         this.drawWindDirections(canvasContext);
         this.drawCircleLegend(canvasContext);
         this.drawCenterZeroSpeed(canvasContext);
+        canvasContext.restore();
     }
 
     private drawWindDirections(canvasContext: CanvasRenderingContext2D) {
@@ -62,12 +66,12 @@ export class WindRoseCanvas {
         canvasContext.strokeStyle = GlobalConfig.leaveBorderColor;
         canvasContext.lineWidth = 2;
         canvasContext.beginPath();
-        canvasContext.moveTo(this.config.centerX, this.config.centerY);
+        canvasContext.moveTo(0, 0);
         //canvasContext.lineTo(this.config.centerX + x, this.config.centerY + y);
-        canvasContext.arc(this.config.centerX, this.config.centerY, radius,
+        canvasContext.arc(0, 0, radius,
             DrawUtil.toRadians(degrees - (this.config.leaveArc / 2)),
             DrawUtil.toRadians(degrees + (this.config.leaveArc / 2)));
-        canvasContext.lineTo(this.config.centerX, this.config.centerY);
+        canvasContext.lineTo(0, 0);
         canvasContext.stroke();
         canvasContext.fillStyle = color;
         canvasContext.fill();
@@ -80,11 +84,11 @@ export class WindRoseCanvas {
         // Cross
         canvasContext.lineWidth = 1;
         canvasContext.strokeStyle = GlobalConfig.crossColor;
-        canvasContext.moveTo(this.config.centerX - this.config.outerRadius, this.config.centerY);
-        canvasContext.lineTo(this.config.centerX + this.config.outerRadius, this.config.centerY);
+        canvasContext.moveTo(0 - this.config.outerRadius, 0);
+        canvasContext.lineTo(this.config.outerRadius, 0);
         canvasContext.stroke();
-        canvasContext.moveTo(this.config.centerX, this.config.centerY - this.config.outerRadius);
-        canvasContext.lineTo(this.config.centerX, this.config.centerY + this.config.outerRadius);
+        canvasContext.moveTo(0, 0 - this.config.outerRadius);
+        canvasContext.lineTo(0, this.config.outerRadius);
         canvasContext.stroke();
 
         // console.log('Cirlce center:', this.config.centerX, this.config.centerY);
@@ -93,25 +97,20 @@ export class WindRoseCanvas {
         const radiusStep = (this.config.outerRadius - this.config.centerRadius) / this.windRoseData.numberOfCircles
         for (let i = 1; i <= this.windRoseData.numberOfCircles; i++) {
             canvasContext.beginPath();
-            canvasContext.arc(this.config.centerX, this.config.centerY, this.config.centerRadius + (radiusStep * i), 0, 2 * Math.PI);
+            canvasContext.arc(0, 0, this.config.centerRadius + (radiusStep * i), 0, 2 * Math.PI);
             canvasContext.stroke();
         }
 
         // Wind direction text
-        const textCirlceSpace = 3;
+        const textCirlceSpace = 15;
         canvasContext.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-text-color')
         canvasContext.font = '22px Arial';
         canvasContext.textAlign = 'center';
-        canvasContext.textBaseline = 'bottom';
-        canvasContext.fillText(this.config.cardinalDirectionLetters[0], this.config.centerX, this.config.centerY - this.config.outerRadius - textCirlceSpace + 4);
-        canvasContext.textBaseline = 'top';
-        canvasContext.fillText(this.config.cardinalDirectionLetters[2], this.config.centerX, this.config.centerY + this.config.outerRadius + textCirlceSpace);
-        canvasContext.textAlign = 'left';
         canvasContext.textBaseline = 'middle';
-        canvasContext.fillText(this.config.cardinalDirectionLetters[1], this.config.centerX + this.config.outerRadius + textCirlceSpace, this.config.centerY);
-        canvasContext.textAlign = 'right';
-        canvasContext.textBaseline = 'middle';
-        canvasContext.fillText(this.config.cardinalDirectionLetters[3], this.config.centerX - this.config.outerRadius - textCirlceSpace, this.config.centerY);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[0], 0, 0 - this.config.outerRadius - textCirlceSpace + 2);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[2], 0, this.config.outerRadius + textCirlceSpace);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[1], this.config.outerRadius + textCirlceSpace, 0);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[3], 0 - this.config.outerRadius - textCirlceSpace, 0);
     }
 
     private drawCircleLegend(canvasContext: CanvasRenderingContext2D) {
@@ -124,9 +123,10 @@ export class WindRoseCanvas {
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
 
         for (let i = 1; i <= this.windRoseData.numberOfCircles; i++) {
-            const xPos = this.config.centerX + centerXY + (xy * i);
-            const yPos = this.config.centerY + centerXY + (xy * i);
-            canvasContext.fillText((this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
+            const xPos = centerXY + (xy * i);
+            const yPos = centerXY + (xy * i);
+            //canvasContext.fillText((this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
+            this.drawText(canvasContext, (this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
         }
     }
 
@@ -134,7 +134,7 @@ export class WindRoseCanvas {
         canvasContext.strokeStyle = GlobalConfig.circlesColor;
         canvasContext.lineWidth = 1;
         canvasContext.beginPath();
-        canvasContext.arc(this.config.centerX, this.config.centerY, this.config.centerRadius, 0, 2 * Math.PI);
+        canvasContext.arc(0, 0, this.config.centerRadius, 0, 2 * Math.PI);
         canvasContext.stroke();
         canvasContext.fillStyle = this.speedRanges[0].color;
         canvasContext.fill();
@@ -143,6 +143,14 @@ export class WindRoseCanvas {
         canvasContext.textBaseline = 'middle';
         canvasContext.strokeStyle = 'white';
         canvasContext.fillStyle = 'white';
-        canvasContext.fillText( Math.round(this.windRoseData.calmSpeedPercentage) + '%', this.config.centerX, this.config.centerY + 2);
+        this.drawText(canvasContext, Math.round(this.windRoseData.calmSpeedPercentage) + '%', 0, 0);
+    }
+
+    private drawText(canvasContext: CanvasRenderingContext2D, text: string, x: number, y: number) {
+        canvasContext.save();
+        canvasContext.translate(x, y);
+        canvasContext.rotate(DrawUtil.toRadians(-this.config.windRoseDrawNorthOffset));
+        canvasContext.fillText(text, 0, 0);
+        canvasContext.restore();
     }
 }

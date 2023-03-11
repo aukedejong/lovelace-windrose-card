@@ -11,7 +11,8 @@ export class WindRoseConfig {
         public cardinalDirectionLetters: string,
         public directionCompensation: number,
         public inputUnit: string,
-        public outputUnit: string) {
+        public outputUnit: string,
+        public windRoseDrawNorthOffset: number) {
     }
 
 }

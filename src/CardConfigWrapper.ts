@@ -16,6 +16,7 @@ export class CardConfigWrapper {
     cardinalDirectionLetters: string;
     windDirectionCount: number;
     windDirectionUnit: string;
+    windRoseDrawNorthOffset: number;
     inputSpeedUnit: string;
     outputSpeedUnit: string;
     speedRangeStep: number | undefined;
@@ -49,6 +50,7 @@ export class CardConfigWrapper {
             speed_range_max: undefined,
             speed_ranges: undefined,
             direction_compensation: 0,
+            windrose_draw_north_offset: 0,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
             direction_speed_time_diff: GlobalConfig.defaultDirectionSpeedTimeDiff
@@ -62,6 +64,7 @@ export class CardConfigWrapper {
         this.maxWidth = this.checkMaxWidth();
         this.windDirectionEntity = this.checkWindDirectionEntity();
         this.windspeedEntities = this.checkWindspeedEntities();
+        this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
         this.directionCompensation = this.checkDirectionCompensation();
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.windspeedBarFull = this.checkWindspeedBarFull();
@@ -132,6 +135,15 @@ export class CardConfigWrapper {
             throw new Error('WindRoseCard: Invalid direction compensation, should be a number in degress between 0 and 360.');
         } else if (this.cardConfig.direction_compensation) {
             return this.cardConfig.direction_compensation;
+        }
+        return 0;
+    }
+
+    private checkwindRoseDrawNorthOffset(): number {
+        if (this.cardConfig.windrose_draw_north_offset && isNaN(this.cardConfig.windrose_draw_north_offset)) {
+            throw new Error('WindRoseCard: Invalid render direction offset, should be a number in degress between 0 and 360.');
+        } else if (this.cardConfig.windrose_draw_north_offset) {
+            return this.cardConfig.windrose_draw_north_offset;
         }
         return 0;
     }
