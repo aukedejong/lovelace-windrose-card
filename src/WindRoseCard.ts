@@ -21,7 +21,7 @@ import {WindSpeedConverter} from "./WindSpeedConverter";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 0.8.0 `,
+    `%c  WINROSE-CARD  %c Version 0.8.1 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -219,9 +219,9 @@ export class WindRoseCard extends LitElement {
         // console.log('updateCanvasSize()', canvasWidth);
 
         this.canvas.width = canvasWidth;
-        this.canvas.height = this.windRoseConfigFactory.canvasHeight as number;
         const windRoseConfig = this.windRoseConfigFactory.createWindRoseConfig(canvasWidth);
         this.windRoseCanvas = new WindRoseCanvas(windRoseConfig, this.windSpeedConverter);
+        this.canvas.height = this.windRoseConfigFactory.canvasHeight as number;
 
         const windBarConfigs = this.windRoseConfigFactory.createWindBarConfigs(canvasWidth);
         this.windBarCanvases = [];
