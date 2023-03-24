@@ -64,7 +64,7 @@ export class WindSpeedConverter {
         this.outputSpeedUnit = this.getSpeedUnit(this.outputUnit);
 
         if (outputUnit === 'bft') {
-            this.outputSpeedUnit.speedRanges = this.generateBeaufortSpeedRanges();
+            this.outputSpeedUnit.speedRanges = this.generateBeaufortSpeedRanges(inputUnit);
 
         } else if (speedRanges && speedRanges.length > 0) {
             this.outputSpeedUnit.speedRanges = speedRanges;
@@ -84,7 +84,7 @@ export class WindSpeedConverter {
     }
 
     getSpeedConverter(): (speed: number) => number {
-        if (this.inputUnit === this.outputUnit) {
+        if (this.inputUnit === this.outputUnit || this.outputUnit === 'bft') {
             return (inputSpeed: number) => inputSpeed;
         } else if (this.inputUnit === 'mps') {
             return this.outputSpeedUnit.fromMpsFunc;
@@ -134,22 +134,89 @@ export class WindSpeedConverter {
         return speedRanges;
     }
 
-    private generateBeaufortSpeedRanges(): SpeedRange[] {
+    private generateBeaufortSpeedRanges(inputUnit: string): SpeedRange[] {
         const colors = new ColorUtil().getColorArray(13);
-        return [
-            new SpeedRange(0, 0, 0.3, colors[0]),
-            new SpeedRange(1, 0.3, 1.6, colors[1]),
-            new SpeedRange(2, 1.6, 3.4, colors[2]),
-            new SpeedRange(3, 3.4, 5.5, colors[3]),
-            new SpeedRange(4, 5.5, 8, colors[4]),
-            new SpeedRange(5, 8, 10.8, colors[5]),
-            new SpeedRange(6, 10.8, 13.9, colors[6]),
-            new SpeedRange(7, 13.9, 17.2, colors[7]),
-            new SpeedRange(8, 17.2, 20.8, colors[8]),
-            new SpeedRange(9, 20.8, 24.5, colors[9]),
-            new SpeedRange(10, 24.5, 28.5, colors[10]),
-            new SpeedRange(11, 28.5, 32.7, colors[11]),
-            new SpeedRange(12, 32.7, -1, colors[12])
-        ];
+        if (inputUnit === 'mps') {
+            return [
+                new SpeedRange(0, 0, 0.5, colors[0]),
+                new SpeedRange(1, 0.5, 1.6, colors[1]),
+                new SpeedRange(2, 1.6, 3.4, colors[2]),
+                new SpeedRange(3, 3.4, 5.5, colors[3]),
+                new SpeedRange(4, 5.5, 8, colors[4]),
+                new SpeedRange(5, 8, 10.8, colors[5]),
+                new SpeedRange(6, 10.8, 13.9, colors[6]),
+                new SpeedRange(7, 13.9, 17.2, colors[7]),
+                new SpeedRange(8, 17.2, 20.8, colors[8]),
+                new SpeedRange(9, 20.8, 24.5, colors[9]),
+                new SpeedRange(10, 24.5, 28.5, colors[10]),
+                new SpeedRange(11, 28.5, 32.7, colors[11]),
+                new SpeedRange(12, 32.7, -1, colors[12])
+            ];
+        } else if (inputUnit === 'kph') {
+            return [
+                new SpeedRange(0, 0, 2, colors[0]),
+                new SpeedRange(1, 2, 6, colors[1]),
+                new SpeedRange(2, 6, 12, colors[2]),
+                new SpeedRange(3, 12, 20, colors[3]),
+                new SpeedRange(4, 20, 29, colors[4]),
+                new SpeedRange(5, 29, 39, colors[5]),
+                new SpeedRange(6, 39, 50, colors[6]),
+                new SpeedRange(7, 50, 62, colors[7]),
+                new SpeedRange(8, 62, 75, colors[8]),
+                new SpeedRange(9, 75, 89, colors[9]),
+                new SpeedRange(10, 89, 103, colors[10]),
+                new SpeedRange(11, 103, 118, colors[11]),
+                new SpeedRange(12, 118, -1, colors[12])
+            ];
+        } else if (inputUnit === 'mph') {
+            return [
+                new SpeedRange(0, 0, 1, colors[0]),
+                new SpeedRange(1, 1, 4, colors[1]),
+                new SpeedRange(2, 4, 8, colors[2]),
+                new SpeedRange(3, 8, 13, colors[3]),
+                new SpeedRange(4, 13, 19, colors[4]),
+                new SpeedRange(5, 19, 25, colors[5]),
+                new SpeedRange(6, 25, 32, colors[6]),
+                new SpeedRange(7, 32, 39, colors[7]),
+                new SpeedRange(8, 39, 47, colors[8]),
+                new SpeedRange(9, 47, 55, colors[9]),
+                new SpeedRange(10, 55, 64, colors[10]),
+                new SpeedRange(11, 64, 73, colors[11]),
+                new SpeedRange(12, 73, -1, colors[12])
+            ];
+        } else if (inputUnit === 'fps') {
+            return [
+                new SpeedRange(0, 0, 1.6, colors[0]),
+                new SpeedRange(1, 1.6, 5.2, colors[1]),
+                new SpeedRange(2, 5.2, 11.2, colors[2]),
+                new SpeedRange(3, 11.2, 18, colors[3]),
+                new SpeedRange(4, 18, 26.2, colors[4]),
+                new SpeedRange(5, 26.2, 35.4, colors[5]),
+                new SpeedRange(6, 35.4, 45.6, colors[6]),
+                new SpeedRange(7, 45.6, 56.4, colors[7]),
+                new SpeedRange(8, 56.4, 68.2, colors[8]),
+                new SpeedRange(9, 68.2, 80.4, colors[9]),
+                new SpeedRange(10, 80.4, 93.5, colors[10]),
+                new SpeedRange(11, 93.5, 107, colors[11]),
+                new SpeedRange(12, 107, -1, colors[12])
+            ];
+        } else if (inputUnit === 'knots') {
+            return [
+                new SpeedRange(0, 0, 1, colors[0]),
+                new SpeedRange(1, 1, 4, colors[1]),
+                new SpeedRange(2, 4, 7, colors[2]),
+                new SpeedRange(3, 7, 11, colors[3]),
+                new SpeedRange(4, 11, 17, colors[4]),
+                new SpeedRange(5, 17, 22, colors[5]),
+                new SpeedRange(6, 22, 28, colors[6]),
+                new SpeedRange(7, 28, 34, colors[7]),
+                new SpeedRange(8, 34, 41, colors[8]),
+                new SpeedRange(9, 41, 48, colors[9]),
+                new SpeedRange(10, 48, 56, colors[10]),
+                new SpeedRange(11, 56, 64, colors[11]),
+                new SpeedRange(12, 64, -1, colors[12])
+            ];
+        }
+        throw new Error("No Bft reanges for input speed unit:: " + inputUnit);
     }
 }

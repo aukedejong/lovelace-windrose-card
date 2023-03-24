@@ -21,7 +21,7 @@ import {WindSpeedConverter} from "./WindSpeedConverter";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 0.8.1 `,
+    `%c  WINROSE-CARD  %c Version 0.9.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
