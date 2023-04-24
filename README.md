@@ -28,7 +28,7 @@ This card is available in [HACS](https://hacs.xyz/) (Home Assistant Community St
 2. Grab `windrose-card.js`:
 
   ```
-  $ wget https://github.com/aukedejong/lovelace-windrose-card/releases/download/latest/windrose-card.js
+  $ wget https://github.com/aukedejong/lovelace-windrose-card/releases/latest/download/windrose-card.js
   ```
 
 3. Add the resource reference as decribed below.
@@ -75,7 +75,7 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 | cardinal_direction_letters | string  |             NESW             |    -     | The cardinal letters used in the windrose.                                                                                                                            |
 | wind_direction_count       | string  |              16              |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                                      |
 | windrose_draw_north_offset | number  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                   |
-| matching_strategy          | string  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-frist`, `speed-first` |
+| matching_strategy          | string  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first` |
 | direction_speed_time_diff  | string  |              1               |    -     | How many seconds a speed measurement time can be earlier or later then the direction measurement time. Or the other way around, depending on thie matching_strategy   |
 
 #### Object windspeed_entities
