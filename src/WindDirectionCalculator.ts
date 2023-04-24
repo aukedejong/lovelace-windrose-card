@@ -7,6 +7,7 @@ export class WindDirectionCalculator {
     data = new WindDirectionData();
     speeds: number[] = [];
     speedRangeCounts: number[] = [];
+    speedRangeCount: number = 0;
     config: WindRoseConfig;
 
     speedRangeFunction: (speed: number) => number;
@@ -19,6 +20,7 @@ export class WindDirectionCalculator {
         this.windSpeedConverter = windSpeedConverter;
         this.speedRangeFunction = this.windSpeedConverter.getRangeFunction();
         this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter();
+        this.speedRangeCount = this.windSpeedConverter.getSpeedRanges().length;
         if (minDegrees < 0) {
             this.data.minDegrees = minDegrees + 360;
         } else {
@@ -49,17 +51,17 @@ export class WindDirectionCalculator {
     }
 
     calculateSpeedPercentages(): number[] {
-        const speedRangeCounts = Array(13).fill(0);
+        const speedRangeCounts = Array(this.speedRangeCount).fill(0);
         let speedAboveZeroCount = 0;
         for (const speed of this.speeds) {
-            const speedRange = this.speedRangeFunction(speed);
-            if (speedRange !== undefined && speedRange > 0) {
-                speedRangeCounts[speedRange]++;
+            const speedRangeIndex = this.speedRangeFunction(speed);
+            if (speedRangeIndex !== undefined && speedRangeIndex > 0) {
+                speedRangeCounts[speedRangeIndex]++;
                 speedAboveZeroCount++;
             }
         }
         if (speedAboveZeroCount === 0) {
-            return Array(12).fill(0);
+            return Array(this.speedRangeCount).fill(0);
         }
         this.data.speedRangePercentages = [];
         for (const speedRangeCount of speedRangeCounts) {

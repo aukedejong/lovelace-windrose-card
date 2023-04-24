@@ -42,7 +42,7 @@ export class WindRoseCanvas {
     private drawWindDirection(windDirection: WindDirectionData, canvasContext: CanvasRenderingContext2D) {
         if (windDirection.speedRangePercentages.length === 0) return;
 
-        const percentages = Array(13).fill(0);
+        const percentages = Array(windDirection.speedRangePercentages.length).fill(0);
         for (let i = windDirection.speedRangePercentages.length - 1; i >= 0; i--) {
             percentages[i] = windDirection.speedRangePercentages[i];
             if (windDirection.speedRangePercentages[i] > 0) {
