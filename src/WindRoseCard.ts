@@ -11,6 +11,7 @@ import {customElement, query} from "lit/decorators"
 import {CardConfigWrapper} from "./CardConfigWrapper";
 import {MeasurementMatcher} from "./MeasurementMatcher";
 import {WindSpeedConverter} from "./WindSpeedConverter";
+import {CardConfig} from "./CardConfig";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -21,7 +22,7 @@ import {WindSpeedConverter} from "./WindSpeedConverter";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 0.9.0 `,
+    `%c  WINROSE-CARD  %c Version 0.9.1 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -51,6 +52,7 @@ export class WindRoseCard extends LitElement {
     windRoseData: WindRoseData | undefined;
     windBarsData: WindBarData[] = [];
 
+    config!: CardConfig;
     cardConfig!: CardConfigWrapper;
     canvasWidth = 400;
     canvasHeight = 400;
@@ -137,9 +139,10 @@ export class WindRoseCard extends LitElement {
 
     }
 
-    setConfig(cardConfig: any): void {
-        console.log('setConfig(): ', cardConfig);
-        this.cardConfig = new CardConfigWrapper(cardConfig);
+    setConfig(config: any): void {
+        console.log('setConfig(): ', config);
+        this.config = config;
+        this.cardConfig = new CardConfigWrapper(config);
         if (this.canvas) {
             this.initWindRoseObjects(this.cardConfig, this.canvas.width);
             this.updateWindData();
