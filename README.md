@@ -66,8 +66,8 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 | windspeed_bar_location     | string  |            bottom            |    -     | Location of the speed bar graph: `bottom`, `right`                                                                                                                    |
 | windspeed_bar_full         | boolean |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                  |
 | wind_direction_unit        | string  |           degrees            |    -     | Wind direction unit, options: `degrees`, `letters`.  Where letters being N, NE upto 32 directions.                                                                    |
-| input_speed_unit           | string  |             mps              |    -     | Windspeed unit of measurement, options: `mps`, `kph`, `mph`, `knots`.                                                                                                 |
-| output_speed_unit          | string  |             bft              |    -     | Windspeed unit used on card, options: `mps`, `kph`, `mph`, `knots`, `bft`.                                                                                            |
+| input_speed_unit           | string  |             mps              |    -     | Windspeed unit of measurement, see Speed unit options bellow.                                                                                                         |
+| output_speed_unit          | string  |             bft              |    -     | Windspeed unit used on card, see Spped unit options bellow.                                                                                                           |
 | speed_range_step           | number  | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                 |
 | speed_range_max            | number  | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity  |
 | speed_ranges               | object  | depends on output speed unit |    -     | Define custom speedranges and colours. Not possible for output speed unit bft (Beaufort).                                                                             |
@@ -91,6 +91,17 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 |------------|:------:|:-------:|:--------:|------------------------------|
 | from_value | number |         |    x     | Start speed of a speed range |
 | color      | string |         |    x     | Color CSS value              |
+
+#### Speed unit options:
+
+| Name |    Description     | Input | Output |
+|------|:------------------:|:-----:|:------:|
+| bft  |      Beaufort      |       |   x    |
+| mps  | metres per second  |   x   |   x    |
+| kph  | kilometer per hour |   x   |   x    |
+| mph  |   miles per hour   |   x   |   x    |
+| fps  |  feet per second   |   x   |   x    |
+| knot |       knots        |   x   |   x    |
 
 
 ## Examples using custom speed ranges
