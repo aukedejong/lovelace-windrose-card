@@ -2,7 +2,6 @@ import {WindRoseConfig} from "./WindRoseConfig";
 import {WindRoseData} from "./WindRoseData";
 import {DrawUtil} from "./DrawUtil";
 import {WindDirectionData} from "./WindDirectionData";
-import {GlobalConfig} from "./GlobalConfig";
 import {SpeedRange, WindSpeedConverter} from "./WindSpeedConverter";
 
 export class WindRoseCanvas {
@@ -63,7 +62,7 @@ export class WindRoseCanvas {
     private drawSpeedPart(canvasContext: CanvasRenderingContext2D, degrees: number, radius: number, color: string) {
         //var x = Math.cos(DrawUtil.toRadians(degreesCompensated - (this.config.leaveArc / 2)));
         //var y = Math.sin(DrawUtil.toRadians(degreesCompensated - (this.config.leaveArc / 2)));
-        canvasContext.strokeStyle = GlobalConfig.leaveBorderColor;
+        canvasContext.strokeStyle = this.config.roseLinesColor;
         canvasContext.lineWidth = 2;
         canvasContext.beginPath();
         canvasContext.moveTo(0, 0);
@@ -83,7 +82,7 @@ export class WindRoseCanvas {
 
         // Cross
         canvasContext.lineWidth = 1;
-        canvasContext.strokeStyle = GlobalConfig.crossColor;
+        canvasContext.strokeStyle = this.config.roseLinesColor;
         canvasContext.moveTo(0 - this.config.outerRadius, 0);
         canvasContext.lineTo(this.config.outerRadius, 0);
         canvasContext.stroke();
@@ -93,7 +92,7 @@ export class WindRoseCanvas {
 
         // console.log('Cirlce center:', this.config.centerX, this.config.centerY);
         // Cirlces
-        canvasContext.strokeStyle = GlobalConfig.circlesColor;
+        canvasContext.strokeStyle = this.config.roseLinesColor;
         const radiusStep = (this.config.outerRadius - this.config.centerRadius) / this.windRoseData.numberOfCircles
         for (let i = 1; i <= this.windRoseData.numberOfCircles; i++) {
             canvasContext.beginPath();
@@ -103,7 +102,7 @@ export class WindRoseCanvas {
 
         // Wind direction text
         const textCirlceSpace = 15;
-        canvasContext.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-text-color')
+        canvasContext.fillStyle = this.config.roseDirectionLettersColor;
         canvasContext.font = '22px Arial';
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'middle';
@@ -115,7 +114,7 @@ export class WindRoseCanvas {
 
     private drawCircleLegend(canvasContext: CanvasRenderingContext2D) {
         canvasContext.font = "10px Arial";
-        canvasContext.fillStyle = GlobalConfig.getTextColor();
+        canvasContext.fillStyle = this.config.rosePercentagesColor
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'bottom';
         const radiusStep = (this.config.outerRadius - this.config.centerRadius) / this.windRoseData.numberOfCircles
@@ -131,7 +130,7 @@ export class WindRoseCanvas {
     }
 
     private drawCenterZeroSpeed(canvasContext: CanvasRenderingContext2D) {
-        canvasContext.strokeStyle = GlobalConfig.circlesColor;
+        canvasContext.strokeStyle = this.config.roseLinesColor;
         canvasContext.lineWidth = 1;
         canvasContext.beginPath();
         canvasContext.arc(0, 0, this.config.centerRadius, 0, 2 * Math.PI);
@@ -141,8 +140,8 @@ export class WindRoseCanvas {
         canvasContext.font = '12px Arial';
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'middle';
-        canvasContext.strokeStyle = 'white';
-        canvasContext.fillStyle = 'white';
+        canvasContext.strokeStyle = this.config.rosePercentagesColor;
+        canvasContext.fillStyle = this.config.rosePercentagesColor;
         this.drawText(canvasContext, Math.round(this.windRoseData.calmSpeedPercentage) + '%', 0, 0);
     }
 

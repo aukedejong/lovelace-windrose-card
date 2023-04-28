@@ -24,7 +24,7 @@ export class WindRoseCardEditor extends ScopedRegistryHost(LitElement) implement
 
   constructor() {
     super();
-    console.log('WindRoseCardEditor()');
+    //console.log('WindRoseCardEditor()');
   }
 
   public setConfig(config: CardConfig): void {
@@ -46,7 +46,7 @@ export class WindRoseCardEditor extends ScopedRegistryHost(LitElement) implement
   }
 
   protected render(): TemplateResult | void {
-    console.log('Render');
+    //console.log('Render');
     if (!this.hass || !this._helpers) {
       return html``;
     }

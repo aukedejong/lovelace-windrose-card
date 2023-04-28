@@ -77,6 +77,7 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 | windrose_draw_north_offset | number  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                   |
 | matching_strategy          | string  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first` |
 | direction_speed_time_diff  | string  |              1               |    -     | How many seconds a speed measurement time can be earlier or later then the direction measurement time. Or the other way around, depending on thie matching_strategy   |
+| colors                     | object  |                              |          | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                             |
 
 #### Object windspeed_entities
 
@@ -91,6 +92,35 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 |------------|:------:|:-------:|:--------:|------------------------------|
 | from_value | number |         |    x     | Start speed of a speed range |
 | color      | string |         |    x     | Color CSS value              |
+
+#### Object colors
+For some value the theme variable --primary-text-color is used. This is needed if HA switches theme
+light/dark mode.
+CSS color values are allowed.
+
+| Name                     |  Type  | Default |       Required       | Description                          |
+|--------------------------|:------:|:-------:|:--------------------:|--------------------------------------|
+| rose_lines               | string |         |  rgb(160, 160, 160)  | Circles, borders and the cross color |
+| rose_direction_letters   | string |         | --primary-text-color | Direction letters color              |
+| rose_percentages         | string |         | --primary-text-color | Percentage legend  color             |
+| bar_border               | string |         |  rgb(160, 160, 160)  | Bar border color                     |
+| bar_unit_name            | string |         | --primary-text-color | Unit name color                      |
+| bar_name                 | string |         | --primary-text-color | Entity name color                    |
+| bar_unit_values          | string |         | --primary-text-color | Unit value color                     |
+| bar_percentages          | string |         |        black         | Percentage color                     |
+
+#### Example colors yaml
+```yaml
+colors:
+  rose_lines: 'rgb(0,255,0)'
+  rose_direction_letters: 'yellow'
+  rose_percentages: 'blue'
+  bar_border: 'hsl(200, 100%, 60%)'
+  bar_unit_name: 'purple'
+  bar_name: 'yellow'
+  bar_unit_values: 'blue'
+  bar_percentages: 'orange'
+```
 
 #### Speed unit options:
 

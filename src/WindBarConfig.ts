@@ -10,6 +10,13 @@ export class WindBarConfig {
         public orientation: string,
         public full: boolean,
         public inputUnit: string,
-        public outputUnit: string) {
+        public outputUnit: string,
+
+        public barBorderColor: string,
+        public barUnitNameColor: string,
+        public barNameColor: string,
+        public barUnitValuesColor: string,
+        public barPercentagesColor: string,
+        ) {
     }
 }

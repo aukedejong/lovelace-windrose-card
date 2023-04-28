@@ -1,6 +1,7 @@
 import {GlobalConfig} from "./GlobalConfig";
 import {CardConfig} from "./CardConfig";
 import {SpeedRange} from "./WindSpeedConverter";
+import {CardColors} from "./CardColors";
 
 export class CardConfigWrapper {
 
@@ -24,6 +25,7 @@ export class CardConfigWrapper {
     speedRanges: SpeedRange[] = [];
     matchingStrategy: string;
     directionSpeedTimeDiff: number;
+    cardColor: CardColors;
 
     entities: string[];
     filterEntitiesQueryParameter: string;
@@ -53,7 +55,7 @@ export class CardConfigWrapper {
             windrose_draw_north_offset: 0,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
-            direction_speed_time_diff: GlobalConfig.defaultDirectionSpeedTimeDiff
+            direction_speed_time_diff: GlobalConfig.defaultDirectionSpeedTimeDiff,
         };
     }
 
@@ -81,6 +83,7 @@ export class CardConfigWrapper {
         this.directionSpeedTimeDiff = this.checkDirectionSpeedTimeDiff();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.entities = this.createEntitiesArray();
+        this.cardColor = this.checkCardColors();
     }
 
     windBarCount(): number {
@@ -312,5 +315,36 @@ export class CardConfigWrapper {
         const entities: string[] = [];
         entities.push(this.windDirectionEntity);
         return entities.concat(this.windspeedEntities.map(config => config.entity));
+    }
+
+    private checkCardColors(): CardColors {
+        const cardColors = new CardColors();
+        if (this.cardConfig.colors) {
+            if (this.cardConfig.colors.rose_direction_letters) {
+                cardColors.roseDirectionLetters = this.cardConfig.colors.rose_direction_letters;
+            }
+            if (this.cardConfig.colors.rose_lines) {
+                cardColors.roseLines = this.cardConfig.colors.rose_lines;
+            }
+            if (this.cardConfig.colors.rose_percentages) {
+                cardColors.rosePercentages = this.cardConfig.colors.rose_percentages;
+            }
+            if (this.cardConfig.colors.bar_border) {
+                cardColors.barBorder = this.cardConfig.colors.bar_border;
+            }
+            if (this.cardConfig.colors.bar_name) {
+                cardColors.barName = this.cardConfig.colors.bar_name;
+            }
+            if (this.cardConfig.colors.bar_percentages) {
+                cardColors.barPercentages = this.cardConfig.colors.bar_percentages;
+            }
+            if (this.cardConfig.colors.bar_unit_name) {
+                cardColors.barUnitName = this.cardConfig.colors.bar_unit_name;
+            }
+            if (this.cardConfig.colors.bar_unit_values) {
+                cardColors.barUnitValues = this.cardConfig.colors.bar_unit_values;
+            }
+        }
+        return cardColors;
     }
 }

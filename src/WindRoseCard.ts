@@ -22,7 +22,7 @@ import {CardConfig} from "./CardConfig";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 0.9.1 `,
+    `%c  WINROSE-CARD  %c Version 0.10.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -82,7 +82,7 @@ export class WindRoseCard extends LitElement {
 
     render(): TemplateResult {
         super.render();
-        console.log('render()');
+        //console.log('render()');
         return html`
             <ha-card header="${this.cardConfig?.title}">
                 <div class="card-content">
@@ -96,7 +96,7 @@ export class WindRoseCard extends LitElement {
     }
 
     firstUpdated(): void {
-        console.log('firstUpdated()');
+        //console.log('firstUpdated()');
         this.initWindRoseObjects(this.cardConfig, this.canvas.width);
         this.updateWindData();
         this.canvasContext = this.canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -108,7 +108,7 @@ export class WindRoseCard extends LitElement {
     }
 
     private initInterval() {
-        console.log('Loop start');
+        //console.log('Loop start');
         this.updateInterval = setInterval(() => this.updateWindData(),
             this.cardConfig.refreshInterval * 1000);
     }
@@ -128,19 +128,19 @@ export class WindRoseCard extends LitElement {
         super.connectedCallback();
         this.ro.observe(this);
         this.initInterval();
-        console.log('connectedCallBack()');
+        //console.log('connectedCallBack()');
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
         this.ro.unobserve(this);
         clearInterval(this.updateInterval);
-        console.log('disconnectedCallback()');
+        //console.log('disconnectedCallback()');
 
     }
 
     setConfig(config: any): void {
-        console.log('setConfig(): ', config);
+        //console.log('setConfig(): ', config);
         this.config = config;
         this.cardConfig = new CardConfigWrapper(config);
         if (this.canvas) {
@@ -151,12 +151,12 @@ export class WindRoseCard extends LitElement {
     }
 
     getCardSize(): number {
-        console.log('getCardSize()');
+        //console.log('getCardSize()');
         return 4;
     }
 
     private initWindRoseObjects(cardConfig: CardConfigWrapper, canvasWidth: number): void {
-        console.log('initWindRoseObjects(cardConfig, canvasWidth)', cardConfig, canvasWidth);
+        //console.log('initWindRoseObjects(cardConfig, canvasWidth)', cardConfig, canvasWidth);
         this.windRoseConfigFactory = new WindRoseConfigFactory(cardConfig);
 
         const windRoseConfig = this.windRoseConfigFactory.createWindRoseConfig(canvasWidth);
@@ -176,7 +176,7 @@ export class WindRoseCard extends LitElement {
     }
 
     private updateWindData() {
-        console.log('updateWindData()');
+        //console.log('updateWindData()');
         this.getHistory().then((history: any) => {
             const directionData = history[this.cardConfig.windDirectionEntity];
             const firstSpeedData = history[this.cardConfig.windspeedEntities[0].entity];

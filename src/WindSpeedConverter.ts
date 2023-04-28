@@ -76,7 +76,7 @@ export class WindSpeedConverter {
             this.outputSpeedUnit.speedRanges = this.generateSpeedRanges(this.outputSpeedUnit.speedRangeStep!,
                 this.outputSpeedUnit.speedRangeMax!);
         }
-        console.log('Speed ranges: ', this.outputSpeedUnit.speedRanges);
+        //console.log('Speed ranges: ', this.outputSpeedUnit.speedRanges);
     }
 
     getOutputSpeedUnit(): SpeedUnit {

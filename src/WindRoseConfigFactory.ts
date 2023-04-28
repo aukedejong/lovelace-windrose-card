@@ -30,7 +30,10 @@ export class WindRoseConfigFactory {
             this.cardConfig.directionCompensation,
             this.cardConfig.inputSpeedUnit,
             this.cardConfig.outputSpeedUnit,
-            this.cardConfig.windRoseDrawNorthOffset);
+            this.cardConfig.windRoseDrawNorthOffset,
+            this.cardConfig.cardColor.roseLines,
+            this.cardConfig.cardColor.roseDirectionLetters,
+            this.cardConfig.cardColor.rosePercentages);
     }
 
     createWindBarConfigs(canvasWidth: number): WindBarConfig[] {
@@ -52,7 +55,12 @@ export class WindRoseConfigFactory {
                     'horizontal',
                     this.cardConfig.windspeedBarFull,
                     this.cardConfig.inputSpeedUnit,
-                    this.cardConfig.outputSpeedUnit);
+                    this.cardConfig.outputSpeedUnit,
+                    this.cardConfig.cardColor.barBorder,
+                    this.cardConfig.cardColor.barUnitName,
+                    this.cardConfig.cardColor.barName,
+                    this.cardConfig.cardColor.barUnitValues,
+                    this.cardConfig.cardColor.barPercentages);
 
             } else if (this.cardConfig.windspeedBarLocation === 'right') {
 
@@ -65,7 +73,12 @@ export class WindRoseConfigFactory {
                     'vertical',
                     this.cardConfig.windspeedBarFull,
                     this.cardConfig.inputSpeedUnit,
-                    this.cardConfig.outputSpeedUnit);
+                    this.cardConfig.outputSpeedUnit,
+                    this.cardConfig.cardColor.barBorder,
+                    this.cardConfig.cardColor.barUnitName,
+                    this.cardConfig.cardColor.barName,
+                    this.cardConfig.cardColor.barUnitValues,
+                    this.cardConfig.cardColor.barPercentages);
 
             } else {
                 throw Error('Unknown windspeed bar location: ' + this.cardConfig.windspeedBarLocation);
@@ -95,7 +108,7 @@ export class WindRoseConfigFactory {
         } else if (this.cardConfig.windspeedBarLocation === 'bottom') {
             this.canvasHeight = this.roseCenterY + this.outerRadius + (40 * this.cardConfig.windBarCount()) + 35;
         } else {
-            console.log('Unknown windspeed bar location', this.cardConfig.windspeedBarLocation);
+            //console.log('Unknown windspeed bar location', this.cardConfig.windspeedBarLocation);
         }
     }
 }

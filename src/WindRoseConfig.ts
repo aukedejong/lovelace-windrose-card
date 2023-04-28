@@ -12,7 +12,11 @@ export class WindRoseConfig {
         public directionCompensation: number,
         public inputUnit: string,
         public outputUnit: string,
-        public windRoseDrawNorthOffset: number) {
+        public windRoseDrawNorthOffset: number,
+
+        public roseLinesColor: string,
+        public roseDirectionLettersColor: string,
+        public rosePercentagesColor: string) {
     }
 
 }

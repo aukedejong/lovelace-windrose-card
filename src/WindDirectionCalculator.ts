@@ -7,7 +7,7 @@ export class WindDirectionCalculator {
     data = new WindDirectionData();
     speeds: number[] = [];
     speedRangeCounts: number[] = [];
-    speedRangeCount: number = 0;
+    speedRangeCount = 0;
     config: WindRoseConfig;
 
     speedRangeFunction: (speed: number) => number;
