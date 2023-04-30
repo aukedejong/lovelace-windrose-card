@@ -68,6 +68,7 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 | wind_direction_unit        | string  |           degrees            |    -     | Wind direction unit, options: `degrees`, `letters`.  Where letters being N, NE upto 32 directions.                                                                    |
 | input_speed_unit           | string  |             mps              |    -     | Windspeed unit of measurement, see Speed unit options bellow.                                                                                                         |
 | output_speed_unit          | string  |             bft              |    -     | Windspeed unit used on card, see Spped unit options bellow.                                                                                                           |
+| output_speed_unit_label    | string  |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                              |
 | speed_range_step           | number  | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                 |
 | speed_range_max            | number  | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity  |
 | speed_ranges               | object  | depends on output speed unit |    -     | Define custom speedranges and colours. Not possible for output speed unit bft (Beaufort).                                                                             |
@@ -108,7 +109,7 @@ CSS color values are allowed.
 | bar_name                 | string |         | --primary-text-color | Entity name color                    |
 | bar_unit_values          | string |         | --primary-text-color | Unit value color                     |
 | bar_percentages          | string |         |        black         | Percentage color                     |
-
+_
 #### Example colors yaml
 ```yaml
 colors:

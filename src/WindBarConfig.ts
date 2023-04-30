@@ -11,6 +11,7 @@ export class WindBarConfig {
         public full: boolean,
         public inputUnit: string,
         public outputUnit: string,
+        public outputUnitLabel: string | undefined,
 
         public barBorderColor: string,
         public barUnitNameColor: string,

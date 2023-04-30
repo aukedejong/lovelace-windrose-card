@@ -13,7 +13,11 @@ export class WindBarCanvas {
     constructor(config: WindBarConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
         this.windSpeedConverter = windSpeedConverter;
-        this.outputUnitName = this.windSpeedConverter.getOutputSpeedUnit().name;
+        if (config.outputUnitLabel) {
+            this.outputUnitName = config.outputUnitLabel;
+        } else {
+            this.outputUnitName = this.windSpeedConverter.getOutputSpeedUnit().name;
+        }
         this.speedRanges = this.windSpeedConverter.getOutputSpeedUnit().speedRanges;
     }
 

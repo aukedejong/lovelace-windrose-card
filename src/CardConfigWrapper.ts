@@ -20,6 +20,7 @@ export class CardConfigWrapper {
     windRoseDrawNorthOffset: number;
     inputSpeedUnit: string;
     outputSpeedUnit: string;
+    outputSpeedUnitLabel: string | undefined;
     speedRangeStep: number | undefined;
     speedRangeMax: number | undefined;
     speedRanges: SpeedRange[] = [];
@@ -75,6 +76,7 @@ export class CardConfigWrapper {
         this.windDirectionUnit = this.checkWindDirectionUnit();
         this.inputSpeedUnit = this.checkInputSpeedUnit();
         this.outputSpeedUnit = this.checkOutputSpeedUnit();
+        this.outputSpeedUnitLabel = this.checkOutputSpeedUnitLabel();
         this.speedRangeStep = this.checkSpeedRangeStep();
         this.speedRangeMax = this.checkSpeedRangeMax();
         this.speedRanges = this.checkSpeedRanges();
@@ -228,6 +230,13 @@ export class CardConfigWrapper {
             return this.cardConfig.output_speed_unit;
         }
         return GlobalConfig.defaultOutputSpeedUnit;
+    }
+
+    private checkOutputSpeedUnitLabel(): string | undefined {
+        if (this.cardConfig.output_speed_unit_label) {
+            return this.cardConfig.output_speed_unit_label
+        }
+        return undefined;
     }
 
     private checkSpeedRangeStep(): number | undefined {
