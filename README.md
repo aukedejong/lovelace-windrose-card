@@ -39,17 +39,21 @@ If you configure Lovelace via YAML, add a reference to `windrose-card.js` inside
 
   ```yaml
   resources:
-    - url: /local/windrose-card.js?v=0.0.1
+    - url: /local/lovelace-windrose-card/windrose-card.js?v=0.0.1
       type: module
   ```
 
 Else, if you prefer the graphical editor, use the menu to add the resource:
 
-1. Make sure, advanced mode is enabled in your user profile (click on your user name to get there)
-2. Navigate to Configuration -> Lovelace Dashboards -> Resources Tab. Hit orange (+) icon
-3. Enter URL `/local/windrose-card.js` and select type "JavaScript Module".
-   (Use `/hacsfiles/windrose-card/windrose-card.js` and select "JavaScript Module" for HACS install)
-4. Restart Home Assistant.
+1. Open any lovelace view
+2. Select from the three dot menu - "edit dashboard"
+3. The three dot menu is then replaced with another one, select the new three-dot menu (and do not select raw configuration editor*,
+it will tell you when you try to save it with the resource section, that for adding resources you have to use the three-dot menu choice "Manage Resources" instead).
+Select "Manage Resources"
+4. Click "Add Resource",
+5. Enter this for url: /hacsfiles/lovelace-windrose-card/windrose-card.js
+6. Click the check box for "Javascript Module" and
+7. Click the word "Create" in the corner to add the entry.
 
 
 ### Card options
