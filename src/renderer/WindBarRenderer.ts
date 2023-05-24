@@ -1,11 +1,15 @@
-import {DrawUtil} from "./DrawUtil";
-import {WindBarData} from "./WindBarData";
-import {WindBarConfig} from "./WindBarConfig";
-import {SpeedRange, WindSpeedConverter} from "./WindSpeedConverter";
+import {DrawUtil} from "../util/DrawUtil";
+import {WindBarConfig} from "../config/WindBarConfig";
+import {WindSpeedConverter} from "../converter/WindSpeedConverter";
+import {SpeedRange} from "../converter/SpeedRange";
+import {WindRoseData} from "./WindRoseData";
+import {WindBarDimensions} from "../dimensions/WindBarDimensions";
+import {Log} from "../util/Log";
 
-export class WindBarCanvas {
+export class WindBarRenderer {
 
-    readonly config: WindBarConfig;
+    config: WindBarConfig;
+    dimensions!: WindBarDimensions;
     readonly windSpeedConverter: WindSpeedConverter;
     readonly outputUnitName: string;
     readonly speedRanges: SpeedRange[];
@@ -21,9 +25,26 @@ export class WindBarCanvas {
         this.speedRanges = this.windSpeedConverter.getOutputSpeedUnit().speedRanges;
     }
 
-    drawWindBar(windBarData: WindBarData, canvasContext: CanvasRenderingContext2D) {
+    updateConfig(config: WindBarConfig) {
+        this.config = config;
+    }
 
-        // console.log('Data', windBarData);
+    updateDimensions(dimensions: WindBarDimensions) {
+        Log.debug('WindBarRenderer.updateDimensions()', dimensions);
+        this.dimensions = dimensions;
+    }
+
+    drawWindBar(windBarData: WindRoseData, canvasContext: CanvasRenderingContext2D) {
+        if (this.dimensions === undefined) {
+            Log.error("drawWindBar(): Can't draw bar, dimensions not set.");
+            return;
+        }
+        if (windBarData === undefined) {
+            Log.error("drawWindBar(): Can't draw bar, windRoseData not set.");
+            return;
+        }
+        Log.trace('drawWindBar(): ', windBarData, this.dimensions);
+
         if (this.config.orientation === 'horizontal') {
             this.drawBarLegendHorizontal(windBarData.speedRangePercentages, canvasContext);
 
@@ -40,31 +61,31 @@ export class WindBarCanvas {
             highestRangeMeasured = this.getIndexHighestRangeWithMeasurements(speedRangePercentages);
         }
 
-        const lengthMaxRange = (this.config.length / highestRangeMeasured)
+        const lengthMaxRange = (this.dimensions.length / highestRangeMeasured)
         const maxScale = this.speedRanges[highestRangeMeasured - 1].minSpeed;
         canvasContext.font = '13px Arial';
         canvasContext.textAlign = 'left';
         canvasContext.textBaseline = 'bottom';
         canvasContext.fillStyle = this.config.barNameColor;
         canvasContext.save();
-        canvasContext.translate(this.config.posX, this.config.posY);
+        canvasContext.translate(this.dimensions.posX, this.dimensions.posY);
         canvasContext.rotate(DrawUtil.toRadians(-90));
 
         canvasContext.fillText(this.config.label, 0, 0);
         canvasContext.restore();
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'middle';
-        let posY = this.config.posY;
+        let posY = this.dimensions.posY;
         for (let i = 0; i < highestRangeMeasured; i++) {
             if (i === highestRangeMeasured - 1) {
                 length = lengthMaxRange * -1;
             } else {
-                length = (this.speedRanges[i + 1].minSpeed - this.speedRanges[i].minSpeed) * ((this.config.length - lengthMaxRange) / maxScale) * -1;
+                length = (this.speedRanges[i + 1].minSpeed - this.speedRanges[i].minSpeed) * ((this.dimensions.length - lengthMaxRange) / maxScale) * -1;
             }
 
             canvasContext.beginPath();
             canvasContext.fillStyle = this.speedRanges[i].color;
-            canvasContext.fillRect(this.config.posX, posY, this.config.height, length);
+            canvasContext.fillRect(this.dimensions.posX, posY, this.dimensions.height, length);
             canvasContext.fill();
 
             canvasContext.textAlign = 'left';
@@ -72,18 +93,18 @@ export class WindBarCanvas {
 
             if (this.config.outputUnit === 'bft') {
                 if (i == 12) {
-                    canvasContext.fillText(i+'', this.config.posX + this.config.height + 5, posY - 6);
+                    canvasContext.fillText(i+'', this.dimensions.posX + this.dimensions.height + 5, posY - 6);
                 } else {
-                    canvasContext.fillText(i+'', this.config.posX + this.config.height + 5, posY + (length / 2));
+                    canvasContext.fillText(i+'', this.dimensions.posX + this.dimensions.height + 5, posY + (length / 2));
                 }
             } else {
-                canvasContext.fillText(this.speedRanges[i].minSpeed + '', this.config.posX + this.config.height + 5, posY);
+                canvasContext.fillText(this.speedRanges[i].minSpeed + '', this.dimensions.posX + this.dimensions.height + 5, posY);
             }
 
             canvasContext.textAlign = 'center';
             canvasContext.fillStyle = this.config.barPercentagesColor;
             if (speedRangePercentages[i] > 0) {
-                canvasContext.fillText(`${Math.round(speedRangePercentages[i])}%`, this.config.posX + (this.config.height / 2), posY + (length / 2));
+                canvasContext.fillText(`${Math.round(speedRangePercentages[i])}%`, this.dimensions.posX + (this.dimensions.height / 2), posY + (length / 2));
             }
             canvasContext.stroke();
 
@@ -91,14 +112,14 @@ export class WindBarCanvas {
         }
         canvasContext.lineWidth = 1;
         canvasContext.strokeStyle = this.config.barBorderColor;
-        canvasContext.rect(this.config.posX, this.config.posY, this.config.height, this.config.length * -1);
+        canvasContext.rect(this.dimensions.posX, this.dimensions.posY, this.dimensions.height, this.dimensions.length * -1);
         canvasContext.stroke();
 
         canvasContext.beginPath();
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'bottom';
         canvasContext.fillStyle = this.config.barUnitNameColor;
-        canvasContext.fillText(this.outputUnitName, this.config.posX + (this.config.height / 2), this.config.posY - this.config.length - 2);
+        canvasContext.fillText(this.outputUnitName, this.dimensions.posX + (this.dimensions.height / 2), this.dimensions.posY - this.dimensions.length - 2);
         canvasContext.fill();
     }
 
@@ -109,7 +130,7 @@ export class WindBarCanvas {
             highestRangeMeasured = this.getIndexHighestRangeWithMeasurements(speedRangePercentages);
         }
 
-        const lengthMaxRange = (this.config.length / highestRangeMeasured)
+        const lengthMaxRange = (this.dimensions.length / highestRangeMeasured)
         const maxScale = this.speedRanges[highestRangeMeasured - 1].minSpeed;
 
         canvasContext.font = '13px Arial';
@@ -117,36 +138,36 @@ export class WindBarCanvas {
         canvasContext.textBaseline = 'bottom';
         canvasContext.lineWidth = 1;
         canvasContext.fillStyle = this.config.barNameColor;
-        canvasContext.fillText(this.config.label, this.config.posX, this.config.posY);
+        canvasContext.fillText(this.config.label, this.dimensions.posX, this.dimensions.posY);
 
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'top';
-        let posX = this.config.posX;
+        let posX = this.dimensions.posX;
         for (let i = 0; i < highestRangeMeasured; i++) {
             if (i === highestRangeMeasured - 1) {
                 length = lengthMaxRange;
             } else {
-                length = (this.speedRanges[i + 1].minSpeed - this.speedRanges[i].minSpeed) * ((this.config.length - lengthMaxRange) / maxScale);
+                length = (this.speedRanges[i + 1].minSpeed - this.speedRanges[i].minSpeed) * ((this.dimensions.length - lengthMaxRange) / maxScale);
             }
 
             canvasContext.beginPath();
             canvasContext.fillStyle = this.speedRanges[i].color;
-            canvasContext.fillRect(posX, this.config.posY, length, this.config.height);
+            canvasContext.fillRect(posX, this.dimensions.posY, length, this.dimensions.height);
             canvasContext.fill();
 
             canvasContext.textAlign = 'center';
             canvasContext.fillStyle = this.config.barUnitValuesColor;
 
             if (this.config.outputUnit === 'bft') {
-                canvasContext.fillText(i+'', posX + (length / 2), this.config.posY + this.config.height + 2);
+                canvasContext.fillText(i+'', posX + (length / 2), this.dimensions.posY + this.dimensions.height + 2);
             } else {
-                canvasContext.fillText(this.speedRanges[i].minSpeed + '', posX, this.config.posY + this.config.height + 2);
+                canvasContext.fillText(this.speedRanges[i].minSpeed + '', posX, this.dimensions.posY + this.dimensions.height + 2);
             }
 
             canvasContext.textAlign = 'center';
             canvasContext.fillStyle = this.config.barPercentagesColor;
             if (speedRangePercentages[i] > 0) {
-                canvasContext.fillText(`${Math.round(speedRangePercentages[i])}%`, posX + (length / 2), this.config.posY + 2);
+                canvasContext.fillText(`${Math.round(speedRangePercentages[i])}%`, posX + (length / 2), this.dimensions.posY + 2);
             }
             canvasContext.stroke();
 
@@ -154,14 +175,14 @@ export class WindBarCanvas {
         }
         canvasContext.lineWidth = 1;
         canvasContext.strokeStyle = this.config.barBorderColor;
-        canvasContext.rect(this.config.posX, this.config.posY, this.config.length, this.config.height);
+        canvasContext.rect(this.dimensions.posX, this.dimensions.posY, this.dimensions.length, this.dimensions.height);
         canvasContext.stroke();
 
         canvasContext.beginPath();
         canvasContext.textAlign = 'right';
         canvasContext.textBaseline = 'bottom';
         canvasContext.fillStyle = this.config.barUnitNameColor;
-        canvasContext.fillText(this.outputUnitName, this.config.posX + this.config.length, this.config.posY);
+        canvasContext.fillText(this.outputUnitName, this.dimensions.posX + this.dimensions.length, this.dimensions.posY);
         canvasContext.fill();
     }
 

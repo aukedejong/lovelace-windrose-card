@@ -1,14 +1,17 @@
-import {WindRoseConfig} from "./WindRoseConfig";
+import {WindRoseConfig} from "../config/WindRoseConfig";
+import {DrawUtil} from "../util/DrawUtil";
+import {WindSpeedConverter} from "../converter/WindSpeedConverter";
+import {SpeedRange} from "../converter/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
-import {DrawUtil} from "./DrawUtil";
-import {WindDirectionData} from "./WindDirectionData";
-import {SpeedRange, WindSpeedConverter} from "./WindSpeedConverter";
+import {WindRoseDimensions} from "../dimensions/WindRoseDimensions";
+import {Log} from "../util/Log";
 
-export class WindRoseCanvas {
-    readonly config: WindRoseConfig;
-    readonly windSpeedConverter: WindSpeedConverter;
-    readonly speedRanges: SpeedRange[];
-    readonly rangeCount: number;
+export class WindRoseRendererCenterCalm {
+    private config: WindRoseConfig;
+    private dimensions!: WindRoseDimensions;
+    private readonly windSpeedConverter: WindSpeedConverter;
+    private readonly speedRanges: SpeedRange[];
+    private readonly rangeCount: number;
     windRoseData!: WindRoseData;
 
     constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
@@ -18,12 +21,24 @@ export class WindRoseCanvas {
         this.rangeCount = this.speedRanges.length;
     }
 
-    drawWindRose(windRoseData: WindRoseData, canvasContext: CanvasRenderingContext2D) {
-        // console.log('Drawing windrose', this.config.outerRadius);
+    updateDimensions(dimensions: WindRoseDimensions): void {
+        this.dimensions = dimensions;
+    }
+
+    drawWindRose(windRoseData: WindRoseData, canvasContext: CanvasRenderingContext2D): void {
+        if (this.dimensions === undefined) {
+            Log.error("drawWindRose(): Can't draw, dimensions not set");
+            return;
+        }
+        if (windRoseData === undefined) {
+            Log.error("drawWindRose(): Can't draw, no windrose data.");
+            return;
+        }
+        Log.trace('drawWindRose()', windRoseData);
         this.windRoseData = windRoseData;
-        canvasContext.clearRect(0, 0, 700, 500);
+        canvasContext.clearRect(0, 0, 7000, 5000);
         canvasContext.save();
-        canvasContext.translate(this.config.centerX, this.config.centerY);
+        canvasContext.translate(this.dimensions.centerX, this.dimensions.centerY);
         canvasContext.rotate(DrawUtil.toRadians(this.config.windRoseDrawNorthOffset));
         this.drawBackground(canvasContext);
         this.drawWindDirections(canvasContext);
@@ -33,40 +48,40 @@ export class WindRoseCanvas {
     }
 
     private drawWindDirections(canvasContext: CanvasRenderingContext2D) {
-        for (const windDirection of this.windRoseData.windDirections) {
-            this.drawWindDirection(windDirection, canvasContext);
+        for (let i = 0; i < this.windRoseData.directionPercentages.length; i++) {
+            this.drawWindDirection(this.windRoseData.directionSpeedRangePercentages[i],
+                this.windRoseData.directionPercentages[i],
+                this.windRoseData.directionDegrees[i], canvasContext);
         }
     }
 
-    private drawWindDirection(windDirection: WindDirectionData, canvasContext: CanvasRenderingContext2D) {
-        if (windDirection.speedRangePercentages.length === 0) return;
+    private drawWindDirection(speedRangePercentages: number[], directionPercentage: number, degrees: number,
+                              canvasContext: CanvasRenderingContext2D) {
+        if (directionPercentage === 0) return;
 
-        const percentages = Array(windDirection.speedRangePercentages.length).fill(0);
-        for (let i = windDirection.speedRangePercentages.length - 1; i >= 0; i--) {
-            percentages[i] = windDirection.speedRangePercentages[i];
-            if (windDirection.speedRangePercentages[i] > 0) {
-                for (let x = i - 1; x >= 1; x--) {
-                    percentages[i] += windDirection.speedRangePercentages[x];
+        const percentages = Array(speedRangePercentages.length).fill(0);
+        for (let i = speedRangePercentages.length - 1; i >= 0; i--) {
+            percentages[i] = speedRangePercentages[i];
+            if (speedRangePercentages[i] > 0) {
+                for (let x = i - 1; x >= 0; x--) {
+                    percentages[i] += speedRangePercentages[x];
                 }
             }
         }
-        const maxRadius = (this.config.outerRadius - this.config.centerRadius) * (windDirection.directionPercentage / 100);
-        for (let i = this.speedRanges.length - 1; i >= 1; i--) {
+        const maxDirectionRadius = (directionPercentage * (this.dimensions.outerRadius - this.config.centerRadius)) / this.windRoseData.maxCirclePercentage;
+        for (let i = this.speedRanges.length - 1; i >= 0; i--) {
             this.drawSpeedPart(canvasContext,
-                windDirection.centerDegrees - 90,
-                (maxRadius * (percentages[i] / 100)) + this.config.centerRadius,
+                degrees - 90,
+                (maxDirectionRadius * (percentages[i] / 100)) + this.config.centerRadius,
                 this.speedRanges[i].color);
         }
     }
 
     private drawSpeedPart(canvasContext: CanvasRenderingContext2D, degrees: number, radius: number, color: string) {
-        //var x = Math.cos(DrawUtil.toRadians(degreesCompensated - (this.config.leaveArc / 2)));
-        //var y = Math.sin(DrawUtil.toRadians(degreesCompensated - (this.config.leaveArc / 2)));
         canvasContext.strokeStyle = this.config.roseLinesColor;
         canvasContext.lineWidth = 2;
         canvasContext.beginPath();
         canvasContext.moveTo(0, 0);
-        //canvasContext.lineTo(this.config.centerX + x, this.config.centerY + y);
         canvasContext.arc(0, 0, radius,
             DrawUtil.toRadians(degrees - (this.config.leaveArc / 2)),
             DrawUtil.toRadians(degrees + (this.config.leaveArc / 2)));
@@ -83,21 +98,23 @@ export class WindRoseCanvas {
         // Cross
         canvasContext.lineWidth = 1;
         canvasContext.strokeStyle = this.config.roseLinesColor;
-        canvasContext.moveTo(0 - this.config.outerRadius, 0);
-        canvasContext.lineTo(this.config.outerRadius, 0);
+        canvasContext.moveTo(0 - this.dimensions.outerRadius, 0);
+        canvasContext.lineTo(this.dimensions.outerRadius, 0);
         canvasContext.stroke();
-        canvasContext.moveTo(0, 0 - this.config.outerRadius);
-        canvasContext.lineTo(0, this.config.outerRadius);
+        canvasContext.moveTo(0, 0 - this.dimensions.outerRadius);
+        canvasContext.lineTo(0, this.dimensions.outerRadius);
         canvasContext.stroke();
 
-        // console.log('Cirlce center:', this.config.centerX, this.config.centerY);
         // Cirlces
+        const circleCount = this.windRoseData.circleCount;
         canvasContext.strokeStyle = this.config.roseLinesColor;
-        const radiusStep = (this.config.outerRadius - this.config.centerRadius) / this.windRoseData.numberOfCircles
-        for (let i = 1; i <= this.windRoseData.numberOfCircles; i++) {
+        const radiusStep = (this.dimensions.outerRadius - this.config.centerRadius) / circleCount;
+        let circleRadius = this.config.centerRadius + radiusStep;
+        for (let i = 1; i <= circleCount; i++) {
             canvasContext.beginPath();
-            canvasContext.arc(0, 0, this.config.centerRadius + (radiusStep * i), 0, 2 * Math.PI);
+            canvasContext.arc(0, 0, circleRadius, 0, 2 * Math.PI);
             canvasContext.stroke();
+            circleRadius += radiusStep;
         }
 
         // Wind direction text
@@ -106,10 +123,10 @@ export class WindRoseCanvas {
         canvasContext.font = '22px Arial';
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'middle';
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[0], 0, 0 - this.config.outerRadius - textCirlceSpace + 2);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[2], 0, this.config.outerRadius + textCirlceSpace);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[1], this.config.outerRadius + textCirlceSpace, 0);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[3], 0 - this.config.outerRadius - textCirlceSpace, 0);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[0], 0, 0 - this.dimensions.outerRadius - textCirlceSpace + 2);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[2], 0, this.dimensions.outerRadius + textCirlceSpace);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[1], this.dimensions.outerRadius + textCirlceSpace, 0);
+        this.drawText(canvasContext, this.config.cardinalDirectionLetters[3], 0 - this.dimensions.outerRadius - textCirlceSpace, 0);
     }
 
     private drawCircleLegend(canvasContext: CanvasRenderingContext2D) {
@@ -117,14 +134,13 @@ export class WindRoseCanvas {
         canvasContext.fillStyle = this.config.rosePercentagesColor
         canvasContext.textAlign = 'center';
         canvasContext.textBaseline = 'bottom';
-        const radiusStep = (this.config.outerRadius - this.config.centerRadius) / this.windRoseData.numberOfCircles
+        const radiusStep = (this.dimensions.outerRadius - this.config.centerRadius) / this.windRoseData.circleCount;
         const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.config.centerRadius;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
 
-        for (let i = 1; i <= this.windRoseData.numberOfCircles; i++) {
+        for (let i = 1; i <= this.windRoseData.circleCount; i++) {
             const xPos = centerXY + (xy * i);
             const yPos = centerXY + (xy * i);
-            //canvasContext.fillText((this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
             this.drawText(canvasContext, (this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
         }
     }
@@ -142,7 +158,7 @@ export class WindRoseCanvas {
         canvasContext.textBaseline = 'middle';
         canvasContext.strokeStyle = this.config.rosePercentagesColor;
         canvasContext.fillStyle = this.config.rosePercentagesColor;
-        this.drawText(canvasContext, Math.round(this.windRoseData.calmSpeedPercentage) + '%', 0, 0);
+        this.drawText(canvasContext, Math.round(this.windRoseData.speedRangePercentages[0]) + '%', 0, 0);
     }
 
     private drawText(canvasContext: CanvasRenderingContext2D, text: string, x: number, y: number) {

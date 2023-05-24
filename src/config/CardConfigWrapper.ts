@@ -1,7 +1,8 @@
 import {GlobalConfig} from "./GlobalConfig";
-import {CardConfig} from "./CardConfig";
-import {SpeedRange} from "./WindSpeedConverter";
+import {CardConfig} from "../card/CardConfig";
+import {SpeedRange} from "../converter/SpeedRange";
 import {CardColors} from "./CardColors";
+import {Log} from "../util/Log";
 
 export class CardConfigWrapper {
 
@@ -11,9 +12,11 @@ export class CardConfigWrapper {
     maxWidth: number | undefined;
     windDirectionEntity: string;
     windspeedEntities: {entity: string, name: string}[];
+    useStatistics: boolean;
     directionCompensation: number;
     windspeedBarLocation: string;
     windspeedBarFull: boolean;
+    centerCalmPercentage: boolean;
     cardinalDirectionLetters: string;
     windDirectionCount: number;
     windDirectionUnit: string;
@@ -27,6 +30,7 @@ export class CardConfigWrapper {
     matchingStrategy: string;
     directionSpeedTimeDiff: number;
     cardColor: CardColors;
+    logLevel: string;
 
     entities: string[];
     filterEntitiesQueryParameter: string;
@@ -57,6 +61,8 @@ export class CardConfigWrapper {
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
             direction_speed_time_diff: GlobalConfig.defaultDirectionSpeedTimeDiff,
+            center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
+            log_level: GlobalConfig.defaultLogLevel
         };
     }
 
@@ -67,10 +73,12 @@ export class CardConfigWrapper {
         this.maxWidth = this.checkMaxWidth();
         this.windDirectionEntity = this.checkWindDirectionEntity();
         this.windspeedEntities = this.checkWindspeedEntities();
+        this.useStatistics = this.checkUseStatistics();
         this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
         this.directionCompensation = this.checkDirectionCompensation();
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.windspeedBarFull = this.checkWindspeedBarFull();
+        this.centerCalmPercentage = this.checkCenterCalmPercentage();
         this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
         this.windDirectionCount = this.checkWindDirectionCount();
         this.windDirectionUnit = this.checkWindDirectionUnit();
@@ -86,6 +94,8 @@ export class CardConfigWrapper {
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.entities = this.createEntitiesArray();
         this.cardColor = this.checkCardColors();
+        this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
+        Log.info('Config check OK');
     }
 
     windBarCount(): number {
@@ -135,6 +145,10 @@ export class CardConfigWrapper {
         return this.cardConfig.windspeed_entities;
     }
 
+    private checkUseStatistics(): boolean {
+        return this.cardConfig.use_statistics;
+    }
+
     private checkDirectionCompensation(): number {
         if (this.cardConfig.direction_compensation && isNaN(this.cardConfig.direction_compensation)) {
             throw new Error('WindRoseCard: Invalid direction compensation, should be a number in degress between 0 and 360.');
@@ -166,6 +180,13 @@ export class CardConfigWrapper {
 
     private checkWindspeedBarFull(): boolean {
         return this.cardConfig.windspeed_bar_full;
+    }
+
+    private checkCenterCalmPercentage(): boolean {
+        if (this.cardConfig.center_calm_percentage === undefined) {
+            return true;
+        }
+        return this.cardConfig.center_calm_percentage;
     }
 
     private checkCardinalDirectionLetters(): string {

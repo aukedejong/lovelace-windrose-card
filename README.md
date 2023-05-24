@@ -1,6 +1,6 @@
 # Lovelace Windrose card
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
@@ -63,7 +63,8 @@ Select "Manage Resources"
 | type                       | string  |                              |    x     | `custom:windrose-card`.                                                                                                                                               |
 | title                      | string  |                              |    -     | The card title.                                                                                                                                                       |
 | wind_direction_entity      | string  |                              |    x     | The wind direction entity, having directing in degrees as the state.                                                                                                  |
-| windspeed_entities         | object  |                              |    x     | One are more windspeed entities. Only the first is used for the windrose. (for now)                                                                                   |
+| windspeed_entities         | object  |                              |    x     | One are more windspeed entities. Only the first is used for the windrose.                                                                                             |
+| use_statistics             | boolean |            false             |    -     | Uses the 5 min statistics data from HA for all sensors. Can make fetching data faster.                                                                                |
 | refresh_interval           | number  |             300              |    -     | Refresh interval in seconds                                                                                                                                           |
 | hours_to_show              | number  |              4               |    -     | Show winddata for the last number of hours.                                                                                                                           |
 | max_width                  | number  |             null             |    -     | Use to limit the with (and height) of the windrose.                                                                                                                   |
@@ -73,6 +74,7 @@ Select "Manage Resources"
 | input_speed_unit           | string  |             mps              |    -     | Windspeed unit of measurement, see Speed unit options bellow.                                                                                                         |
 | output_speed_unit          | string  |             bft              |    -     | Windspeed unit used on card, see Spped unit options bellow.                                                                                                           |
 | output_speed_unit_label    | string  |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                              |
+| center_calm_percentage     | boolean |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.        |                                                                                |
 | speed_range_step           | number  | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                 |
 | speed_range_max            | number  | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity  |
 | speed_ranges               | object  | depends on output speed unit |    -     | Define custom speedranges and colours. Not possible for output speed unit bft (Beaufort).                                                                             |
@@ -82,7 +84,8 @@ Select "Manage Resources"
 | windrose_draw_north_offset | number  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                   |
 | matching_strategy          | string  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first` |
 | direction_speed_time_diff  | string  |              1               |    -     | How many seconds a speed measurement time can be earlier or later then the direction measurement time. Or the other way around, depending on thie matching_strategy   |
-| colors                     | object  |                              |          | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                             |
+| colors                     | object  |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                             |
+| log_level                  | string  |             NONE             |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                          |
 
 #### Object windspeed_entities
 

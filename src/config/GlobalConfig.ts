@@ -11,6 +11,8 @@ export class GlobalConfig {
     static defaultWindspeedBarFull = true;
     static defaultMatchingStategy = 'direction-first';
     static defaultDirectionSpeedTimeDiff = 1;
+    static defaultCenterCalmPercentage = true;
+    static defaultLogLevel: 'NONE';
 
     static verticalBarHeight = 30;
     static horizontalBarHeight = 15;

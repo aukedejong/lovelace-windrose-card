@@ -1,29 +1,7 @@
-import {ColorUtil} from "./ColorUtil";
-
-export class SpeedUnit {
-    public speedRanges: SpeedRange[] = [];
-    constructor(
-        public readonly name: string,
-        public readonly toMpsFunc: (speed: number) => number,
-        public readonly fromMpsFunc: (speed: number) => number,
-        public readonly speedRangeStep: number | undefined,
-        public readonly speedRangeMax: number | undefined) {
-    }
-}
-
-export class SpeedRange {
-    constructor(
-        public readonly range: number,
-        public readonly minSpeed: number,
-        public readonly maxSpeed: number,
-        public readonly color: string) {
-    }
-
-    isRangeMatch(speed: number): boolean {
-        //console.log(this.minSpeed, speed, this.maxSpeed,  speed >= this.minSpeed && (speed < this.maxSpeed || this.maxSpeed === -1));
-        return speed >= this.minSpeed && (speed < this.maxSpeed || this.maxSpeed === -1);
-    }
-}
+import {ColorUtil} from "../util/ColorUtil";
+import {SpeedRange} from "./SpeedRange";
+import {SpeedUnit} from "./SpeedUnit";
+import {Log} from "../util/Log";
 
 export class WindSpeedConverter {
 
@@ -76,7 +54,7 @@ export class WindSpeedConverter {
             this.outputSpeedUnit.speedRanges = this.generateSpeedRanges(this.outputSpeedUnit.speedRangeStep!,
                 this.outputSpeedUnit.speedRangeMax!);
         }
-        //console.log('Speed ranges: ', this.outputSpeedUnit.speedRanges);
+        Log.trace('Speed ranges: ', this.outputSpeedUnit.speedRanges);
     }
 
     getOutputSpeedUnit(): SpeedUnit {
@@ -96,7 +74,7 @@ export class WindSpeedConverter {
 
     getRangeFunction(): (speed: number) => number {
         return (speed: number) => {
-            const speedRange = this.outputSpeedUnit.speedRanges.find(speedRange => speedRange.isRangeMatch(speed));
+            const speedRange = this.outputSpeedUnit.speedRanges.find((speedRange: SpeedRange) => speedRange.isRangeMatch(speed));
             if (speedRange) {
                 return speedRange.range;
             }

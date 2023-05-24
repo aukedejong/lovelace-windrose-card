@@ -1,3 +1,6 @@
+import {CardConfigSpeedRange} from "./CardConfigSpeedRange";
+import {CardConfigColors} from "./CardConfigColors";
+
 export interface CardConfig {
     type: string;
     title: string;
@@ -7,6 +10,7 @@ export interface CardConfig {
     max_width: number;
     wind_direction_entity: string;
     windspeed_entities: {entity: string, name: string}[];
+    use_statistics: boolean
     wind_direction_unit: string;
     input_speed_unit: string;
     output_speed_unit: string;
@@ -15,6 +19,7 @@ export interface CardConfig {
     speed_range_max: number;
     speed_ranges: CardConfigSpeedRange[];
 
+    center_calm_percentage: boolean;
     windrose_draw_north_offset: number;
     direction_compensation: number;
     windspeed_bar_location: string;
@@ -23,22 +28,7 @@ export interface CardConfig {
     wind_direction_count: number;
     matching_strategy: string;
     direction_speed_time_diff: number;
+    log_level: string;
 
     colors: CardConfigColors;
-}
-
-export interface CardConfigSpeedRange {
-    from_value: number;
-    color: string;
-}
-
-export interface CardConfigColors {
-    rose_lines: string;
-    rose_direction_letters: string;
-    rose_percentages: string;
-    bar_border: string;
-    bar_unit_name: string;
-    bar_name: string
-    bar_unit_values: string
-    bar_percentages: string;
 }

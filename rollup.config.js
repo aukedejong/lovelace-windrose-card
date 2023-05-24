@@ -8,7 +8,10 @@ import json from "@rollup/plugin-json";
 const dev = true;
 
 export default {
-    input: 'src/**/*',
+    input: [
+        'src/card/WindRoseCard.ts',
+        'src/util/Log.ts'
+    ],
     output: {
         format: 'es',
         name: 'windroseCardBundle',
