@@ -5,13 +5,13 @@ import {WindSpeedConverter} from "../converter/WindSpeedConverter";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {WindRoseConfigFactory} from "../config/WindRoseConfigFactory";
 import {DimensionsCalculator} from "../dimensions/DimensionsCalculator";
-import {MeasurementProvider} from "../measurement-provider/MeasurementProvider";
 import {MeasurementCounter} from "../counter/MeasurementCounter";
 import {WindRoseData} from "./WindRoseData";
 import {Log} from "../util/Log";
 import {WindRoseRendererCenterCalm} from "./WindRoseRendererCenterCalm";
 import {PercentageCalculatorCenterCalm} from "./PercentageCalculatorCenterCalm";
 import {WindRoseRenderer} from "./WindRoseRenderer";
+import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 
 export class WindRoseDirigent {
     //Util
@@ -22,7 +22,7 @@ export class WindRoseDirigent {
     private cardConfig!: CardConfigWrapper;
 
     //Measurements
-    private measurementProvider!: MeasurementProvider;
+    private measurementProvider!: HomeAssistantMeasurementProvider;
     private measurementCounter!: MeasurementCounter;
     private percentageCalculator!: PercentageCalculator;
 
@@ -38,7 +38,7 @@ export class WindRoseDirigent {
     private dimensionsReady = false;
     private measurementsReady = false;
 
-    init(cardConfig: CardConfigWrapper, measurementProvider: MeasurementProvider): void {
+    init(cardConfig: CardConfigWrapper, measurementProvider: HomeAssistantMeasurementProvider): void {
         this.initReady = true;
         this.dimensionsReady = false;
         this.measurementsReady = false;
@@ -46,24 +46,24 @@ export class WindRoseDirigent {
         this.measurementProvider = measurementProvider;
         this.configFactory = new WindRoseConfigFactory(cardConfig);
         const windRoseConfig = this.configFactory.createWindRoseConfig();
-        this.windSpeedConverter = new WindSpeedConverter(cardConfig.inputSpeedUnit,
-            cardConfig.outputSpeedUnit, cardConfig.speedRangeStep, cardConfig.speedRangeMax,
-            cardConfig.speedRanges);
+        this.windSpeedConverter = new WindSpeedConverter(cardConfig.outputSpeedUnit, cardConfig.speedRangeBeaufort,
+            cardConfig.speedRangeStep, cardConfig.speedRangeMax, cardConfig.speedRanges);
 
         this.measurementCounter = new MeasurementCounter(windRoseConfig, this.windSpeedConverter);
         this.dimensionCalculator = new DimensionsCalculator();
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
-            this.windRoseRenderer = new WindRoseRendererCenterCalm(windRoseConfig, this.windSpeedConverter);
+            this.windRoseRenderer = new WindRoseRendererCenterCalm(windRoseConfig, this.windSpeedConverter.getSpeedRanges());
         } else {
             this.percentageCalculator = new PercentageCalculator();
-            this.windRoseRenderer = new WindRoseRendererStandaard(windRoseConfig, this.windSpeedConverter);
+            this.windRoseRenderer = new WindRoseRendererStandaard(windRoseConfig, this.windSpeedConverter.getSpeedRanges());
         }
 
+        this.windBarRenderers = [];
         const barConfigs = this.configFactory.createWindBarConfigs();
         for (let i = 0; i < cardConfig.windBarCount(); i++) {
-            this.windBarRenderers.push(new WindBarRenderer(barConfigs[i], this.windSpeedConverter));
+            this.windBarRenderers.push(new WindBarRenderer(barConfigs[i], this.windSpeedConverter.getOutputSpeedUnit()));
         }
         this.windRoseData = [];
     }
@@ -94,9 +94,10 @@ export class WindRoseDirigent {
         if (this.initReady) {
             Log.debug('refreshData()');
             return this.measurementProvider.getMeasurements().then((matchedGroups) => {
-
-                for (const measurements of matchedGroups) {
-                    for (const measurement of measurements) {
+                Log.debug('Matched measurements:', matchedGroups);
+                for (let i = 0; i < matchedGroups.length; i++) {
+                    this.measurementCounter.init(this.cardConfig.windspeedEntities[i].speedUnit);
+                    for (const measurement of matchedGroups[i]) {
                         this.measurementCounter.addWindMeasurements(measurement.direction, measurement.speed);
                     }
                     const windCounts = this.measurementCounter.getMeasurementCounts();
@@ -113,7 +114,7 @@ export class WindRoseDirigent {
 
     render(canvasContext: CanvasRenderingContext2D): void {
         if (canvasContext && this.initReady && this.dimensionsReady && this.measurementsReady) {
-            Log.debug('render()', canvasContext, this.windRoseData);
+            Log.debug('render()', canvasContext, this.windRoseData, this.windBarRenderers);
             this.windRoseRenderer.drawWindRose(this.windRoseData[0], canvasContext);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i], canvasContext);

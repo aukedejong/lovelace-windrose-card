@@ -16,13 +16,12 @@ export class MeasurementCounter {
     private windData = new WindCounts();
 
     private speedRangeFunction: (speed: number) => number;
-    private speedConverterFunction: (speed: number) => number;
+    private speedConverterFunction!: (speed: number) => number;
 
     constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
         this.windSpeedConverter = windSpeedConverter;
         this.speedRangeFunction = this.windSpeedConverter.getRangeFunction();
-        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter();
         const leaveDegrees = 360 / config.windDirectionCount;
         for (let i = 0; i < config.windDirectionCount; i++) {
             const degrees = (i * leaveDegrees);
@@ -31,11 +30,11 @@ export class MeasurementCounter {
             this.windDirections.push(new WindDirection(minDegrees, maxDegrees));
             this.windData.speedRangeDegrees.push(degrees);
         }
-        this.reset();
     }
 
-    reset() {
+    init(inputSpeedUnit: string) {
         this.windData.init(this.windSpeedConverter.getSpeedRanges().length, this.config.windDirectionCount);
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(inputSpeedUnit);
     }
 
     getMeasurementCounts(): WindCounts {

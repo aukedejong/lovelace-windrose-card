@@ -1,21 +1,27 @@
-import {MeasurementProvider} from "./MeasurementProvider";
 import {HomeAssistant} from "custom-card-helpers";
 import {DirectionSpeed} from "../matcher/DirectionSpeed";
 import {Log} from "../util/Log";
-import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
+import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
 
-export class HomeAssistantMeasurementProvider implements MeasurementProvider {
+export class HomeAssistantMeasurementProvider {
 
     private hass!: HomeAssistant;
-    private cardConfig!: CardConfigWrapper
+    private cardConfig: CardConfigWrapper;
+    private rawEntities: string[];
+    private statsEntities: string[];
+    private measurementMatcher: MeasurementMatcher;
+    private waitingForMeasurements = false;
+
+    constructor(cardConfig: CardConfigWrapper) {
+        this.cardConfig = cardConfig;
+        this.rawEntities = cardConfig.createRawEntitiesArray();
+        this.statsEntities = cardConfig.createStatisticsEntitiesArray();
+        this.measurementMatcher = new MeasurementMatcher(this.cardConfig.matchingStrategy);
+    }
 
     setHass(hass: HomeAssistant): void {
         this.hass = hass;
-    }
-
-    setCardConfig(cardConfig: CardConfigWrapper): void {
-        this.cardConfig = cardConfig;
     }
 
     getMeasurements(): Promise<DirectionSpeed[][]> {
@@ -24,20 +30,85 @@ export class HomeAssistantMeasurementProvider implements MeasurementProvider {
             Log.error('Cant read measurements, HASS not set.');
             return Promise.resolve([]);
         }
-        return this.getHistory().then((history: any) => {
-            const directionData = history[this.cardConfig.windDirectionEntity];
+        if (this.waitingForMeasurements) {
+            Log.error('Measurements already requested, waiting');
+            return Promise.resolve([]);
+        }
+        this.waitingForMeasurements = true;
+        return Promise.all([this.getHistory(), this.getStatistics()]).then(results => {
+            this.checkLoadedData(results);
+            this.waitingForMeasurements = false;
+            Log.debug("Measurements loaded:", results);
             const directionSpeedData: DirectionSpeed[][] = [];
-            for (let speedEntity of this.cardConfig.windspeedEntities) {
-                const speedData = history[speedEntity.entity];
-                const directionSpeeds = new MeasurementMatcher(directionData, speedData,
-                    this.cardConfig.directionSpeedTimeDiff).match(this.cardConfig.matchingStrategy);
-                directionSpeedData.push(directionSpeeds);
+            if (this.cardConfig.windDirectionEntity.useStatistics) {
+                const directionStats = results[1][this.cardConfig.windDirectionEntity.entity] as StatisticsData[];
+                for (let speedEntity of this.cardConfig.windspeedEntities) {
+                    if (speedEntity.useStatistics) {
+                        const speedStats = results[1][speedEntity.entity];
+                        const directionSpeeds = this.measurementMatcher.matchStatsStats(directionStats, speedStats)
+                        directionSpeedData.push(directionSpeeds);
+                        this.logMatchingStats(speedEntity.entity, directionStats.length, speedStats.length, directionSpeeds.length);
+                    } else {
+                        const speedHistory = results[0][speedEntity.entity];
+                        const directionSpeeds = this.measurementMatcher.matchStatsHistory(directionStats, speedHistory);
+                        directionSpeedData.push(directionSpeeds);
+                        this.logMatchingStats(speedEntity.entity, directionStats.length, speedHistory.length, directionSpeeds.length);
+                    }
+                }
+
+            } else {
+                const directionHistory = results[0][this.cardConfig.windDirectionEntity.entity] as HistoryData[];
+                for (let speedEntity of this.cardConfig.windspeedEntities) {
+                    if (speedEntity.useStatistics) {
+                        const speedStats = results[1][speedEntity.entity];
+                        const directionSpeeds = this.measurementMatcher.matchHistoryStats(directionHistory, speedStats);
+                        directionSpeedData.push(directionSpeeds);
+                        this.logMatchingStats(speedEntity.entity, directionHistory.length, speedStats.length, directionSpeeds.length);
+                    } else {
+                        const speedHistory = results[0][speedEntity.entity];
+                        const directionSpeeds = this.measurementMatcher.matchHistoryHistory(directionHistory, speedHistory);
+                        directionSpeedData.push(directionSpeeds);
+                        this.logMatchingStats(speedEntity.entity, directionHistory.length, speedHistory.length, directionSpeeds.length);
+                    }
+                }
             }
             return Promise.resolve(directionSpeedData);
         });
     }
 
+    private checkLoadedData(results: any) {
+        const directionEntity = this.cardConfig.windDirectionEntity.entity;
+        if (results[0][directionEntity] === undefined && results[1][directionEntity] === undefined) {
+            throw new Error(`Entity ${directionEntity} did not return data, is this the correct entity name?`);
+        }
+        for (const speedEntity of this.cardConfig.windspeedEntities) {
+            if (results[0][speedEntity.entity] === undefined && results[1][speedEntity.entity] === undefined) {
+                throw new Error(`Entity ${speedEntity.entity} did not return data, is this the correct entity name?`);
+            }
+        }
+    }
+
+    private logMatchingStats(speedEntity: string, directionMeasurements: number, speedMeasurements: number, matchedMeasurements: number) {
+        Log.info(`Loaded measurements: directions: ${directionMeasurements}, speeds: ${speedMeasurements}, entity: ${speedEntity}`);
+        if (this.cardConfig.matchingStrategy === 'direction-first') {
+            if (matchedMeasurements < directionMeasurements) {
+                Log.warn(`Matching results entity ${speedEntity}, ${directionMeasurements - matchedMeasurements} not matched of total ${directionMeasurements} direction measurements`);
+            } else {
+                Log.info(`Matched measurements, direction-first: ${matchedMeasurements}`);
+            }
+        } else {
+            if (matchedMeasurements < speedMeasurements) {
+                Log.warn(`Matching results entity ${speedEntity}, ${speedMeasurements - matchedMeasurements}  not matched of total ${speedMeasurements} speed measurements`);
+            } else {
+                Log.info(`Matched measurements, speed-first: ${matchedMeasurements}`);
+            }
+        }
+    }
+
     private getHistory(): Promise<any> {
+        if (this.rawEntities.length === 0) {
+            return Promise.resolve({});
+        }
         const startTime = new Date();
         startTime.setHours(startTime.getHours() - this.cardConfig.hoursToShow);
         const endTime = new Date();
@@ -48,8 +119,25 @@ export class HomeAssistantMeasurementProvider implements MeasurementProvider {
             "end_time": endTime,
             "minimal_response": true,
             "no_attributes": true,
-            "entity_ids": this.cardConfig.entities
+            "entity_ids": this.rawEntities
         }
         return this.hass.callWS(historyMessage);
+    }
+
+    private getStatistics(): Promise<any> {
+        if (this.statsEntities.length === 0) {
+            return Promise.resolve({});
+        }
+        const startTime = new Date();
+        startTime.setHours(startTime.getHours() - this.cardConfig.hoursToShow);
+
+        const statisticsMessage = {
+            "type": "recorder/statistics_during_period",
+            "start_time": startTime,
+            "period": "5minute",
+            "statistic_ids": this.statsEntities,
+            "types":["mean"]
+        }
+        return this.hass.callWS(statisticsMessage);
     }
 }

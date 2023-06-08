@@ -8,6 +8,7 @@ export class WindBarConfig {
         public inputUnit: string,
         public outputUnit: string,
         public outputUnitLabel: string | undefined,
+        public speedRangeBeaufort: boolean,
 
         public barBorderColor: string,
         public barUnitNameColor: string,

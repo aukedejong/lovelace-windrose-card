@@ -1,37 +1,34 @@
 import {DrawUtil} from "../util/DrawUtil";
 import {WindBarConfig} from "../config/WindBarConfig";
-import {WindSpeedConverter} from "../converter/WindSpeedConverter";
 import {SpeedRange} from "../converter/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
 import {WindBarDimensions} from "../dimensions/WindBarDimensions";
 import {Log} from "../util/Log";
+import {SpeedUnit} from "../converter/SpeedUnit";
 
 export class WindBarRenderer {
 
     config: WindBarConfig;
     dimensions!: WindBarDimensions;
-    readonly windSpeedConverter: WindSpeedConverter;
     readonly outputUnitName: string;
     readonly speedRanges: SpeedRange[];
 
-    constructor(config: WindBarConfig, windSpeedConverter: WindSpeedConverter) {
+    constructor(config: WindBarConfig, outputSpeedUnit: SpeedUnit) {
+        Log.debug('WindBarRenderer init', config, outputSpeedUnit);
         this.config = config;
-        this.windSpeedConverter = windSpeedConverter;
         if (config.outputUnitLabel) {
             this.outputUnitName = config.outputUnitLabel;
+        } else if (config.speedRangeBeaufort) {
+            this.outputUnitName = 'Beaufort';
         } else {
-            this.outputUnitName = this.windSpeedConverter.getOutputSpeedUnit().name;
+            this.outputUnitName = outputSpeedUnit.name;
         }
-        this.speedRanges = this.windSpeedConverter.getOutputSpeedUnit().speedRanges;
-    }
-
-    updateConfig(config: WindBarConfig) {
-        this.config = config;
+        this.speedRanges = outputSpeedUnit.speedRanges;
     }
 
     updateDimensions(dimensions: WindBarDimensions) {
-        Log.debug('WindBarRenderer.updateDimensions()', dimensions);
         this.dimensions = dimensions;
+        Log.debug('WindBarRenderer.updateDimensions()', this.dimensions);
     }
 
     drawWindBar(windBarData: WindRoseData, canvasContext: CanvasRenderingContext2D) {
@@ -91,7 +88,7 @@ export class WindBarRenderer {
             canvasContext.textAlign = 'left';
             canvasContext.fillStyle = this.config.barUnitValuesColor;
 
-            if (this.config.outputUnit === 'bft') {
+            if (this.config.speedRangeBeaufort === true) {
                 if (i == 12) {
                     canvasContext.fillText(i+'', this.dimensions.posX + this.dimensions.height + 5, posY - 6);
                 } else {
@@ -109,6 +106,11 @@ export class WindBarRenderer {
             canvasContext.stroke();
 
             posY += length;
+        }
+        if (!this.config.speedRangeBeaufort && !this.config.full && highestRangeMeasured < speedRangePercentages.length) {
+            canvasContext.textAlign = 'left';
+            canvasContext.fillStyle = this.config.barUnitValuesColor;
+            canvasContext.fillText(this.speedRanges[highestRangeMeasured].minSpeed + '', this.dimensions.posX + this.dimensions.height + 5, posY);
         }
         canvasContext.lineWidth = 1;
         canvasContext.strokeStyle = this.config.barBorderColor;
@@ -158,7 +160,7 @@ export class WindBarRenderer {
             canvasContext.textAlign = 'center';
             canvasContext.fillStyle = this.config.barUnitValuesColor;
 
-            if (this.config.outputUnit === 'bft') {
+            if (this.config.speedRangeBeaufort === true) {
                 canvasContext.fillText(i+'', posX + (length / 2), this.dimensions.posY + this.dimensions.height + 2);
             } else {
                 canvasContext.fillText(this.speedRanges[i].minSpeed + '', posX, this.dimensions.posY + this.dimensions.height + 2);
@@ -172,6 +174,10 @@ export class WindBarRenderer {
             canvasContext.stroke();
 
             posX += length;
+        }
+        if (!this.config.speedRangeBeaufort && !this.config.full && highestRangeMeasured < speedRangePercentages.length) {
+            canvasContext.fillStyle = this.config.barUnitValuesColor;
+            canvasContext.fillText(this.speedRanges[highestRangeMeasured].minSpeed + '', posX, this.dimensions.posY + this.dimensions.height + 2);
         }
         canvasContext.lineWidth = 1;
         canvasContext.strokeStyle = this.config.barBorderColor;

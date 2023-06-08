@@ -1,6 +1,5 @@
 import {WindRoseConfig} from "../config/WindRoseConfig";
 import {DrawUtil} from "../util/DrawUtil";
-import {WindSpeedConverter} from "../converter/WindSpeedConverter";
 import {SpeedRange} from "../converter/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
 import {WindRoseDimensions} from "../dimensions/WindRoseDimensions";
@@ -9,15 +8,13 @@ import {Log} from "../util/Log";
 export class WindRoseRendererStandaard {
     private config: WindRoseConfig;
     private dimensions!: WindRoseDimensions;
-    private readonly windSpeedConverter: WindSpeedConverter;
     private readonly speedRanges: SpeedRange[];
     private readonly rangeCount: number;
     windRoseData!: WindRoseData;
 
-    constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
+    constructor(config: WindRoseConfig, speedRanges: SpeedRange[]) {
         this.config = config;
-        this.windSpeedConverter = windSpeedConverter;
-        this.speedRanges = this.windSpeedConverter.getSpeedRanges();
+        this.speedRanges = speedRanges;
         this.rangeCount = this.speedRanges.length;
     }
 

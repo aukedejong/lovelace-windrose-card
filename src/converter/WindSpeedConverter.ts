@@ -5,44 +5,49 @@ import {Log} from "../util/Log";
 
 export class WindSpeedConverter {
 
-    readonly bft = new SpeedUnit("Beaufort",
+    readonly bft = new SpeedUnit('Beaufort',
+        ['bft'],
         (speed: number) => speed,
         (speed: number) => speed, undefined, undefined);
 
-    readonly mps = new SpeedUnit("m/s",
+    readonly mps = new SpeedUnit('m/s',
+        ['mps', 'm/s'],
         (speed: number) => speed,
         (speed: number) => speed, 5, 30);
 
-    readonly kph = new SpeedUnit("km/h",
+    readonly kph = new SpeedUnit('km/h',
+        ['kph', 'km/h'],
         (speed: number) => speed / 3.6,
         (speed: number) => speed * 3.6, 10, 100);
 
-    readonly mph = new SpeedUnit("m/h",
+    readonly mph = new SpeedUnit('m/h',
+        ['mph', 'm/h'],
         (speed: number) => speed / 2.2369,
         (speed: number) => speed * 2.2369, 10, 70);
 
-    readonly fps = new SpeedUnit("ft/s",
+    readonly fps = new SpeedUnit('ft/s',
+        ['fps', 'ft/s'],
         (speed: number) => speed / 3.2808399,
         (speed: number) => speed * 3.2808399, 10, 100);
 
-    readonly knots = new SpeedUnit("knots",
+    readonly knots = new SpeedUnit('knots',
+        ['knots', 'kts', 'knts'],
         (speed: number) => speed / 1.9438444924406,
         (speed: number) => speed * 1.9438444924406, 5, 60);
+    readonly units: SpeedUnit[] = [this.bft, this.mps, this.kph, this.mph, this.fps,this.knots];
 
-    readonly inputSpeedUnit: SpeedUnit;
     readonly outputSpeedUnit: SpeedUnit;
 
-    constructor(private readonly inputUnit: string,
-                private readonly outputUnit: string,
+    constructor(private readonly outputUnit: string,
+                private readonly rangeBeaufort?: boolean,
                 private readonly rangeStep?: number,
                 private readonly rangeMax?: number,
                 private readonly speedRanges?: SpeedRange[]) {
 
-        this.inputSpeedUnit = this.getSpeedUnit(this.inputUnit);
         this.outputSpeedUnit = this.getSpeedUnit(this.outputUnit);
 
-        if (outputUnit === 'bft') {
-            this.outputSpeedUnit.speedRanges = this.generateBeaufortSpeedRanges(inputUnit);
+        if (rangeBeaufort === true) {
+            this.outputSpeedUnit.speedRanges = this.generateBeaufortSpeedRanges(outputUnit);
 
         } else if (speedRanges && speedRanges.length > 0) {
             this.outputSpeedUnit.speedRanges = speedRanges;
@@ -61,13 +66,14 @@ export class WindSpeedConverter {
         return this.outputSpeedUnit;
     }
 
-    getSpeedConverter(): (speed: number) => number {
-        if (this.inputUnit === this.outputUnit || this.outputUnit === 'bft') {
+    getSpeedConverter(inputUnit: string): (speed: number) => number {
+        if (inputUnit === this.outputUnit) {
             return (inputSpeed: number) => inputSpeed;
-        } else if (this.inputUnit === 'mps') {
+        } else if (inputUnit === 'mps') {
             return this.outputSpeedUnit.fromMpsFunc;
         }
-        const toMpsFunction = this.inputSpeedUnit.toMpsFunc;
+        const inputSpeedUnit = this.getSpeedUnit(inputUnit);
+        const toMpsFunction = inputSpeedUnit.toMpsFunc;
         const fromMpsFunction = this.outputSpeedUnit.fromMpsFunc;
         return (speed: number) => fromMpsFunction(toMpsFunction(speed));
     }
@@ -86,16 +92,14 @@ export class WindSpeedConverter {
         return this.outputSpeedUnit.speedRanges;
     }
 
-    private getSpeedUnit(unit: string): SpeedUnit {
-        switch (unit) {
-            case 'bft': return this.bft;
-            case 'mps': return this.mps;
-            case 'kph': return this.kph;
-            case 'mph': return this.mph;
-            case 'fps': return this.fps;
-            case 'knots': return this.knots;
-            default: throw new Error("Unknown speed unit: " + unit);
+    getSpeedUnit(unit: string): SpeedUnit {
+        const speedUnit = this.units.find(speedUnit => speedUnit.configs.includes(unit));
+        if (speedUnit === undefined) {
+            throw new Error("Unknown speed unit: " + unit);
+        } else {
+            Log.debug(`Matched speedunit ${speedUnit.name}`);
         }
+        return speedUnit;
     }
 
     private generateSpeedRanges(step: number, max: number): SpeedRange[] {
@@ -112,9 +116,9 @@ export class WindSpeedConverter {
         return speedRanges;
     }
 
-    private generateBeaufortSpeedRanges(inputUnit: string): SpeedRange[] {
+    private generateBeaufortSpeedRanges(beaufortType: string | undefined): SpeedRange[] {
         const colors = new ColorUtil().getColorArray(13);
-        if (inputUnit === 'mps') {
+        if (beaufortType === undefined || beaufortType === 'mps') {
             return [
                 new SpeedRange(0, 0, 0.5, colors[0]),
                 new SpeedRange(1, 0.5, 1.6, colors[1]),
@@ -130,7 +134,7 @@ export class WindSpeedConverter {
                 new SpeedRange(11, 28.5, 32.7, colors[11]),
                 new SpeedRange(12, 32.7, -1, colors[12])
             ];
-        } else if (inputUnit === 'kph') {
+        } else if (beaufortType === 'kph') {
             return [
                 new SpeedRange(0, 0, 2, colors[0]),
                 new SpeedRange(1, 2, 6, colors[1]),
@@ -146,7 +150,7 @@ export class WindSpeedConverter {
                 new SpeedRange(11, 103, 118, colors[11]),
                 new SpeedRange(12, 118, -1, colors[12])
             ];
-        } else if (inputUnit === 'mph') {
+        } else if (beaufortType === 'mph') {
             return [
                 new SpeedRange(0, 0, 1, colors[0]),
                 new SpeedRange(1, 1, 4, colors[1]),
@@ -162,7 +166,7 @@ export class WindSpeedConverter {
                 new SpeedRange(11, 64, 73, colors[11]),
                 new SpeedRange(12, 73, -1, colors[12])
             ];
-        } else if (inputUnit === 'fps') {
+        } else if (beaufortType === 'fps') {
             return [
                 new SpeedRange(0, 0, 1.6, colors[0]),
                 new SpeedRange(1, 1.6, 5.2, colors[1]),
@@ -178,7 +182,7 @@ export class WindSpeedConverter {
                 new SpeedRange(11, 93.5, 107, colors[11]),
                 new SpeedRange(12, 107, -1, colors[12])
             ];
-        } else if (inputUnit === 'knots') {
+        } else if (beaufortType === 'knots') {
             return [
                 new SpeedRange(0, 0, 1, colors[0]),
                 new SpeedRange(1, 1, 4, colors[1]),
@@ -195,6 +199,6 @@ export class WindSpeedConverter {
                 new SpeedRange(12, 64, -1, colors[12])
             ];
         }
-        throw new Error("No Bft reanges for input speed unit:: " + inputUnit);
+        throw new Error("No Bft reanges for type: " + beaufortType);
     }
 }

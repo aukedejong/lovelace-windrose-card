@@ -6,13 +6,14 @@ export class GlobalConfig {
     static defaultRefreshInterval = 300;
     static defaultWindDirectionCount = 16;
     static defaultWindDirectionUnit = 'degrees';
-    static defaultInputSpeedUnit = 'mps';
-    static defaultOutputSpeedUnit = 'bft';
+    static defaultInputSpeedUnit = 'auto';
+    static defaultOutputSpeedUnit = 'mps';
     static defaultWindspeedBarFull = true;
     static defaultMatchingStategy = 'direction-first';
     static defaultDirectionSpeedTimeDiff = 1;
     static defaultCenterCalmPercentage = true;
     static defaultLogLevel: 'NONE';
+    static defaultSpeedRangeBeaufort = false;
 
     static verticalBarHeight = 30;
     static horizontalBarHeight = 15;

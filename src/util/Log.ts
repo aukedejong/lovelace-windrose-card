@@ -11,7 +11,7 @@ export class Log {
             case 'TRACE': this.level = 5; break;
             default:
                 this.level = 0;
-                this.error('Unkonwn log level set: ', level, ' default to NONE');
+                this.error('Unkonwn log level set: ', level, ' default to WARN');
                 break;
         }
         if (this.level > 0) {
@@ -21,7 +21,7 @@ export class Log {
 
     static checkLogLevel(logLevel: string | undefined): string {
         if (logLevel === undefined) {
-            return 'NONE';
+            return 'WARN';
         }
         if (logLevel === 'NONE' || logLevel === 'ERROR' || logLevel === 'WARN' || logLevel === 'INFO' ||
             logLevel === 'DEBUG' || logLevel === 'TRACE') {
