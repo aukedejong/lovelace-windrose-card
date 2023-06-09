@@ -44,7 +44,7 @@ export class CardConfigWrapper {
                 entity: '',
                 direction_unit: GlobalConfig.defaultWindDirectionUnit,
                 use_statistics: false,
-                direction_compensation: 45
+                direction_compensation: 0
             },
             windspeed_entities: [
                 {

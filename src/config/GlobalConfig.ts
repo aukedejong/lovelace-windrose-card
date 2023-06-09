@@ -13,7 +13,7 @@ export class GlobalConfig {
     static defaultDirectionSpeedTimeDiff = 1;
     static defaultCenterCalmPercentage = true;
     static defaultLogLevel: 'NONE';
-    static defaultSpeedRangeBeaufort = false;
+    static defaultSpeedRangeBeaufort = true;
 
     static verticalBarHeight = 30;
     static horizontalBarHeight = 15;
