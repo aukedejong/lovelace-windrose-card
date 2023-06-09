@@ -2,6 +2,8 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 
+Attention! The latest version (1.0.0) has breaking changes. The configuration is changed. The easyiest way is to just add the card and modify the generated configuration.
+
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
 
