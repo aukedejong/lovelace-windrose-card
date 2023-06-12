@@ -31,7 +31,7 @@ export class WindSpeedConverter {
         (speed: number) => speed * 3.2808399, 10, 100);
 
     readonly knots = new SpeedUnit('knots',
-        ['knots', 'kts', 'knts'],
+        ['knots', 'kts', 'knts', 'kn'],
         (speed: number) => speed / 1.9438444924406,
         (speed: number) => speed * 1.9438444924406, 5, 60);
     readonly units: SpeedUnit[] = [this.bft, this.mps, this.kph, this.mph, this.fps,this.knots];

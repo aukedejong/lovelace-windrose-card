@@ -47,6 +47,9 @@ export class MeasurementCounter {
         const speedRangeIndex = this.speedRangeFunction(convertedSpeed)
 
         const convertedDirection = this.convertDirection(direction);
+        if (convertedDirection === undefined) {
+            return;
+        }
         const compensatedDirection = this.compensateDirection(convertedDirection);
         const windDirectionIndex = this.windDirections.findIndex(
             windDirection => windDirection.checkDirection(compensatedDirection));
@@ -56,14 +59,19 @@ export class MeasurementCounter {
         this.windData.add(windDirectionIndex, speedRangeIndex);
     }
 
-    private convertDirection(direction: number | string): number {
+    private convertDirection(direction: number | string): number | undefined {
         let degrees = 0;
         if (this.config.windDirectionUnit === 'letters') {
             degrees = this.windDirectionConverter.getDirection(direction as string);
             if (isNaN(degrees)) {
                 Log.info("Could not convert direction " + direction + " to degrees.");
+                return undefined;
             }
         } else {
+            if (isNaN(direction as number)) {
+                Log.info("Direction " + direction + " is not a number.");
+                return undefined;
+            }
             degrees = direction as number;
         }
         return degrees;

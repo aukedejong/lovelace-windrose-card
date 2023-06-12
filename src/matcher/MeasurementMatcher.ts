@@ -16,8 +16,8 @@ export class MeasurementMatcher {
             for (const direction of directionStats) {
                 const speed = this.findHistoryInPeriod(direction, speedHistory);
                 if (speed) {
-                    if (speed.s === '' || speed.s === null || isNaN(+speed.s)) {
-                        Log.warn("Spped " + speed.s + " at timestamp " + direction.start + " is not a number.");
+                    if (this.isInvalidSpeed(speed.s)) {
+                        Log.warn("Speed " + speed.s + " at timestamp " + direction.start + " is not a number.");
                     } else {
                         directionSpeed.push(new DirectionSpeed(direction.mean, +speed.s));
                     }
@@ -32,7 +32,7 @@ export class MeasurementMatcher {
                 if (direction) {
                     directionSpeed.push(new DirectionSpeed(direction.mean, +speed.s));
                     if (speed.s === '' || speed.s === null || isNaN(+speed.s)) {
-                        Log.warn("Spped " + speed.s + " at timestamp " + direction.start + " is not a number.");
+                        Log.warn("Speed " + speed.s + " at timestamp " + direction.start + " is not a number.");
                     } else {
                         directionSpeed.push(new DirectionSpeed(direction.mean, +speed.s));
                     }
@@ -79,7 +79,7 @@ export class MeasurementMatcher {
             for (const direction of directionHistory) {
                 const speed = this.findHistoryBackAtTime(direction.lu, speedHistory);
                 if (speed) {
-                    if (speed.s === '' || speed.s === null || isNaN(+speed.s)) {
+                    if (this.isInvalidSpeed(speed.s)) {
                         Log.warn("Speed " + speed.s + " at timestamp " + speed.lu + " is not a number.");
                     } else {
                         directionSpeed.push(new DirectionSpeed(direction.s, +speed.s));
@@ -90,15 +90,17 @@ export class MeasurementMatcher {
             }
         } else {
             for (const speed of speedHistory) {
-                const direction = this.findHistoryBackAtTime(speed.lu, directionHistory);
-                if (direction) {
-                    if (direction.s === '' || direction.s === null || isNaN(+direction.s)) {
-                        Log.warn("Speed " + speed.s + " at timestamp " + speed.lu + " is not a number.");
+                if (this.isValidSpeed(speed.s)) {
+                    const direction = this.findHistoryBackAtTime(speed.lu, directionHistory);
+                    if (direction) {
+                        if (direction.s === '' || direction.s === null || isNaN(+direction.s)) {
+                            Log.warn("Speed " + speed.s + " at timestamp " + speed.lu + " is not a number.");
+                        } else {
+                            directionSpeed.push(new DirectionSpeed(direction.s, +speed.s));
+                        }
                     } else {
-                        directionSpeed.push(new DirectionSpeed(direction.s, +speed.s));
+                        Log.trace('No matching direction found for speed ' + speed.s + " at timestamp " + speed.lu);
                     }
-                } else {
-                    Log.trace('No matching direction found for speed ' + speed.s + " at timestamp " + speed.lu);
                 }
             }
         }
@@ -162,6 +164,14 @@ export class MeasurementMatcher {
             }
         }
         return match;
+    }
+
+    private isInvalidSpeed(speed: string) {
+        return speed === '' || speed === null || speed === undefined || isNaN(+speed);
+    }
+
+    private isValidSpeed(speed: string) {
+        return speed !== '' && speed !== null && speed !== undefined && !isNaN(+speed);
     }
 
 }
