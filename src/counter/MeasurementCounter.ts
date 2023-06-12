@@ -61,7 +61,7 @@ export class MeasurementCounter {
         if (this.config.windDirectionUnit === 'letters') {
             degrees = this.windDirectionConverter.getDirection(direction as string);
             if (isNaN(degrees)) {
-                throw new Error("Could not convert direction " + direction + " to degrees.");
+                Log.info("Could not convert direction " + direction + " to degrees.");
             }
         } else {
             degrees = direction as number;

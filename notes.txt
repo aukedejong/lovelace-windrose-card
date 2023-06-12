@@ -1,0 +1,20 @@
+Big release, breaking changes:
+
+The easiest way to update, is add the card to a dashboard and change the generated default configuration.
+
+New features:
+ - Option to disable the center calm percentage and show the first speed range.
+ - Statistics data can now be used for winddirection and windspeed entities. Not all entities support this.
+ - Windspeed unit is automatic detected, see readme. Depends on the unit_of_measurement attribuut of the entity.
+   If your windspeed entitiy uses an unit_of_measurement that's not recognized, please let me know. You can always configure the speedunit your self.
+ - Log level configurable, level INFO can give you some more information about measurement counts and speed units detected.
+Changes:
+ - Beaufort is not a speedunit any more. It more like a speed range option. It can be turned on with a separate property. The Beaufort speed ranges depend on the output speed unit.
+ - Wind direction speed matching logic changed:
+   - When NOT using statistics, when matching a speed to a direction, the matched speed is the last measurements before the measurement time of the direction.
+     So also when you get speed updates once in an hour and direction updated every second, machtes can be found.
+     The direction_speed_time_diff property is not used anymore.
+
+
+INFO Loaded measurements: directions: 4429, speeds: 5478, entity: sensor.alecto_ws4500_a1_01_wind_gust
+windrose-card.js:172 WARN Matching results entity sensor.alecto_ws4500_a1_01_wind_gust, 645 not matched of total 4429 direction measurements

@@ -14,7 +14,7 @@ export class Log {
                 this.error('Unkonwn log level set: ', level, ' default to WARN');
                 break;
         }
-        if (this.level > 0) {
+        if (this.level > 2) {
             console.log('LOG level set to:', level);
         }
     }
