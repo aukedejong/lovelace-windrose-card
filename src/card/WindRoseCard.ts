@@ -17,7 +17,7 @@ import {EntityChecker} from "../entity-checker/EntityChecker";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.0.2 `,
+    `%c  WINROSE-CARD  %c Version 1.1.2 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );

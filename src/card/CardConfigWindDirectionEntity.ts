@@ -3,4 +3,5 @@ export interface CardConfigWindDirectionEntity {
     use_statistics: boolean;
     direction_unit: string;
     direction_compensation: number;
+    direction_letters: string;
 }

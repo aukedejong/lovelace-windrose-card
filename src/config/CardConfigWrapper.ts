@@ -137,7 +137,8 @@ export class CardConfigWrapper {
             const useStatistics = this.checkBooleanDefaultFalse(entityConfig.use_statistics);
             const directionUnit = this.checkWindDirectionUnit(entityConfig.direction_unit);
             const directionCompensation = this.checkDirectionCompensation(entityConfig.direction_compensation);
-            return new WindDirectionEntity(entity, useStatistics, directionUnit, directionCompensation);
+            const directionLetters = this.checkDirectionLetters(directionUnit, entityConfig.direction_letters);
+            return new WindDirectionEntity(entity, useStatistics, directionUnit, directionCompensation, directionLetters);
         }
         throw new Error("WindRoseCard: No wind_direction_entity configured.");
     }
@@ -192,6 +193,22 @@ export class CardConfigWrapper {
             return directionCompensation;
         }
         return 0;
+    }
+
+    private checkDirectionLetters(directionUnit: string, directionLetters: string): string | undefined {
+        if (directionLetters) {
+            if (directionUnit === 'letters') {
+                if (directionLetters && directionLetters.length === 5) {
+                    return directionLetters.toUpperCase();
+                } else {
+                    throw new Error('WindRoseCard: direction_letters config should be 5 letters.');
+                }
+
+            } else {
+                throw new Error('WindRoseCard: config direction_letters should only be use in combination with direction_unit letters.');
+            }
+        }
+        return undefined;
     }
 
     private checkwindRoseDrawNorthOffset(): number {

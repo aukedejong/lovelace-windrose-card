@@ -1,9 +1,12 @@
+import {Log} from "../util/Log";
 
 export class WindDirectionConverter {
 
     directions: Record<string, number>;
+    defaultLetters: string[] = ['N', 'E', 'S', 'W'];
 
-    constructor() {
+    constructor(private readonly windDirectionLetters: string | undefined) {
+
         this.directions = {
             N: 0,
             NXE: 11.25,
@@ -26,7 +29,7 @@ export class WindDirectionConverter {
             SSW: 202.5,
             SWXS: 213.75,
             SW: 225,
-            SWxW: 236.25,
+            SWXW: 236.25,
             WSW: 247.5,
             WXS: 258.75,
             W: 270,
@@ -41,8 +44,27 @@ export class WindDirectionConverter {
         };
     }
 
-    getDirection(designation: string): number {
-        return this.directions[designation.toUpperCase()];
+    getDirection(direction: string): number {
+
+        let convertedDirection = direction.toUpperCase();
+
+        if (this.windDirectionLetters) {
+            convertedDirection = this.convertDirectionLetters(direction);
+        }
+
+        return this.directions[convertedDirection];
+    }
+
+    private convertDirectionLetters(direction: string): string {
+        let convertedDirection = '';
+        for (let i = 0; i < direction.length; i++) {
+            const index = this.windDirectionLetters!.indexOf(direction[i])
+            if (index < 0) {
+                Log.info('Could not translate cardinal direction, letters not found in config wind_direction_entity.direction_letters');
+            }
+            convertedDirection += this.defaultLetters[index];
+        }
+        return convertedDirection;
     }
 }
 

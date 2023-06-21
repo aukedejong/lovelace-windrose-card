@@ -4,7 +4,8 @@ export class WindDirectionEntity {
         public readonly entity: string,
         public readonly useStatistics: boolean,
         public readonly directionUnit: string,
-        public readonly directionCompensation: number
+        public readonly directionCompensation: number,
+        public readonly directionLetters: string | undefined,
     ) {}
 
 }

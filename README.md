@@ -2,12 +2,12 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 
-Attention! The latest version (1.0.0) has breaking changes. The configuration is changed. The easyiest way is to just add the card and modify the generated configuration.
+Attention! Version (1.0.0 and higher) has breaking configuration changes. The easiest way is to just add the card and modify the generated configuration.
 
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
 
-<img alt="Pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-dark.png?raw=true" width="482"/>
+<img alt="Peview" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-dark.png?raw=true" width="482"/>
 
 ## Install
 
@@ -87,12 +87,13 @@ Select "Manage Resources"
 
 #### Object wind_direction_entity
 
-| Name                   |  Type   | Default | Required | Description                                                                                                          |
-|------------------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------------------------------------------------------|
-| entity                 | string  |         |    x     | Wind speed entity                                                                                                    |
-| use_statistics         | boolean |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster. |
-| direction_unit         | string  | degrees |    -     | Wind direction unit, options: degrees, letters. Where letters being N, NE upto 32 directions.                        |
-| direction_compensation | number  |    0    |    -     | Compensate the measured direction in degrees.                                                                        |
+| Name                   |  Type   | Default | Required | Description                                                                                                                                                                                                                             |
+|------------------------|:-------:|:-------:|:--------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entity                 | string  |         |    x     | Wind speed entity                                                                                                                                                                                                                       |
+| use_statistics         | boolean |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                                                    |
+| direction_unit         | string  | degrees |    -     | Wind direction unit, options: degrees, letters. Where letters being N, NE upto 32 directions.                                                                                                                                           |
+| direction_compensation | number  |    0    |    -     | Compensate the measured direction in degrees.                                                                                                                                                                                           |
+| direction_letters      | string  |  NESWX  |    -     | Only used when direction_unit is 'letters'. Some weather integrations use language specific letters. With this property you can change the default letters used. See https://en.wikipedia.org/wiki/Points_of_the_compass for more info. |
 
 
 #### Object windspeed_entities

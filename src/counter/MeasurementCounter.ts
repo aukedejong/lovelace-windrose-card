@@ -8,7 +8,7 @@ import {WindDirection} from "./WindDirection";
 export class MeasurementCounter {
 
     private readonly windSpeedConverter: WindSpeedConverter;
-    private readonly windDirectionConverter = new WindDirectionConverter();
+    private readonly windDirectionConverter: WindDirectionConverter;
 
     private windDirections: WindDirection[] = [];
     private config: WindRoseConfig;
@@ -21,6 +21,7 @@ export class MeasurementCounter {
     constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
         this.windSpeedConverter = windSpeedConverter;
+        this.windDirectionConverter = new WindDirectionConverter(config.windDirectionLetters);
         this.speedRangeFunction = this.windSpeedConverter.getRangeFunction();
         const leaveDegrees = 360 / config.windDirectionCount;
         for (let i = 0; i < config.windDirectionCount; i++) {

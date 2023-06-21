@@ -12,6 +12,7 @@ export class WindRoseConfigFactory {
             25,
             this.cardConfig.windDirectionCount,
             this.cardConfig.windDirectionEntity.directionUnit,
+            this.cardConfig.windDirectionEntity.directionLetters,
             (360 / this.cardConfig.windDirectionCount) - 8,
             this.cardConfig.cardinalDirectionLetters,
             this.cardConfig.windDirectionEntity.directionCompensation,
