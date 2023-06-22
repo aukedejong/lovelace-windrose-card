@@ -5,11 +5,13 @@ import {CardColors} from "./CardColors";
 import {Log} from "../util/Log";
 import {WindSpeedEntity} from "./WindSpeedEntity";
 import {WindDirectionEntity} from "./WindDirectionEntity";
+import {DataPeriod} from "./DataPeriod";
+import {CardConfigDataPeriod} from "../card/CardConfigDataPeriod";
 
 export class CardConfigWrapper {
 
     title: string;
-    hoursToShow: number;
+    dataPeriod: DataPeriod;
     refreshInterval: number;
     maxWidth: number | undefined;
     windDirectionEntity: WindDirectionEntity;
@@ -35,7 +37,9 @@ export class CardConfigWrapper {
     static exampleConfig(): Record<string, unknown>  {
         return {
             title: 'Wind direction',
-            hours_to_show: GlobalConfig.defaultHoursToShow,
+            data_period: {
+                hours_to_show: GlobalConfig.defaultHoursToShow
+            },
             max_width: 400,
             refresh_interval: GlobalConfig.defaultRefreshInterval,
             windspeed_bar_location: GlobalConfig.defaultWindspeedBarLocation,
@@ -69,7 +73,7 @@ export class CardConfigWrapper {
 
     constructor(private readonly cardConfig: CardConfig) {
         this.title = this.cardConfig.title;
-        this.hoursToShow = this.checkHoursToShow();
+        this.dataPeriod = this.checkDataPeriod(cardConfig.hours_to_show, cardConfig.data_period);
         this.refreshInterval = this.checkRefreshInterval();
         this.maxWidth = this.checkMaxWidth();
         this.windDirectionEntity = this.checkWindDirectionEntity();
@@ -98,13 +102,39 @@ export class CardConfigWrapper {
         return this.windspeedEntities.length;
     }
 
-    private checkHoursToShow(): number {
-        if (this.cardConfig.hours_to_show && isNaN(this.cardConfig.hours_to_show)) {
-            throw new Error('WindRoseCard: Invalid hours_to_show, should be a number.');
-        } else if (this.cardConfig.hours_to_show) {
-            return this.cardConfig.hours_to_show;
+    private checkDataPeriod(oldHoursToShow: number, dataPeriod: CardConfigDataPeriod): DataPeriod {
+        const oldHoursToShowCheck = this.checkHoursToShow(oldHoursToShow);
+        const hoursToShowCheck = this.checkHoursToShow(dataPeriod?.hours_to_show);
+        const fromHourOfDayCheck = this.checkFromHourOfDay(dataPeriod?.from_hour_of_day);
+        if (oldHoursToShowCheck) {
+            Log.warn('WindRoseCard: hours_to_show config is deprecated, use the data_period object.');
+            return new DataPeriod(oldHoursToShow, undefined);
         }
-        return GlobalConfig.defaultHoursToShow;
+        if (hoursToShowCheck && fromHourOfDayCheck) {
+            throw new Error('WindRoseCard: Only one is allowed: hours_to_show or from_hour_of_day');
+        }
+        if (!hoursToShowCheck && !fromHourOfDayCheck) {
+            throw new Error('WindRoseCard: One config option object data_period should be filled.');
+        }
+        return new DataPeriod(dataPeriod.hours_to_show, dataPeriod.from_hour_of_day);
+    }
+
+    private checkHoursToShow(hoursToShow: number): boolean {
+        if (hoursToShow && isNaN(hoursToShow) ) {
+            throw new Error('WindRoseCard: Invalid hours_to_show, should be a number above 0.');
+        } else if (hoursToShow) {
+            return true
+        }
+        return false;
+    }
+
+    private checkFromHourOfDay(fromHourOfDay: number): boolean {
+        if (fromHourOfDay && (isNaN(fromHourOfDay) || fromHourOfDay < 0 || fromHourOfDay > 23)) {
+            throw new Error('WindRoseCard: Invalid hours_to_show, should be a number between 0 and 23, hour of the day..');
+        } else if (fromHourOfDay != null && fromHourOfDay >= 0) {
+            return true
+        }
+        return false;
     }
 
     private checkRefreshInterval(): number {

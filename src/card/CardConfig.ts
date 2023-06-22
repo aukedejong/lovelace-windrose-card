@@ -2,12 +2,15 @@ import {CardConfigSpeedRange} from "./CardConfigSpeedRange";
 import {CardConfigColors} from "./CardConfigColors";
 import {CardConfigWindSpeedEntity} from "./CardConfigWindSpeedEntity";
 import {CardConfigWindDirectionEntity} from "./CardConfigWindDirectionEntity";
+import {CardConfigDataPeriod} from "./CardConfigDataPeriod";
 
 export interface CardConfig {
     type: string;
     title: string;
 
     hours_to_show: number;
+    data_period: CardConfigDataPeriod;
+
     refresh_interval: number;
     max_width: number;
     wind_direction_entity: CardConfigWindDirectionEntity;

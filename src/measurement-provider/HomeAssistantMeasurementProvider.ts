@@ -3,6 +3,7 @@ import {DirectionSpeed} from "../matcher/DirectionSpeed";
 import {Log} from "../util/Log";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
+import {DataPeriod} from "../config/DataPeriod";
 
 export class HomeAssistantMeasurementProvider {
 
@@ -109,8 +110,7 @@ export class HomeAssistantMeasurementProvider {
         if (this.rawEntities.length === 0) {
             return Promise.resolve({});
         }
-        const startTime = new Date();
-        startTime.setHours(startTime.getHours() - this.cardConfig.hoursToShow);
+        const startTime = this.calculateStartTime(this.cardConfig.dataPeriod);
         const endTime = new Date();
 
         const historyMessage = {
@@ -128,8 +128,7 @@ export class HomeAssistantMeasurementProvider {
         if (this.statsEntities.length === 0) {
             return Promise.resolve({});
         }
-        const startTime = new Date();
-        startTime.setHours(startTime.getHours() - this.cardConfig.hoursToShow);
+        const startTime = this.calculateStartTime(this.cardConfig.dataPeriod);
 
         const statisticsMessage = {
             "type": "recorder/statistics_during_period",
@@ -139,5 +138,21 @@ export class HomeAssistantMeasurementProvider {
             "types":["mean"]
         }
         return this.hass.callWS(statisticsMessage);
+    }
+
+    private calculateStartTime(dataPeriod: DataPeriod): Date {
+        const startTime = new Date();
+        if (dataPeriod.hourstoShow) {
+            startTime.setHours(startTime.getHours() - dataPeriod.hourstoShow);
+        } else if ((dataPeriod.fromHourOfDay && dataPeriod.fromHourOfDay > 0) || dataPeriod.fromHourOfDay === 0) {
+            if (startTime.getHours() < dataPeriod.fromHourOfDay) {
+                startTime.setDate(startTime.getDate() - 1);
+            }
+            startTime.setHours(dataPeriod.fromHourOfDay, 0, 0, 0);
+        } else {
+            throw new Error("No data period config option available.");
+        }
+        Log.info('Using start time for data query', startTime);
+        return startTime;
     }
 }
