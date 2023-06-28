@@ -94,6 +94,7 @@ export class WindRoseDirigent {
         if (this.initReady) {
             Log.debug('refreshData()');
             return this.measurementProvider.getMeasurements().then((matchedGroups) => {
+                this.windRoseData = [];
                 Log.debug('Matched measurements:', matchedGroups);
                 for (let i = 0; i < matchedGroups.length; i++) {
                     this.measurementCounter.init(this.cardConfig.windspeedEntities[i].speedUnit);
