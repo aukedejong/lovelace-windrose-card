@@ -61,10 +61,13 @@ export class WindRoseDirigent {
         }
 
         this.windBarRenderers = [];
-        const barConfigs = this.configFactory.createWindBarConfigs();
-        for (let i = 0; i < cardConfig.windBarCount(); i++) {
-            this.windBarRenderers.push(new WindBarRenderer(barConfigs[i], this.windSpeedConverter.getOutputSpeedUnit()));
+        if (!cardConfig.hideWindspeedBar) {
+            const barConfigs = this.configFactory.createWindBarConfigs();
+            for (let i = 0; i < cardConfig.windBarCount(); i++) {
+                this.windBarRenderers.push(new WindBarRenderer(barConfigs[i], this.windSpeedConverter.getOutputSpeedUnit()));
+            }
         }
+
         this.windRoseData = [];
     }
 

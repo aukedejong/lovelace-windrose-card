@@ -26,6 +26,7 @@ export interface CardConfig {
     windrose_draw_north_offset: number;
     windspeed_bar_location: string;
     windspeed_bar_full: boolean;
+    hide_windspeed_bar: boolean;
     cardinal_direction_letters: string;
     wind_direction_count: number;
     matching_strategy: string;

@@ -18,6 +18,7 @@ export class CardConfigWrapper {
     windspeedEntities: WindSpeedEntity[];
     windspeedBarLocation: string;
     windspeedBarFull: boolean;
+    hideWindspeedBar: boolean;
     centerCalmPercentage: boolean;
     cardinalDirectionLetters: string;
     windDirectionCount: number;
@@ -81,6 +82,7 @@ export class CardConfigWrapper {
         this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.windspeedBarFull = this.checkBooleanDefaultTrue(cardConfig.windspeed_bar_full);
+        this.hideWindspeedBar = this.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
         this.centerCalmPercentage = this.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
         this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
         this.windDirectionCount = this.checkWindDirectionCount();
@@ -99,6 +101,9 @@ export class CardConfigWrapper {
     }
 
     windBarCount(): number {
+        if (this.hideWindspeedBar) {
+            return 0;
+        }
         return this.windspeedEntities.length;
     }
 
