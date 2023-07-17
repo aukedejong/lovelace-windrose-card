@@ -110,12 +110,13 @@ Only one of the options should be configured.
 
 #### Object windspeed_entities
 
-| Name           |  Type   | Default | Required | Description                                                                  |
-|----------------|:-------:|:-------:|:--------:|------------------------------------------------------------------------------|
-| entity         | string  |         |    x     | Wind speed entity  .                                                         |
-| name           | string  |         |    -     | Label, displayed with the windspeed bar.                                     |
-| use_statistics | boolean |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster. |
-| speed_unit     | string  |  auto   |    -     | Windspeed unit of measurement, see Speed unit options bellow.                                                                        |
+| Name                  |  Type   | Default | Required | Description                                                                                                          |
+|-----------------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------------------------------------------------------|
+| entity                | string  |         |    x     | Wind speed entity  .                                                                                                 |
+| name                  | string  |         |    -     | Label, displayed with the windspeed bar.                                                                             |
+| use_statistics        | boolean |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster. |
+| render_relative_scale | boolean |  true   |   -      | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks. |
+| speed_unit            | string  |  auto   |    -     | Windspeed unit of measurement, see Speed unit options bellow.                                                        |
 
 
 #### Windspeed unit options:

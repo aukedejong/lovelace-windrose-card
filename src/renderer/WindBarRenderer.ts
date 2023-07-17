@@ -74,7 +74,7 @@ export class WindBarRenderer {
         canvasContext.textBaseline = 'middle';
         let posY = this.dimensions.posY;
         for (let i = 0; i < highestRangeMeasured; i++) {
-            if (i === highestRangeMeasured - 1) {
+            if (!this.config.renderRelativeScale || i === highestRangeMeasured - 1) {
                 length = lengthMaxRange * -1;
             } else {
                 length = (this.speedRanges[i + 1].minSpeed - this.speedRanges[i].minSpeed) * ((this.dimensions.length - lengthMaxRange) / maxScale) * -1;
@@ -146,7 +146,7 @@ export class WindBarRenderer {
         canvasContext.textBaseline = 'top';
         let posX = this.dimensions.posX;
         for (let i = 0; i < highestRangeMeasured; i++) {
-            if (i === highestRangeMeasured - 1) {
+            if (!this.config.renderRelativeScale || i === highestRangeMeasured - 1) {
                 length = lengthMaxRange;
             } else {
                 length = (this.speedRanges[i + 1].minSpeed - this.speedRanges[i].minSpeed) * ((this.dimensions.length - lengthMaxRange) / maxScale);

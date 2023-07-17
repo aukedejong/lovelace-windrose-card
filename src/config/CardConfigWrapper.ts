@@ -200,7 +200,8 @@ export class CardConfigWrapper {
             const name = entityConfig.name;
             const useStatistics = this.checkBooleanDefaultFalse(entityConfig.use_statistics);
             const inputSpeedUnit = this.checkInputSpeedUnit(entityConfig.speed_unit);
-            entities.push(new WindSpeedEntity(entity, name, useStatistics, inputSpeedUnit))
+            const renderRelativeScale = this.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
+            entities.push(new WindSpeedEntity(entity, name, useStatistics, renderRelativeScale, inputSpeedUnit))
         }
         return entities;
     }

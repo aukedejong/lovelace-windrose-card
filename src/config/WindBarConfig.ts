@@ -5,8 +5,7 @@ export class WindBarConfig {
         public label: string,
         public orientation: string,
         public full: boolean,
-        public inputUnit: string,
-        public outputUnit: string,
+        public renderRelativeScale: boolean,
         public outputUnitLabel: string | undefined,
         public speedRangeBeaufort: boolean,
 
