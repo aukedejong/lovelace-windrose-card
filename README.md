@@ -68,7 +68,7 @@ Select "Manage Resources"
 | windspeed_entities         | object  |                              |    x     | One are more windspeed entities. Only the first is used for the windrose.                                                                                             |
 | refresh_interval           | number  |             300              |    -     | Refresh interval in seconds                                                                                                                                           |
 | hours_to_show (DEPRECATED) | number  |                              |    -     | Deprecated. Still works for now. Use the data period object instead.                                                                                                  |
-| data_period                | object  |                              |    -     | Configure what data period to query. See object data_period below. Only one options should be configured.                                                             |
+| data_period                | object  |                              |    x     | Configure what data period to query. See object data_period below. Only one options should be configured.                                                             |
 | max_width                  | number  |             null             |    -     | Use to limit the with (and height) of the windrose.                                                                                                                   |
 | windspeed_bar_location     | string  |            bottom            |    -     | Location of the speed bar graph: `bottom`, `right`                                                                                                                    |
 | windspeed_bar_full         | boolean |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                  |
@@ -182,6 +182,8 @@ Uses speed_range_step and speed_range_max.
 ```yaml
 type: custom:windrose-card
 title: Wind direction
+data_period:
+  hours_to_show: 24
 max_width: 400
 windspeed_bar_full: true
 wind_direction_entity:
@@ -208,6 +210,8 @@ Always make sure there is a speedrange starting from 0, otherwise you can the th
 ```yaml
 type: custom:windrose-card
 title: Wind direction
+data_period:
+  hours_to_show: 24
 max_width: 400
 windspeed_bar_full: true
 wind_direction_entity:
