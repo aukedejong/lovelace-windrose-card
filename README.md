@@ -73,7 +73,7 @@ Select "Manage Resources"
 | windspeed_bar_location     | string  |            bottom            |    -     | Location of the speed bar graph: `bottom`, `right`                                                                                                                    |
 | windspeed_bar_full         | boolean |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                  |
 | hide_windspeed_bar         | boolean |            false             |    -     | Hides all windspeed bars.                                                                                                                                             |
-| output_speed_unit          | string  |             mps              |    -     | Windspeed unit used on card, see Spped unit options bellow.                                                                                                           |
+| output_speed_unit          | string  |             mps              |    -     | Windspeed unit used on card, see Speed unit options bellow.                                                                                                           |
 | output_speed_unit_label    | string  |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                              |
 | center_calm_percentage     | boolean |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.        |                                                                                |
 | speed_range_beaufort       | boolean |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit.                                                                        |
@@ -125,14 +125,15 @@ Default is auto. When no windspeed unit is configured, the unit_of_measurement f
 
 When your windspeed entity uses an unit of measurement not mentioned in the table below, please open an issue in GitHub.
 
-| Name |    Description     | Input  | Output | Recognized HA units of measurements |
-|------|:------------------:|:------:|:------:|-------------------------------------|
-| auto |    automatic       |   x    |        |                                     |
-| mps  | metres per second  |   x    |   x    | mps, m/s                            |
-| kph  | kilometer per hour |   x    |   x    | kph, km/h                           |
-| mph  |   miles per hour   |   x    |   x    | mps, m/h                            |
-| fps  |  feet per second   |   x    |   x    | fps, f/s                            |
-| knot |       knots        |   x    |   x    | knots, knts, kts                    |
+| Name     |    Description     | Input | Output | Recognized HA units of measurements |
+|----------|:------------------:|:-----:|:------:|-------------------------------------|
+| auto     |     automatic      |   x   |        |                                     |
+| Beaufort |     Beaufort       |   x   |        | Beaufort                            |
+| mps      | metres per second  |   x   |   x    | mps, m/s                            |
+| kph      | kilometer per hour |   x   |   x    | kph, km/h                           |
+| mph      |   miles per hour   |   x   |   x    | mps, m/h                            |
+| fps      |  feet per second   |   x   |   x    | fps, f/s                            |
+| knot     |       knots        |   x   |   x    | knots, knts, kts                    |
 
 
 #### Object speed_ranges

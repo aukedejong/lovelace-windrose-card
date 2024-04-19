@@ -209,13 +209,14 @@ export class CardConfigWrapper {
     private checkInputSpeedUnit(inputSpeedUnit: string): string {
         if (inputSpeedUnit) {
             if (inputSpeedUnit !== 'mps'
+                && inputSpeedUnit !== 'bft'
                 && inputSpeedUnit !== 'kph'
                 && inputSpeedUnit !== 'mph'
                 && inputSpeedUnit !== 'fps'
                 && inputSpeedUnit !== 'knots'
                 && inputSpeedUnit !== 'auto') {
                 throw new Error('Invalid windspeed unit configured: ' + inputSpeedUnit +
-                    '. Valid options: mps, fps, kph, mph, knots, auto');
+                    '. Valid options: mps, bft, fps, kph, mph, knots, auto');
             }
             return inputSpeedUnit;
         }

@@ -6,9 +6,27 @@ import {Log} from "../util/Log";
 export class WindSpeedConverter {
 
     readonly bft = new SpeedUnit('Beaufort',
-        ['bft'],
-        (speed: number) => speed,
-        (speed: number) => speed, undefined, undefined);
+        ['bft', 'Beaufort'],
+        (speed: number) => {
+            switch (speed) {
+                case 0: return 0;
+                case 1: return 1;
+                case 2: return 2.5;
+                case 3: return 4;
+                case 4: return 6.5;
+                case 5: return 9;
+                case 6: return 12;
+                case 7: return 15.5;
+                case 8: return 18.5;
+                case 9: return 22.5;
+                case 10: return 26.5;
+                case 11: return 30;
+                case 12: return 34;
+                default: return 0; //throw new Error("Incorrect Beaufort speed: " + speed);
+            }
+        },
+        (speed: number) => speed, undefined,
+        undefined);
 
     readonly mps = new SpeedUnit('m/s',
         ['mps', 'm/s'],
