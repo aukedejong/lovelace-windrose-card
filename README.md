@@ -85,6 +85,7 @@ Select "Manage Resources"
 | windrose_draw_north_offset | number  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                   |
 | matching_strategy          | string  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first` |
 | colors                     | object  |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                             |
+| show_wind_text       | boolean |             true             |    -     | Show the cardinal direction letters in the windrose. For example, set to false when space is limited to omit the direction letters. |
 | log_level                  | string  |             WARN             |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                          |
 
 

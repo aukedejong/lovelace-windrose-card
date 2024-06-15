@@ -31,6 +31,7 @@ export interface CardConfig {
     wind_direction_count: number;
     matching_strategy: string;
     direction_speed_time_diff: number;
+    show_wind_text: boolean;
     log_level: string;
 
     colors: CardConfigColors;

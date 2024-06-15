@@ -78,12 +78,13 @@ export class WindRoseDirigent {
                 width,
                 this.cardConfig.maxWidth,
                 this.cardConfig.windBarCount(),
-                this.cardConfig.windspeedBarLocation);
+                this.cardConfig.windspeedBarLocation,
+                this.cardConfig.showWindText);
             this.windRoseRenderer.updateDimensions(roseDimensions);
 
             for (let i = 0; i < this.cardConfig.windBarCount(); i++) {
                 this.windBarRenderers[i].updateDimensions(this.dimensionCalculator.calculatorWindBarDimensions(
-                    roseDimensions, this.cardConfig.windspeedBarLocation, i));
+                    roseDimensions, this.cardConfig.windspeedBarLocation, i, this.cardConfig.showWindText));
             }
             this.dimensionsReady = true;
             return roseDimensions.canvasHeight;

@@ -9,6 +9,7 @@ export class WindRoseConfig {
         public cardinalDirectionLetters: string,
         public directionCompensation: number,
         public windRoseDrawNorthOffset: number,
+        public showWindText: boolean,
 
         public roseLinesColor: string,
         public roseDirectionLettersColor: string,

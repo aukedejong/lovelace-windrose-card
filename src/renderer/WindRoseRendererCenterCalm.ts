@@ -115,30 +115,37 @@ export class WindRoseRendererCenterCalm {
         }
 
         // Wind direction text
-        const textCirlceSpace = 15;
-        canvasContext.fillStyle = this.config.roseDirectionLettersColor;
-        canvasContext.font = '22px Arial';
-        canvasContext.textAlign = 'center';
-        canvasContext.textBaseline = 'middle';
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[0], 0, 0 - this.dimensions.outerRadius - textCirlceSpace + 2);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[2], 0, this.dimensions.outerRadius + textCirlceSpace);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[1], this.dimensions.outerRadius + textCirlceSpace, 0);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[3], 0 - this.dimensions.outerRadius - textCirlceSpace, 0);
+        if (this.config.showWindText) {
+            const textCirlceSpace = 15;
+            canvasContext.fillStyle = this.config.roseDirectionLettersColor;
+            canvasContext.font = '22px Arial';
+            canvasContext.textAlign = 'center';
+            canvasContext.textBaseline = 'middle';
+            this.drawText(canvasContext, this.config.cardinalDirectionLetters[0], 0, 0 - this.dimensions.outerRadius - textCirlceSpace + 2);
+            this.drawText(canvasContext, this.config.cardinalDirectionLetters[2], 0, this.dimensions.outerRadius + textCirlceSpace);
+            this.drawText(canvasContext, this.config.cardinalDirectionLetters[1], this.dimensions.outerRadius + textCirlceSpace, 0);
+            this.drawText(canvasContext, this.config.cardinalDirectionLetters[3], 0 - this.dimensions.outerRadius - textCirlceSpace, 0);
+        }
     }
 
     private drawCircleLegend(canvasContext: CanvasRenderingContext2D) {
         canvasContext.font = "10px Arial";
         canvasContext.fillStyle = this.config.rosePercentagesColor
         canvasContext.textAlign = 'center';
-        canvasContext.textBaseline = 'bottom';
+        canvasContext.textBaseline = 'middle';
         const radiusStep = (this.dimensions.outerRadius - this.config.centerRadius) / this.windRoseData.circleCount;
         const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.config.centerRadius;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
+        let lastYPos = centerXY + (xy * this.windRoseData.circleCount) + 12;
 
-        for (let i = 1; i <= this.windRoseData.circleCount; i++) {
+        for (let i = this.windRoseData.circleCount; i >= 1; i--) {
             const xPos = centerXY + (xy * i);
             const yPos = centerXY + (xy * i);
-            this.drawText(canvasContext, (this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
+            const yDiff = lastYPos - yPos;
+            if (yDiff > 10) {
+                lastYPos = yPos;
+                this.drawText(canvasContext, (this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
+            }
         }
     }
 
