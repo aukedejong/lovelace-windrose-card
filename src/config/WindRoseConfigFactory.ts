@@ -17,6 +17,7 @@ export class WindRoseConfigFactory {
             this.cardConfig.cardinalDirectionLetters,
             this.cardConfig.windDirectionEntity.directionCompensation,
             this.cardConfig.windRoseDrawNorthOffset,
+            this.cardConfig.showWindText,
             this.cardConfig.cardColor.roseLines,
             this.cardConfig.cardColor.roseDirectionLetters,
             this.cardConfig.cardColor.rosePercentages);

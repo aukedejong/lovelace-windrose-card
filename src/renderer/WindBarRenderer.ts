@@ -135,7 +135,11 @@ export class WindBarRenderer {
         const lengthMaxRange = (this.dimensions.length / highestRangeMeasured)
         const maxScale = this.speedRanges[highestRangeMeasured - 1].minSpeed;
 
-        canvasContext.font = '13px Arial';
+        if (lengthMaxRange < 30) {
+            canvasContext.font = (lengthMaxRange / 2).toString() + 'px Arial';
+        } else {
+            canvasContext.font = '13px Arial';
+        }
         canvasContext.textAlign = 'left';
         canvasContext.textBaseline = 'bottom';
         canvasContext.lineWidth = 1;

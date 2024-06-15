@@ -31,6 +31,7 @@ export class CardConfigWrapper {
     speedRanges: SpeedRange[] = [];
     matchingStrategy: string;
     cardColor: CardColors;
+    showWindText: boolean;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -68,6 +69,7 @@ export class CardConfigWrapper {
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
             center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
+            showWindText: true,
             log_level: GlobalConfig.defaultLogLevel
         };
     }
@@ -96,6 +98,7 @@ export class CardConfigWrapper {
         this.matchingStrategy = this.checkMatchingStrategy();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.cardColor = this.checkCardColors();
+        this.showWindText = this.checkBooleanDefaultTrue(cardConfig.show_wind_text);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
         Log.info('Config check OK');
     }
