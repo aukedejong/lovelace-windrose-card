@@ -73,10 +73,10 @@ Select "Manage Resources"
 | windspeed_bar_location     | string  |            bottom            |    -     | Location of the speed bar graph: `bottom`, `right`                                                                                                                    |
 | windspeed_bar_full         | boolean |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                  |
 | hide_windspeed_bar         | boolean |            false             |    -     | Hides all windspeed bars.                                                                                                                                             |
-| output_speed_unit          | string  |             mps              |    -     | Windspeed unit used on card, see Speed unit options bellow.                                                                                                           |
+| output_speed_unit          | string  |             mps              |    -     | Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                           |
 | output_speed_unit_label    | string  |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                              |
 | center_calm_percentage     | boolean |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.        |                                                                                |
-| speed_range_beaufort       | boolean |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit.                                                                        |
+| speed_range_beaufort       | boolean |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false. |
 | speed_range_step           | number  | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                 |
 | speed_range_max            | number  | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity  |
 | speed_ranges               | object  | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                |
@@ -116,7 +116,7 @@ Only one of the options should be configured.
 | name                  | string  |         |    -     | Label, displayed with the windspeed bar.                                                                             |
 | use_statistics        | boolean |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster. |
 | render_relative_scale | boolean |  true   |   -      | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks. |
-| speed_unit            | string  |  auto   |    -     | Windspeed unit of measurement, see Speed unit options bellow.                                                        |
+| speed_unit            | string  |  auto   |    -     | Windspeed unit of measurement, see Windspeed unit options bellow. When the speed_range_beaufort property is not set or set to true, the bars will show Beaufort ranges.                                                     |
 
 
 #### Windspeed unit options:
