@@ -52,8 +52,8 @@ export class WindRoseCard extends LitElement {
 
     set hass(hass: HomeAssistant) {
         this._hass = hass;
-        const state = this._hass.states["sensor.gorredijk_wind_direction_azimuth"];
-        this.windRoseDirigent.update(state.state, this.svg);
+        //const state = this._hass.states["sensor.gorredijk_wind_direction_azimuth"];
+        //this.windRoseDirigent.update(state.state, this.svg);
     }
 
     render(): TemplateResult {
