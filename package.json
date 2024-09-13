@@ -6,7 +6,7 @@
   "scripts": {
     "http-server": "http-server ./",
     "lint": "npx  eslint .",
-    "build-watch": "rollup -c --watch",
+    "build-watch": "rollup -c --watch --no-cache",
     "build": "rimraf build && tsc && rollup -c",
     "rollup": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -43,7 +43,9 @@
     "@lit-labs/scoped-registry-mixin": "^1.0.1",
     "@material/mwc-formfield": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
+    "@types/snapsvg": "^0.5.8",
     "custom-card-helpers": "^1.9.0",
-    "lit": "^2.2.8"
+    "lit": "^2.2.8",
+    "snapsvg": "^0.5.1"
   }
 }

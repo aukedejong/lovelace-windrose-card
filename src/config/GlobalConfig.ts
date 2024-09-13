@@ -15,7 +15,4 @@ export class GlobalConfig {
     static defaultLogLevel: 'NONE';
     static defaultSpeedRangeBeaufort = true;
 
-    static verticalBarHeight = 30;
-    static horizontalBarHeight = 15;
-
 }

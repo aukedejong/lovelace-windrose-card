@@ -5,13 +5,14 @@ import commonjs from "rollup-plugin-commonjs";
 import {terser} from "rollup-plugin-terser";
 import json from "@rollup/plugin-json";
 
-const dev = true;
+const dev = false;
 
 export default {
     input: [
         'src/card/WindRoseCard.ts',
         'src/util/Log.ts'
     ],
+    cache: false,
     output: {
         format: 'es',
         name: 'windroseCardBundle',

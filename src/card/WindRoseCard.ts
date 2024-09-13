@@ -7,6 +7,7 @@ import {Log} from "../util/Log";
 import {WindRoseDirigent} from "../renderer/WindRoseDirigent";
 import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {EntityChecker} from "../entity-checker/EntityChecker";
+import Snap from "snapsvg";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -17,7 +18,7 @@ import {EntityChecker} from "../entity-checker/EntityChecker";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.5.0 `,
+    `%c  WINROSE-CARD  %c Version 1.6.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -29,7 +30,7 @@ export class WindRoseCard extends LitElement {
         return CardConfigWrapper.exampleConfig();
     }
 
-    @query('#windRose') canvas!: HTMLCanvasElement;
+    @query('#svg-container') svgContainer!: HTMLElement;
     @query('.card-content') parentDiv!: HTMLDivElement;
 
     windRoseDirigent!: WindRoseDirigent;
@@ -38,44 +39,27 @@ export class WindRoseCard extends LitElement {
 
     config!: CardConfig;
     cardConfig!: CardConfigWrapper;
-    canvasWidth = 400;
-    canvasHeight = 400;
     updateInterval: NodeJS.Timer | undefined;
-    canvasContext!: CanvasRenderingContext2D;
     _hass!: HomeAssistant;
+    svg!: Snap.Paper;
 
     constructor() {
         super();
         this.windRoseDirigent = new WindRoseDirigent();
         this.entityChecker = new EntityChecker();
+        this.svg = Snap("100%", "100%");
     }
 
     set hass(hass: HomeAssistant) {
         this._hass = hass;
     }
 
-    ro = new ResizeObserver(entries => {
-        if (this.cardConfig) {
-            for (const entry of entries) {
-                Log.trace('ResizeObserver entries:', entries);
-                const cs = entry.contentRect;
-                this.recalculateCanvasSize(cs.width);
-                this.requestUpdate();
-                Log.debug("Request update, because of resize.");
-            }
-        }
-    });
-
     render(): TemplateResult {
         super.render();
         Log.debug('card render()');
         return html`
             <ha-card header="${this.cardConfig?.title}">
-                <div class="card-content">
-                    <canvas id="windRose"
-                            width=${this.canvasWidth}
-                            height=${this.canvasHeight}>
-                    </canvas>
+                <div class="card-content" id="svg-container">
                 </div>
             </ha-card>
         `;
@@ -83,15 +67,15 @@ export class WindRoseCard extends LitElement {
 
     firstUpdated(): void {
         Log.debug('firstUpdated()');
-        this.canvasContext = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-        Log.debug('Canvas context found: ', this.canvasContext, this.measurementProvider);
+        Log.debug('SVG container found: ', this.svgContainer, this.measurementProvider);
+        this.svgContainer.appendChild(this.svg.node);
         this.refreshCardConfig();
     }
 
     update(changedProperties: PropertyValues): void {
         Log.debug('update()');
         super.update(changedProperties);
-        this.windRoseDirigent.render(this.canvasContext);
+        this.windRoseDirigent.render(this.svg);
     }
 
     private initInterval() {
@@ -118,7 +102,7 @@ export class WindRoseCard extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         Log.debug('connectedCallBack()');
-        this.ro.observe(this);
+        //this.ro.observe(this);
         this.initInterval();
 
     }
@@ -126,7 +110,6 @@ export class WindRoseCard extends LitElement {
     disconnectedCallback() {
         super.disconnectedCallback();
         Log.debug('disconnectedCallback()');
-        this.ro.unobserve(this);
         clearInterval(this.updateInterval);
 
     }
@@ -137,7 +120,7 @@ export class WindRoseCard extends LitElement {
         Log.setLevel(this.cardConfig.logLevel);
         Log.debug('setConfig(): ', config, this._hass);
 
-        if (this._hass && this.canvasContext) {
+        if (this._hass && this.svg) {
             this.refreshCardConfig();
         }
     }
@@ -147,12 +130,19 @@ export class WindRoseCard extends LitElement {
         return 4;
     }
 
+    public getLayoutOptions() {
+        return {
+            grid_rows: 2,
+            grid_columns: 4,
+            grid_min_rows: 4,
+        };
+    }
+
     refreshCardConfig() {
         this.entityChecker.checkEntities(this.cardConfig, this._hass).then(() => {
             this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
             this.measurementProvider.setHass(this._hass);
             this.windRoseDirigent.init(this.cardConfig, this.measurementProvider);
-            this.recalculateCanvasSize(this.canvas.width);
             this.refreshMeasurements();
         });
     }
@@ -164,12 +154,6 @@ export class WindRoseCard extends LitElement {
                 this.requestUpdate();
             }
         });
-    }
-
-    private recalculateCanvasSize(width: number) {
-        const canvasHeight = this.windRoseDirigent.resize(width - 32);
-        this.canvas.width = width - 32;
-        this.canvas.height = canvasHeight as number;
     }
 
 }

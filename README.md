@@ -7,8 +7,8 @@ Attention! Version (1.0.0 and higher) has breaking configuration changes. The ea
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
 
-<img alt="Peview" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-dark.png?raw=true" width="482"/>
-
+<img alt="Peview dark" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-dark.png?raw=true" width="482"/>
+<img alt="Peview light" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-white.png?raw=true" width="482"/>
 ## Install
 
 ### HACS (recommended)
@@ -148,16 +148,16 @@ For some value the theme variable --primary-text-color is used. This is needed i
 light/dark mode.
 CSS color values are allowed.
 
-| Name                     |  Type  | Default |       Required       | Description                          |
-|--------------------------|:------:|:-------:|:--------------------:|--------------------------------------|
-| rose_lines               | string |         |  rgb(160, 160, 160)  | Circles, borders and the cross color |
-| rose_direction_letters   | string |         | --primary-text-color | Direction letters color              |
-| rose_percentages         | string |         | --primary-text-color | Percentage legend  color             |
-| bar_border               | string |         |  rgb(160, 160, 160)  | Bar border color                     |
-| bar_unit_name            | string |         | --primary-text-color | Unit name color                      |
-| bar_name                 | string |         | --primary-text-color | Entity name color                    |
-| bar_unit_values          | string |         | --primary-text-color | Unit value color                     |
-| bar_percentages          | string |         |        black         | Percentage color                     |
+| Name                     |  Type  |       Default        | Required |  Description                         |
+|--------------------------|:------:|:--------------------:|:--------:|:-------------------------------------|
+| rose_lines               | string |  rgb(160, 160, 160)  |          | Circles, borders and the cross color |
+| rose_direction_letters   | string | --primary-text-color |          | Direction letters color              |
+| rose_percentages         | string | --primary-text-color |          | Percentage legend  color             |
+| bar_border               | string |  rgb(160, 160, 160)  |          | Bar border color                     |
+| bar_unit_name            | string | --primary-text-color |          | Unit name color                      |
+| bar_name                 | string | --primary-text-color |          | Entity name color                    |
+| bar_unit_values          | string | --primary-text-color |          | Unit value color                     |
+| bar_percentages          | string |        black         |          | Percentage color                     |
 _
 #### Example colors yaml
 ```yaml
