@@ -9,7 +9,7 @@ export class WindRoseConfigFactory {
 
     createWindRoseConfig(): WindRoseConfig {
         return new WindRoseConfig(
-            25,
+            60,
             this.cardConfig.windDirectionCount,
             this.cardConfig.windDirectionEntity.directionUnit,
             this.cardConfig.windDirectionEntity.directionLetters,

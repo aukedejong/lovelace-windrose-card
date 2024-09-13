@@ -2,59 +2,71 @@ import {WindRoseConfig} from "../config/WindRoseConfig";
 import {DrawUtil} from "../util/DrawUtil";
 import {SpeedRange} from "../converter/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
-import {WindRoseDimensions} from "../dimensions/WindRoseDimensions";
 import {Log} from "../util/Log";
+import Snap from "snapsvg";
+import {SvgUtil} from "./SvgUtil";
+import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
+import {DimensionConfig} from "./DimensionConfig";
+import {TextAttributes} from "./TextAttributes";
+import {CircleCoordinate} from "./CircleCoordinate";
+import {Coordinate} from "./Coordinate";
 
 export class WindRoseRendererCenterCalm {
     private config: WindRoseConfig;
-    private dimensions!: WindRoseDimensions;
     private readonly speedRanges: SpeedRange[];
-    private readonly rangeCount: number;
+
+    private readonly dimensionCalculator: WindRoseDimensionCalculator;
+    svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
 
-    constructor(config: WindRoseConfig, speedRanges: SpeedRange[]) {
+    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, speedRanges: SpeedRange[]) {
         this.config = config;
         this.speedRanges = speedRanges;
-        this.rangeCount = this.speedRanges.length;
+        this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
     }
 
-    updateDimensions(dimensions: WindRoseDimensions): void {
-        this.dimensions = dimensions;
-    }
-
-    drawWindRose(windRoseData: WindRoseData, canvasContext: CanvasRenderingContext2D): void {
-        if (this.dimensions === undefined) {
-            Log.error("drawWindRose(): Can't draw, dimensions not set");
-            return;
-        }
+    drawWindRose(windRoseData: WindRoseData, svg: Snap.Paper): void {
         if (windRoseData === undefined) {
             Log.error("drawWindRose(): Can't draw, no windrose data.");
             return;
         }
         Log.trace('drawWindRose()', windRoseData);
+        this.svgUtil = new SvgUtil(svg);
+
+        svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
+
         this.windRoseData = windRoseData;
-        canvasContext.clearRect(0, 0, 7000, 5000);
-        canvasContext.save();
-        canvasContext.translate(this.dimensions.centerX, this.dimensions.centerY);
-        canvasContext.rotate(DrawUtil.toRadians(this.config.windRoseDrawNorthOffset));
-        this.drawBackground(canvasContext);
-        this.drawWindDirections(canvasContext);
-        this.drawCircleLegend(canvasContext);
-        this.drawCenterZeroSpeed(canvasContext);
-        canvasContext.restore();
+
+        const windDirectionText = this.drawWindDirectionText(svg);
+        const windDirections = this.drawWindDirections(svg);
+        const background = this.drawBackground(svg);
+
+        //Rotate
+        const rotateGroup = svg.group(windDirectionText, windDirections, background);
+        var center = this.dimensionCalculator.roseCenter();
+        rotateGroup.transform("r" + this.config.windRoseDrawNorthOffset + "," + center.x + "," + center.y);
+
+        const circleLegend = this.drawCircleLegend(svg);
+        const centerZeroSpeed = this.drawCenterZeroSpeed(svg);
     }
 
-    private drawWindDirections(canvasContext: CanvasRenderingContext2D) {
+    private drawWindDirections(svg: Snap.Paper): Snap.Paper {
+        const windDirections = svg.group();
         for (let i = 0; i < this.windRoseData.directionPercentages.length; i++) {
-            this.drawWindDirection(this.windRoseData.directionSpeedRangePercentages[i],
-                this.windRoseData.directionPercentages[i],
-                this.windRoseData.directionDegrees[i], canvasContext);
+            windDirections.add(
+                this.drawWindDirection(this.windRoseData.directionSpeedRangePercentages[i],
+                    this.windRoseData.directionPercentages[i],
+                    this.windRoseData.directionDegrees[i], svg));
         }
+        return windDirections;
     }
 
     private drawWindDirection(speedRangePercentages: number[], directionPercentage: number, degrees: number,
-                              canvasContext: CanvasRenderingContext2D) {
-        if (directionPercentage === 0) return;
+                              svg: Snap.Paper): Snap.Paper {
+        const windDirection = svg.group();
+        if (directionPercentage === 0) {
+            return windDirection;
+        }
 
         const percentages = Array(speedRangePercentages.length).fill(0);
         for (let i = speedRangePercentages.length - 1; i >= 0; i--) {
@@ -65,104 +77,102 @@ export class WindRoseRendererCenterCalm {
                 }
             }
         }
-        const maxDirectionRadius = (directionPercentage * (this.dimensions.outerRadius - this.config.centerRadius)) / this.windRoseData.maxCirclePercentage;
+        const maxDirectionRadius = (directionPercentage * (this.dimensionCalculator.cfg.roseRadius - this.config.centerRadius)) / this.windRoseData.maxCirclePercentage;
         for (let i = this.speedRanges.length - 1; i >= 0; i--) {
-            this.drawSpeedPart(canvasContext,
+            const sppedPart = this.drawSpeedPart(svg,
                 degrees - 90,
                 (maxDirectionRadius * (percentages[i] / 100)) + this.config.centerRadius,
                 this.speedRanges[i].color);
+            windDirection.add(sppedPart);
         }
+        return windDirection;
     }
 
-    private drawSpeedPart(canvasContext: CanvasRenderingContext2D, degrees: number, radius: number, color: string) {
-        canvasContext.strokeStyle = this.config.roseLinesColor;
-        canvasContext.lineWidth = 2;
-        canvasContext.beginPath();
-        canvasContext.moveTo(0, 0);
-        canvasContext.arc(0, 0, radius,
-            DrawUtil.toRadians(degrees - (this.config.leaveArc / 2)),
-            DrawUtil.toRadians(degrees + (this.config.leaveArc / 2)));
-        canvasContext.lineTo(0, 0);
-        canvasContext.stroke();
-        canvasContext.fillStyle = color;
-        canvasContext.fill();
+    private drawSpeedPart(svg: Snap.Paper, degrees: number, radius: number, color: string): Snap.Element {
+
+        var radians1 = DrawUtil.toRadians(degrees - (this.config.leaveArc / 2));
+        var radians2 = DrawUtil.toRadians(degrees + (this.config.leaveArc / 2));
+        var center = this.dimensionCalculator.roseCenter();
+        var x1 = center.x + Math.round(Math.cos(radians1) * radius);
+        var y1 = center.y + Math.round(Math.sin(radians1) * radius);
+        var x2 = center.x + Math.round(Math.cos(radians2) * radius);
+        var y2 = center.y + Math.round(Math.sin(radians2) * radius);
+
+        return svg.path(Snap.format('M {centerX} {centerY} L {x1} {y1} A{radius} {radius} 0 0 1 {x2} {y2} Z ', {
+            centerX: center.x,
+            centerY: center.y,
+            x1, y1, x2, y2, radius
+        })).attr({'fill': color, stroke: this.config.roseLinesColor});
     }
 
-    private drawBackground(canvasContext: CanvasRenderingContext2D): void {
-        // Clear
-        canvasContext.clearRect(0, 0, 5000, 5000);
-
+    private drawBackground(svg: Snap.Paper): Snap.Paper {
         // Cross
-        canvasContext.lineWidth = 1;
-        canvasContext.strokeStyle = this.config.roseLinesColor;
-        canvasContext.moveTo(0 - this.dimensions.outerRadius, 0);
-        canvasContext.lineTo(this.dimensions.outerRadius, 0);
-        canvasContext.stroke();
-        canvasContext.moveTo(0, 0 - this.dimensions.outerRadius);
-        canvasContext.lineTo(0, this.dimensions.outerRadius);
-        canvasContext.stroke();
+        var lineHorizontal = this.svgUtil.drawLine(this.dimensionCalculator.crossHorizontalLine());
+        var lineVertical = this.svgUtil.drawLine(this.dimensionCalculator.crossVerticalLine());
+        var roseLinesGroup = svg.group(lineHorizontal, lineVertical);
 
-        // Cirlces
+        // Circles
         const circleCount = this.windRoseData.circleCount;
-        canvasContext.strokeStyle = this.config.roseLinesColor;
-        const radiusStep = (this.dimensions.outerRadius - this.config.centerRadius) / circleCount;
+        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.config.centerRadius) / circleCount;
         let circleRadius = this.config.centerRadius + radiusStep;
         for (let i = 1; i <= circleCount; i++) {
-            canvasContext.beginPath();
-            canvasContext.arc(0, 0, circleRadius, 0, 2 * Math.PI);
-            canvasContext.stroke();
+            roseLinesGroup.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(circleRadius)));
             circleRadius += radiusStep;
         }
+        roseLinesGroup.attr({
+            stroke: this.config.roseLinesColor,
+            strokeWidth: 1,
+            fill: "none",
+        });
+        return roseLinesGroup;
+ }
 
+    private drawWindDirectionText(svg: Snap.Paper): Snap.Paper {
         // Wind direction text
-        const textCirlceSpace = 15;
-        canvasContext.fillStyle = this.config.roseDirectionLettersColor;
-        canvasContext.font = '22px Arial';
-        canvasContext.textAlign = 'center';
-        canvasContext.textBaseline = 'middle';
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[0], 0, 0 - this.dimensions.outerRadius - textCirlceSpace + 2);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[2], 0, this.dimensions.outerRadius + textCirlceSpace);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[1], this.dimensions.outerRadius + textCirlceSpace, 0);
-        this.drawText(canvasContext, this.config.cardinalDirectionLetters[3], 0 - this.dimensions.outerRadius - textCirlceSpace, 0);
+        var northText = this.svgUtil.drawText(this.dimensionCalculator.north(), "N",
+            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "auto", "middle"));
+
+        var eastText = this.svgUtil.drawText(this.dimensionCalculator.east(), "E",
+            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "middle", "start"));
+
+        var southText = this.svgUtil.drawText(this.dimensionCalculator.south(), "S",
+            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "hanging", "middle"));
+
+        var westText = this.svgUtil.drawText(this.dimensionCalculator.west(), "W",
+            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "middle", "end"));
+
+        return svg.group(northText, eastText, southText, westText);
     }
 
-    private drawCircleLegend(canvasContext: CanvasRenderingContext2D) {
-        canvasContext.font = "10px Arial";
-        canvasContext.fillStyle = this.config.rosePercentagesColor
-        canvasContext.textAlign = 'center';
-        canvasContext.textBaseline = 'bottom';
-        const radiusStep = (this.dimensions.outerRadius - this.config.centerRadius) / this.windRoseData.circleCount;
+    private drawCircleLegend(svg: Snap.Paper): Snap.Paper {
+        const circleLegendGroup = svg.group();
+        const center = this.dimensionCalculator.roseCenter();
+        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.config.centerRadius) / this.windRoseData.circleCount;
         const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.config.centerRadius;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
 
         for (let i = 1; i <= this.windRoseData.circleCount; i++) {
-            const xPos = centerXY + (xy * i);
-            const yPos = centerXY + (xy * i);
-            this.drawText(canvasContext, (this.windRoseData.percentagePerCircle * i) + "%", xPos, yPos);
+            const xPos = centerXY + (xy * i) + center.x;
+            const yPos = centerXY + (xy * i) + center.y;
+            const text = this.svgUtil.drawText(new Coordinate(xPos, yPos),
+                (this.windRoseData.percentagePerCircle * i) + "%",
+                TextAttributes.roseLegendAttribute(this.config.rosePercentagesColor));
+            circleLegendGroup.add(text);
         }
+        return circleLegendGroup;
     }
 
-    private drawCenterZeroSpeed(canvasContext: CanvasRenderingContext2D) {
-        canvasContext.strokeStyle = this.config.roseLinesColor;
-        canvasContext.lineWidth = 1;
-        canvasContext.beginPath();
-        canvasContext.arc(0, 0, this.config.centerRadius, 0, 2 * Math.PI);
-        canvasContext.stroke();
-        canvasContext.fillStyle = this.speedRanges[0].color;
-        canvasContext.fill();
-        canvasContext.font = '12px Arial';
-        canvasContext.textAlign = 'center';
-        canvasContext.textBaseline = 'middle';
-        canvasContext.strokeStyle = this.config.rosePercentagesColor;
-        canvasContext.fillStyle = this.config.rosePercentagesColor;
-        this.drawText(canvasContext, Math.round(this.windRoseData.speedRangePercentages[0]) + '%', 0, 0);
+    private drawCenterZeroSpeed(svg: Snap.Paper): Snap.Paper {
+        const center = this.dimensionCalculator.roseCenter();
+        var centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
+            this.config.centerRadius));
+        centerCircle.attr({
+            fill: this.speedRanges[0].color
+        })
+        var centerPercentage = this.svgUtil.drawText(center, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
+            TextAttributes.windBarAttribute(this.config.rosePercentagesColor, 40, "middle", "middle"));
+
+        return svg.group(centerCircle, centerPercentage);
     }
 
-    private drawText(canvasContext: CanvasRenderingContext2D, text: string, x: number, y: number) {
-        canvasContext.save();
-        canvasContext.translate(x, y);
-        canvasContext.rotate(DrawUtil.toRadians(-this.config.windRoseDrawNorthOffset));
-        canvasContext.fillText(text, 0, 0);
-        canvasContext.restore();
-    }
 }

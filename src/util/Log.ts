@@ -15,7 +15,7 @@ export class Log {
                 break;
         }
         if (this.level > 2) {
-            console.log('LOG level set to:', level);
+            console.log('WR LOG level set to:', level);
         }
     }
 
@@ -33,9 +33,9 @@ export class Log {
     static error(message: any, ...optionalParams: any[]): void {
         if (this.level >= 1) {
             if (optionalParams.length === 0) {
-                console.error('ERROR ' + message);
+                console.error('WR ERROR ' + message);
             } else {
-                console.error('ERROR ' + message, optionalParams[0]);
+                console.error('WR ERROR ' + message, optionalParams[0]);
             }
         }
     }
@@ -43,9 +43,9 @@ export class Log {
     static warn(message: any, ...optionalParams: any[]): void {
         if (this.level >= 2) {
             if (optionalParams.length === 0) {
-                console.warn('WARN ' + message);
+                console.warn('WR WARN ' + message);
             } else {
-                console.warn('WARN ' +message, optionalParams[0]);
+                console.warn('WR WARN ' +message, optionalParams[0]);
             }
         }
     }
@@ -70,9 +70,9 @@ export class Log {
 
     private static log(message: any, ...optionalParams: any[]): void {
         if (optionalParams[0].length === 0) {
-            console.log(message);
+            console.log('WR ' + message);
         } else {
-            console.log(message, optionalParams[0]);
+            console.log('WR ' + message, optionalParams[0]);
         }
     }
 }
