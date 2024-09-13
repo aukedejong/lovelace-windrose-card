@@ -52,6 +52,8 @@ export class WindRoseCard extends LitElement {
 
     set hass(hass: HomeAssistant) {
         this._hass = hass;
+        const state = this._hass.states["sensor.gorredijk_wind_direction_azimuth"];
+        this.windRoseDirigent.update(state.state, this.svg);
     }
 
     render(): TemplateResult {
@@ -127,16 +129,17 @@ export class WindRoseCard extends LitElement {
 
     getCardSize(): number {
         Log.debug('getCardSize()');
-        return 4;
+        return 9;
     }
 
-    public getLayoutOptions() {
-        return {
-            grid_rows: 2,
-            grid_columns: 4,
-            grid_min_rows: 4,
-        };
-    }
+    // public getLayoutOptions() {
+    //     Log.debug('getLayoutOptions()');
+    //     return {
+    //         grid_rows: 8,
+    //         grid_columns: 6,
+    //         grid_min_rows: 5,
+    //     };
+    // }
 
     refreshCardConfig() {
         this.entityChecker.checkEntities(this.cardConfig, this._hass).then(() => {

@@ -12,6 +12,7 @@ import {PercentageCalculatorCenterCalm} from "./PercentageCalculatorCenterCalm";
 import {WindRoseRenderer} from "./WindRoseRenderer";
 import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {DimensionConfig} from "./DimensionConfig";
+import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
 
 export class WindRoseDirigent {
     //Util
@@ -30,6 +31,7 @@ export class WindRoseDirigent {
     private dimensionConfig!: DimensionConfig;
     private windRoseRenderer!: WindRoseRenderer;
     private windBarRenderers: WindBarRenderer[] = [];
+    private currentDirectionRenderer!: CurrentDirectionRenderer;
 
     //Calculated data
     private windRoseData: WindRoseData[] = [];
@@ -58,6 +60,7 @@ export class WindRoseDirigent {
             this.percentageCalculator = new PercentageCalculator();
             this.windRoseRenderer = new WindRoseRendererStandaard(windRoseConfig, this.dimensionConfig, this.windSpeedConverter.getSpeedRanges());
         }
+        this.currentDirectionRenderer = new CurrentDirectionRenderer(windRoseConfig, this.dimensionConfig);
 
         this.windBarRenderers = [];
         if (!cardConfig.hideWindspeedBar) {
@@ -97,11 +100,18 @@ export class WindRoseDirigent {
         if (svg && this.initReady && this.measurementsReady) {
             Log.debug('render()', svg, this.windRoseData, this.windBarRenderers);
             this.windRoseRenderer.drawWindRose(this.windRoseData[0], svg);
+            this.currentDirectionRenderer.drawCurrentWindDirection("0", svg);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i], svg);
             }
         } else {
             Log.error("render(): Could not render, no svg or windRoseData", svg, this.windRoseData);
+        }
+    }
+
+    update(currentDirection: string, svg: Snap.Paper): void {
+        if (this.initReady) {
+            this.currentDirectionRenderer.drawCurrentWindDirection(currentDirection, svg);
         }
     }
 

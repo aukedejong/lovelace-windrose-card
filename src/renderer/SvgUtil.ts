@@ -30,6 +30,30 @@ export class SvgUtil {
         }));
     }
 
+    public drawTriangle(x: number, y: number, dx1: number, dy1: number, dx2: number, dy2: number): Snap.Element {
+        return this.svg.path(Snap.format('M {x} {y} l {dx1} {dy1} l {dx2} {dy2} Z', {
+            x: x,
+            y: y,
+            dx1: dx1,
+            dy1: dy1,
+            dx2: dx2,
+            dy2: dy2
+        }));
+    }
+
+    public drawArrow(x: number, y: number, size: number): Snap.Element {
+        return this.svg.path(Snap.format('M {x} {y} l {dx1} {dy1} l {dx2} {dy2} l {dx3} {dy3} Z', {
+            x: x,
+            y: y,
+            dx1: -size,
+            dy1: -size/2,
+            dx2: size/4,
+            dy2: size/2,
+            dx3: -size/4,
+            dy3: size/2
+        }));
+    }
+
     public drawCircle(circleCoridnate: CircleCoordinate): Snap.Element {
         return this.svg.circle(circleCoridnate.centerPoint.x, circleCoridnate.centerPoint.y, circleCoridnate.radius);
     }
