@@ -13,7 +13,6 @@ export class CardConfigWrapper {
     title: string;
     dataPeriod: DataPeriod;
     refreshInterval: number;
-    maxWidth: number | undefined;
     windDirectionEntity: WindDirectionEntity;
     windspeedEntities: WindSpeedEntity[];
     windspeedBarLocation: string;
@@ -23,6 +22,7 @@ export class CardConfigWrapper {
     cardinalDirectionLetters: string;
     windDirectionCount: number;
     windRoseDrawNorthOffset: number;
+    showCurrentDirectionArrow: boolean;
     outputSpeedUnit: string;
     outputSpeedUnitLabel: string | undefined;
     speedRangeBeaufort: boolean;
@@ -41,7 +41,6 @@ export class CardConfigWrapper {
             data_period: {
                 hours_to_show: GlobalConfig.defaultHoursToShow
             },
-            max_width: 400,
             refresh_interval: GlobalConfig.defaultRefreshInterval,
             windspeed_bar_location: GlobalConfig.defaultWindspeedBarLocation,
             windspeed_bar_full: GlobalConfig.defaultWindspeedBarFull,
@@ -65,6 +64,7 @@ export class CardConfigWrapper {
             speed_range_max: undefined,
             speed_ranges: undefined,
             windrose_draw_north_offset: 0,
+            show_current_direction_arrow: true,
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
             center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
@@ -76,10 +76,10 @@ export class CardConfigWrapper {
         this.title = this.cardConfig.title;
         this.dataPeriod = this.checkDataPeriod(cardConfig.hours_to_show, cardConfig.data_period);
         this.refreshInterval = this.checkRefreshInterval();
-        this.maxWidth = this.checkMaxWidth();
         this.windDirectionEntity = this.checkWindDirectionEntity();
         this.windspeedEntities = this.checkWindspeedEntities();
         this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
+        this.showCurrentDirectionArrow = this.checkBooleanDefaultFalse(cardConfig.show_current_direction_arrow);
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.windspeedBarFull = this.checkBooleanDefaultTrue(cardConfig.windspeed_bar_full);
         this.hideWindspeedBar = this.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
@@ -149,17 +149,6 @@ export class CardConfigWrapper {
             return this.cardConfig.refresh_interval;
         }
         return GlobalConfig.defaultRefreshInterval;
-    }
-
-    private checkMaxWidth(): number | undefined {
-        if (this.cardConfig.max_width && isNaN(this.cardConfig.max_width)) {
-            throw new Error('WindRoseCard: Invalid max_width, should be a number in pixels.');
-        } else if (this.cardConfig.max_width <= 0) {
-            throw new Error('WindRoseCard: Invalid max_width, should be a positive number.')
-        } else if (this.cardConfig.max_width) {
-            return this.cardConfig.max_width;
-        }
-        return undefined;
     }
 
     private checkWindDirectionEntity(): WindDirectionEntity {
@@ -328,7 +317,7 @@ export class CardConfigWrapper {
     private checkSpeedRangeStep(): number | undefined {
         if (this.cardConfig.speed_range_step && isNaN(this.cardConfig.speed_range_step)) {
             throw new Error('WindRoseCard: Invalid speed_range_step, should be a positive number.');
-        } else if (this.cardConfig.max_width <= 0) {
+        } else if (this.cardConfig.speed_range_step <= 0) {
             throw new Error('WindRoseCard: Invalid speed_range_step, should be a positive number.')
         } else if (this.cardConfig.speed_range_step) {
             return this.cardConfig.speed_range_step;
@@ -339,7 +328,7 @@ export class CardConfigWrapper {
     private checkSpeedRangeMax(): number | undefined {
         if (this.cardConfig.speed_range_max && isNaN(this.cardConfig.speed_range_max)) {
             throw new Error('WindRoseCard: Invalid speed_range_max, should be a positive number.');
-        } else if (this.cardConfig.max_width <= 0) {
+        } else if (this.cardConfig.speed_range_max <= 0) {
             throw new Error('WindRoseCard: Invalid speed_range_max, should be a positive number.')
         } else if (this.cardConfig.speed_range_max) {
             return this.cardConfig.speed_range_max;
@@ -388,18 +377,6 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultMatchingStategy;
     }
 
-    private checkDirectionSpeedTimeDiff(): number {
-        if (this.cardConfig.direction_speed_time_diff || this.cardConfig.direction_speed_time_diff === 0) {
-            if (isNaN(this.cardConfig.direction_speed_time_diff)) {
-                throw new Error("Direction speed time difference is not a number: " +
-                    this.cardConfig.direction_speed_time_diff);
-            }
-            return this.cardConfig.direction_speed_time_diff;
-        }
-        return GlobalConfig.defaultDirectionSpeedTimeDiff;
-    }
-
-
     private createEntitiesQueryParameter() {
         return this.windDirectionEntity + ',' + this.windspeedEntities
             .map(config => config.entity)
@@ -433,6 +410,12 @@ export class CardConfigWrapper {
             }
             if (this.cardConfig.colors.rose_percentages) {
                 cardColors.rosePercentages = this.cardConfig.colors.rose_percentages;
+            }
+            if (this.cardConfig.colors.rose_center_percentage) {
+                cardColors.roseCenterPercentage = this.cardConfig.colors.rose_center_percentage;
+            }
+            if (this.cardConfig.colors.rose_current_direction_arrow) {
+                cardColors.roseCurrentDirectionArrow = this.cardConfig.colors.rose_current_direction_arrow
             }
             if (this.cardConfig.colors.bar_border) {
                 cardColors.barBorder = this.cardConfig.colors.bar_border;

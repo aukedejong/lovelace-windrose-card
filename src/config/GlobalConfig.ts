@@ -10,7 +10,6 @@ export class GlobalConfig {
     static defaultOutputSpeedUnit = 'mps';
     static defaultWindspeedBarFull = true;
     static defaultMatchingStategy = 'direction-first';
-    static defaultDirectionSpeedTimeDiff = 1;
     static defaultCenterCalmPercentage = true;
     static defaultLogLevel: 'NONE';
     static defaultSpeedRangeBeaufort = true;

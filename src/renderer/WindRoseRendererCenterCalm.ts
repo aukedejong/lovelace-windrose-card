@@ -10,6 +10,7 @@ import {DimensionConfig} from "./DimensionConfig";
 import {TextAttributes} from "./TextAttributes";
 import {CircleCoordinate} from "./CircleCoordinate";
 import {Coordinate} from "./Coordinate";
+import {ColorUtil} from "../util/ColorUtil";
 
 export class WindRoseRendererCenterCalm {
     private config: WindRoseConfig;
@@ -42,10 +43,11 @@ export class WindRoseRendererCenterCalm {
         const background = this.drawBackground(svg);
 
         //Rotate
-        const rotateGroup = svg.group(windDirectionText, windDirections, background);
-        var center = this.dimensionCalculator.roseCenter();
-        rotateGroup.transform("r" + this.config.windRoseDrawNorthOffset + "," + center.x + "," + center.y);
-
+        if (this.config.windRoseDrawNorthOffset != 0) {
+            const rotateGroup = svg.group(windDirectionText, windDirections, background);
+            var center = this.dimensionCalculator.roseCenter();
+            rotateGroup.transform("r" + this.config.windRoseDrawNorthOffset + "," + center.x + "," + center.y);
+        }
         const circleLegend = this.drawCircleLegend(svg);
         const centerZeroSpeed = this.drawCenterZeroSpeed(svg);
     }
@@ -125,21 +127,27 @@ export class WindRoseRendererCenterCalm {
             fill: "none",
         });
         return roseLinesGroup;
- }
+    }
 
     private drawWindDirectionText(svg: Snap.Paper): Snap.Paper {
         // Wind direction text
-        var northText = this.svgUtil.drawText(this.dimensionCalculator.north(), "N",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "auto", "middle"));
-
-        var eastText = this.svgUtil.drawText(this.dimensionCalculator.east(), "E",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "middle", "start"));
-
-        var southText = this.svgUtil.drawText(this.dimensionCalculator.south(), "S",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "hanging", "middle"));
-
-        var westText = this.svgUtil.drawText(this.dimensionCalculator.west(), "W",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "middle", "end"));
+        this.config.cardinalDirectionLetters
+        const northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
+            this.config.cardinalDirectionLetters[0],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
+        const eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
+            this.config.cardinalDirectionLetters[1],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
+        const southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
+            this.config.cardinalDirectionLetters[2],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
+        const westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
+            this.config.cardinalDirectionLetters[3],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
 
         return svg.group(northText, eastText, southText, westText);
     }
@@ -164,13 +172,18 @@ export class WindRoseRendererCenterCalm {
 
     private drawCenterZeroSpeed(svg: Snap.Paper): Snap.Paper {
         const center = this.dimensionCalculator.roseCenter();
-        var centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
+        const centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
             this.config.centerRadius));
         centerCircle.attr({
             fill: this.speedRanges[0].color
-        })
-        var centerPercentage = this.svgUtil.drawText(center, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
-            TextAttributes.windBarAttribute(this.config.rosePercentagesColor, 40, "middle", "middle"));
+        });
+
+        let textColor = this.config.roseCenterPercentageColor;
+        if (this.config.roseCenterPercentageColor === 'auto') {
+             textColor = ColorUtil.getTextColorBasedOnBackground(this.speedRanges[0].color);
+        }
+        const centerPercentage = this.svgUtil.drawText(center, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
+            TextAttributes.windBarAttribute(textColor, 40, "middle", "middle"));
 
         return svg.group(centerCircle, centerPercentage);
     }

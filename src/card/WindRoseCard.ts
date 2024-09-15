@@ -8,6 +8,7 @@ import {WindRoseDirigent} from "../renderer/WindRoseDirigent";
 import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {EntityChecker} from "../entity-checker/EntityChecker";
 import Snap from "snapsvg";
+import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -34,6 +35,7 @@ export class WindRoseCard extends LitElement {
     @query('.card-content') parentDiv!: HTMLDivElement;
 
     windRoseDirigent!: WindRoseDirigent;
+    entityStateProcessor!: EntityStatesProcessor;
     measurementProvider!: HomeAssistantMeasurementProvider;
     entityChecker!: EntityChecker;
 
@@ -46,14 +48,15 @@ export class WindRoseCard extends LitElement {
     constructor() {
         super();
         this.windRoseDirigent = new WindRoseDirigent();
+        this.entityStateProcessor = new EntityStatesProcessor();
         this.entityChecker = new EntityChecker();
         this.svg = Snap("100%", "100%");
     }
 
     set hass(hass: HomeAssistant) {
         this._hass = hass;
-        //const state = this._hass.states["sensor.gorredijk_wind_direction_azimuth"];
-        //this.windRoseDirigent.update(state.state, this.svg);
+        const entityStates = this.entityStateProcessor.updatedHass(hass);
+        this.windRoseDirigent.updateEntityStates(entityStates, this.svg);
     }
 
     render(): TemplateResult {
@@ -146,6 +149,7 @@ export class WindRoseCard extends LitElement {
             this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
             this.measurementProvider.setHass(this._hass);
             this.windRoseDirigent.init(this.cardConfig, this.measurementProvider);
+            this.entityStateProcessor.init(this.cardConfig)
             this.refreshMeasurements();
         });
     }

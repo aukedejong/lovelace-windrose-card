@@ -19,7 +19,9 @@ export class WindRoseConfigFactory {
             this.cardConfig.windRoseDrawNorthOffset,
             this.cardConfig.cardColor.roseLines,
             this.cardConfig.cardColor.roseDirectionLetters,
-            this.cardConfig.cardColor.rosePercentages);
+            this.cardConfig.cardColor.roseCenterPercentage,
+            this.cardConfig.cardColor.rosePercentages,
+            this.cardConfig.cardColor.roseCurrentDirectionArrow);
     }
 
     createWindBarConfigs(): WindBarConfig[] {

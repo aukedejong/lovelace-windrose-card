@@ -3,6 +3,7 @@ import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {SvgUtil} from "./SvgUtil";
 import {DimensionConfig} from "./DimensionConfig";
 import {Coordinate} from "./Coordinate";
+import {Log} from "../util/Log";
 
 export class CurrentDirectionRenderer {
 
@@ -20,20 +21,28 @@ export class CurrentDirectionRenderer {
         this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
-    drawCurrentWindDirection(currentWindDirection: string, svg: Snap.Paper): void {
-        // this.svgUtil = new SvgUtil(svg);
-        // if (this.indicator === undefined) {
-        //     this.dimensionCalculator.roseCenter()
-        //     const x = this.roseCenter.x + this.cfg.roseRadius + 20;
-        //     const y = this.roseCenter.y;
-        //
-        //     this.indicator = this.svgUtil.drawArrow(x, y, 40);
-        //     this.indicator.attr({
-        //         stroke: "red",
-        //         fill: "red"
-        //     });
-        // }
-        // this.indicator.animate(
-        //     { transform: "R" + currentWindDirection + "," + this.roseCenter.x + "," + this.roseCenter.y}, 500, mina.easeinout);
+    drawCurrentWindDirection(currentWindDirection: number, svg: Snap.Paper): void {
+        this.svgUtil = new SvgUtil(svg);
+        if (this.indicator === undefined) {
+            this.dimensionCalculator.roseCenter()
+            const x = this.roseCenter.x + this.cfg.roseRadius + 20;
+            const y = this.roseCenter.y;
+
+            this.indicator = this.svgUtil.drawArrow(x, y, 40);
+            this.indicator.attr({
+                stroke: this.config.roseCurrentDirectionArrowColor,
+                fill: this.config.roseCurrentDirectionArrowColor
+            });
+        }
+        if (isNaN(+currentWindDirection)) {
+            return;
+        }
+        const degrees =  -90 + this.config.windRoseDrawNorthOffset + (+currentWindDirection);
+        var transform = "R" + degrees + "," + this.roseCenter.x + "," + this.roseCenter.y;
+
+        Log.debug("Animate", degrees, currentWindDirection, transform);
+        this.indicator.animate(
+            { transform: transform }, 700, mina.easeinout);
     }
+
 }

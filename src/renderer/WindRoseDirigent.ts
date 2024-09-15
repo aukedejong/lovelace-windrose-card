@@ -13,6 +13,7 @@ import {WindRoseRenderer} from "./WindRoseRenderer";
 import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {DimensionConfig} from "./DimensionConfig";
 import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
+import {EntityStates} from "../entity-state-processing/EntityStates";
 
 export class WindRoseDirigent {
     //Util
@@ -37,7 +38,6 @@ export class WindRoseDirigent {
     private windRoseData: WindRoseData[] = [];
 
     private initReady = false;
-    private dimensionsReady = false;
     private measurementsReady = false;
 
     init(cardConfig: CardConfigWrapper, measurementProvider: HomeAssistantMeasurementProvider): void {
@@ -97,10 +97,10 @@ export class WindRoseDirigent {
     }
 
     render(svg: Snap.Paper): void {
+        svg.clear();
         if (svg && this.initReady && this.measurementsReady) {
             Log.debug('render()', svg, this.windRoseData, this.windBarRenderers);
             this.windRoseRenderer.drawWindRose(this.windRoseData[0], svg);
-            this.currentDirectionRenderer.drawCurrentWindDirection("0", svg);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i], svg);
             }
@@ -109,9 +109,9 @@ export class WindRoseDirigent {
         }
     }
 
-    update(currentDirection: string, svg: Snap.Paper): void {
-        if (this.initReady) {
-            this.currentDirectionRenderer.drawCurrentWindDirection(currentDirection, svg);
+    updateEntityStates(entityStates: EntityStates, svg: Snap.Paper) {
+        if (entityStates.updateWindDirection) {
+            this.currentDirectionRenderer.drawCurrentWindDirection(entityStates.currentWindDirection as number, svg);
         }
     }
 

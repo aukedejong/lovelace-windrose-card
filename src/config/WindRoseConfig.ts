@@ -12,7 +12,9 @@ export class WindRoseConfig {
 
         public roseLinesColor: string,
         public roseDirectionLettersColor: string,
-        public rosePercentagesColor: string) {
+        public roseCenterPercentageColor: string,
+        public rosePercentagesColor: string,
+        public roseCurrentDirectionArrowColor: string) {
     }
 
 }

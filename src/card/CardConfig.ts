@@ -12,7 +12,6 @@ export interface CardConfig {
     data_period: CardConfigDataPeriod;
 
     refresh_interval: number;
-    max_width: number;
     wind_direction_entity: CardConfigWindDirectionEntity;
     windspeed_entities: CardConfigWindSpeedEntity[];
     output_speed_unit: string;
@@ -24,13 +23,13 @@ export interface CardConfig {
 
     center_calm_percentage: boolean;
     windrose_draw_north_offset: number;
+    show_current_direction_arrow: boolean;
     windspeed_bar_location: string;
     windspeed_bar_full: boolean;
     hide_windspeed_bar: boolean;
     cardinal_direction_letters: string;
     wind_direction_count: number;
     matching_strategy: string;
-    direction_speed_time_diff: number;
     log_level: string;
 
     colors: CardConfigColors;

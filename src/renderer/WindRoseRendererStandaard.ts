@@ -40,9 +40,11 @@ export class WindRoseRendererStandaard {
         const windDirections = this.drawWindDirections(svg);
 
         // Rotate
-        const rotateGroup = svg.group(windDirectionText, windDirections, backgroundLines);
-        var center = this.dimensionCalculator.roseCenter();
-        rotateGroup.transform("r" + this.config.windRoseDrawNorthOffset + "," + center.x + "," + center.y);
+        if (this.config.windRoseDrawNorthOffset != 0) {
+            const rotateGroup = svg.group(windDirectionText, windDirections, backgroundLines);
+            var center = this.dimensionCalculator.roseCenter();
+            rotateGroup.transform("r" + this.config.windRoseDrawNorthOffset + "," + center.x + "," + center.y);
+        }
 
         const circleLegend = this.drawCircleLegend(svg);
     }
@@ -130,17 +132,23 @@ export class WindRoseRendererStandaard {
 
     private drawWindDirectionText(svg: Snap.Paper): Snap.Paper {
         // Wind direction text
-        var northText = this.svgUtil.drawText(this.dimensionCalculator.north(), "N",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "auto", "middle"));
-
-        var eastText = this.svgUtil.drawText(this.dimensionCalculator.east(), "E",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "middle", "start"));
-
-        var southText = this.svgUtil.drawText(this.dimensionCalculator.south(), "S",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "hanging", "middle"));
-
-        var westText = this.svgUtil.drawText(this.dimensionCalculator.west(), "W",
-            TextAttributes.windBarAttribute(this.config.roseDirectionLettersColor, 50, "middle", "end"));
+        this.config.cardinalDirectionLetters
+        const northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
+            this.config.cardinalDirectionLetters[0],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
+        const eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
+            this.config.cardinalDirectionLetters[1],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
+        const southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
+            this.config.cardinalDirectionLetters[2],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
+        const westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
+            this.config.cardinalDirectionLetters[3],
+            -this.config.windRoseDrawNorthOffset,
+            this.config.roseDirectionLettersColor);
 
         return svg.group(northText, eastText, southText, westText);
     }

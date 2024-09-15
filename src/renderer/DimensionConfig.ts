@@ -5,7 +5,7 @@ export class DimensionConfig {
     readonly marginRight = 80;
     readonly marginTop = 80;
     readonly marginBottom = 100;
-    readonly directionLetterMargin = 20;
+    readonly directionLetterMargin = 45;
 
     readonly barBottom = {
         barLength: this.roseRadius * 2,

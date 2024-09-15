@@ -10,6 +10,7 @@ import {Coordinate} from "./Coordinate";
 import {TextAttributes} from "./TextAttributes";
 import {WindBarDimensionCalculator} from "./WindBarDimensionCalculator";
 import {DimensionConfig} from "./DimensionConfig";
+import {ColorUtil} from "../util/ColorUtil";
 
 export class WindBarRenderer {
 
@@ -91,8 +92,8 @@ export class WindBarRenderer {
             if (speedRangePercentages[i] > 0) {
                 var percentage = Math.round(speedRangePercentages[i]);
                 var percFontSize = percentage === 100 ? fontSize - 5 : fontSize;
-
-                this.svgUtil.drawText(new Coordinate(posX + (barRect.width / 2), posY + (length / 2)), `${percentage}%`, TextAttributes.windBarAttribute(this.config.barPercentagesColor, percFontSize, "middle", "middle"));
+                let percentageTextColor = this.getPercentageTextColor(this.config.barPercentagesColor, this.speedRanges[i].color);
+                this.svgUtil.drawText(new Coordinate(posX + (barRect.width / 2), posY + (length / 2)), `${percentage}%`, TextAttributes.windBarAttribute(percentageTextColor, percFontSize, "middle", "middle"));
             }
 
             posY += length;
@@ -141,7 +142,8 @@ export class WindBarRenderer {
 
             if (speedRangePercentages[i] > 0) {
                 const coord = new Coordinate(posX + (length / 2), posY + (barRect.height / 2) + 2);
-                this.svgUtil.drawText(coord, `${Math.round(speedRangePercentages[i])}%`, TextAttributes.windBarAttribute(this.config.barPercentagesColor, 35, "middle", "middle"));
+                let percentageTextColor = this.getPercentageTextColor(this.config.barPercentagesColor, this.speedRanges[i].color);
+                this.svgUtil.drawText(coord, `${Math.round(speedRangePercentages[i])}%`, TextAttributes.windBarAttribute(percentageTextColor, 35, "middle", "middle"));
             }
 
             posX += length;
@@ -162,5 +164,12 @@ export class WindBarRenderer {
             }
         }
         return speedRangePercentages.length;
+    }
+
+    private getPercentageTextColor(configColor: string, backgroundColor: string) {
+        if (configColor === 'auto') {
+             return ColorUtil.getTextColorBasedOnBackground(backgroundColor);
+        }
+        return configColor;
     }
 }
