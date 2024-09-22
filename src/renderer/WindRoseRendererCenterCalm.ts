@@ -11,6 +11,7 @@ import {TextAttributes} from "./TextAttributes";
 import {CircleCoordinate} from "./CircleCoordinate";
 import {Coordinate} from "./Coordinate";
 import {ColorUtil} from "../util/ColorUtil";
+import {DegreesCalculator} from "./DegreesCalculator";
 
 export class WindRoseRendererCenterCalm {
     private readonly config: WindRoseConfig;
@@ -18,18 +19,28 @@ export class WindRoseRendererCenterCalm {
     private readonly svg: Snap.Paper;
 
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
+    private readonly degreesCalculator: DegreesCalculator;
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
+    private readonly roseCenter: Coordinate;
+    private roseGroup!: Snap.Paper;
+    private northText!: Snap.Element;
+    private eastText!: Snap.Element;
+    private southText!: Snap.Element;
+    private westText!: Snap.Element;
 
     constructor(config: WindRoseConfig,
                 dimensionConfig: DimensionConfig,
                 speedRanges: SpeedRange[],
-                svg: Snap.Paper) {
+                svg: Snap.Paper,
+                degreesCalculator: DegreesCalculator) {
         this.config = config;
         this.speedRanges = speedRanges;
         this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
+        this.degreesCalculator = degreesCalculator;
+        this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
     drawWindRose(windRoseData: WindRoseData): void {
@@ -48,11 +59,9 @@ export class WindRoseRendererCenterCalm {
         const background = this.drawBackground();
 
         //Rotate
-        if (this.config.windRoseDrawNorthOffset != 0) {
-            const rotateGroup = this.svg.group(windDirectionText, windDirections, background);
-            var center = this.dimensionCalculator.roseCenter();
-            rotateGroup.transform("r" + this.config.windRoseDrawNorthOffset + "," + center.x + "," + center.y);
-        }
+        this.roseGroup = this.svg.group(windDirectionText, windDirections, background);
+        this.roseGroup.transform("r" +this.degreesCalculator.getRoseRenderDegrees() + "," + this.roseCenter.x + "," + this.roseCenter.y);
+
         const circleLegend = this.drawCircleLegend();
         const centerZeroSpeed = this.drawCenterZeroSpeed();
     }
@@ -135,25 +144,26 @@ export class WindRoseRendererCenterCalm {
 
     private drawWindDirectionText(): Snap.Paper {
         // Wind direction text
+        const roseRenderDegrees = this.degreesCalculator.getRoseRenderDegrees();
         this.config.cardinalDirectionLetters
-        const northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
+        this.northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
             this.config.cardinalDirectionLetters[0],
-            -this.config.windRoseDrawNorthOffset,
+            -roseRenderDegrees,
             this.config.roseDirectionLettersColor);
-        const eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
+        this.eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
             this.config.cardinalDirectionLetters[1],
-            -this.config.windRoseDrawNorthOffset,
+            -roseRenderDegrees,
             this.config.roseDirectionLettersColor);
-        const southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
+        this.southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
             this.config.cardinalDirectionLetters[2],
-            -this.config.windRoseDrawNorthOffset,
+            -roseRenderDegrees,
             this.config.roseDirectionLettersColor);
-        const westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
+        this.westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
             this.config.cardinalDirectionLetters[3],
-            -this.config.windRoseDrawNorthOffset,
+            -roseRenderDegrees,
             this.config.roseDirectionLettersColor);
 
-        return this.svg.group(northText, eastText, southText, westText);
+        return this.svg.group(this.northText, this.eastText, this.southText, this.westText);
     }
 
     private drawCircleLegend(): Snap.Paper {
