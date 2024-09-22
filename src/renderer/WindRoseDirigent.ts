@@ -111,12 +111,12 @@ export class WindRoseDirigent {
         this.svg.clear();
         if (this.initReady && this.measurementsReady) {
             this.log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
-            if (this.cardConfig.showCurrentDirectionArrow) {
-                this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
-            }
             this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
+            }
+            if (this.cardConfig.showCurrentDirectionArrow) {
+                this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
             }
         } else {
             this.log.error("render(): Could not render, init or measurementsn not ready " + this.initReady + " - "  + this.measurementsReady);
