@@ -82,11 +82,13 @@ export class WindRoseCard extends LitElement {
         }
         this._hass = hass;
         const entityStates = this.entityStateProcessor.updatedHass(hass);
-        this.windRoseDirigent.updateEntityStates(entityStates);
+        if (entityStates.updatedWindDirection) {
+            this.windRoseDirigent.updateEntityStates(entityStates);
+        }
     }
 
     refreshCardConfig() {
-        this.log.debug("refreshCardConfig");
+        this.log.debug("refreshCardConfig()");
         this.entityChecker.checkEntities(this.cardConfig, this._hass);
         this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
         this.measurementProvider.setHass(this._hass);

@@ -126,7 +126,7 @@ export class WindRoseDirigent {
     updateEntityStates(entityStates: EntityStates) {
         this.log.debug("updateEntityStates()", entityStates);
         this.entityStates = entityStates;
-        if (entityStates.updateWindDirection) {
+        if (entityStates.updatedWindDirection) {
             this.degreesCalculator.setWindDirectionDegrees(+(entityStates.currentWindDirection as number));
             this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
         }

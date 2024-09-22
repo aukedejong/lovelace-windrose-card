@@ -1,7 +1,7 @@
 export class EntityStates {
 
     constructor(public currentWindDirection: number | undefined,
-                public updateWindDirection: boolean) {
+                public updatedWindDirection: boolean) {
     }
 
     static doNothing(): EntityStates {
