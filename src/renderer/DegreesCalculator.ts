@@ -1,7 +1,7 @@
-import {Log} from "../util/Log";
+import {Log2} from "../util/Log2";
 
 export class DegreesCalculator {
-
+    private readonly log = new Log2("DegreesCalculator");
     private compassDegrees = 0;
     private windDirectionDegrees = 0;
     private roseRenderDegrees = 0;
@@ -9,6 +9,7 @@ export class DegreesCalculator {
 
     constructor(private readonly northOfffset: number,
                 private readonly autoRotateByEntity: boolean) {
+        this.log.debug("constructor");
         this.updateRenderDegrees();
     }
 
@@ -24,8 +25,8 @@ export class DegreesCalculator {
             this.windDirectionRenderDegrees = -90 + this.northOfffset + this.windDirectionDegrees;
 
         }
-        Log.debug("Degrees sensor: ", this.windDirectionDegrees, this.compassDegrees)
-        Log.debug("Degrees for rendering: ", this.roseRenderDegrees, this.windDirectionRenderDegrees);
+        this.log.debug("updateRenderDegrees: Degrees sensor: ", this.windDirectionDegrees, this.compassDegrees)
+        this.log.debug("updateRenderDegrees: Degrees for rendering: ", this.roseRenderDegrees, this.windDirectionRenderDegrees);
     }
 
     getWindDirectionRenderDegrees(): number {
@@ -37,6 +38,7 @@ export class DegreesCalculator {
     }
 
     setWindDirectionDegrees(degrees: number) {
+        this.log.debug("setWindDirectionDegrees: Set windsensor degrees: " + degrees);
         this.windDirectionDegrees = degrees;
         this.updateRenderDegrees();
     }
@@ -45,9 +47,5 @@ export class DegreesCalculator {
         this.compassDegrees = degrees;
         this.updateRenderDegrees();
     }
-
-
-
-
 
 }

@@ -39,10 +39,9 @@ export class CurrentDirectionRenderer {
         if (isNaN(+currentWindDirection)) {
             return;
         }
-        const degrees =  -90 + this.config.windRoseDrawNorthOffset + (+currentWindDirection);
-        var transform = "R" + degrees + "," + this.roseCenter.x + "," + this.roseCenter.y;
+        var transform = "R" + currentWindDirection + "," + this.roseCenter.x + "," + this.roseCenter.y;
 
-        Log.debug("Animate", degrees, currentWindDirection, transform);
+        Log.debug("Animate", currentWindDirection, transform);
         this.indicator.animate(
             { transform: transform }, 700, mina.easeinout);
     }

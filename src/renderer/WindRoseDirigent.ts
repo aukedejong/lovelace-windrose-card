@@ -6,7 +6,6 @@ import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {WindRoseConfigFactory} from "../config/WindRoseConfigFactory";
 import {MeasurementCounter} from "../counter/MeasurementCounter";
 import {WindRoseData} from "./WindRoseData";
-import {Log} from "../util/Log";
 import {WindRoseRendererCenterCalm} from "./WindRoseRendererCenterCalm";
 import {PercentageCalculatorCenterCalm} from "./PercentageCalculatorCenterCalm";
 import {WindRoseRenderer} from "./WindRoseRenderer";
@@ -15,9 +14,11 @@ import {DimensionConfig} from "./DimensionConfig";
 import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
 import {EntityStates} from "../entity-state-processing/EntityStates";
 import {DegreesCalculator} from "./DegreesCalculator";
+import {Log2} from "../util/Log2";
 
 export class WindRoseDirigent {
     //Util
+    private readonly log = new Log2("WindRoseDirigent");
     private windSpeedConverter!: WindSpeedConverter;
 
     //Config
@@ -42,12 +43,14 @@ export class WindRoseDirigent {
     private readonly svg: Snap.Paper;
     private initReady = false;
     private measurementsReady = false;
+    private entityStates!: EntityStates;
 
     constructor(svg: Snap.Paper) {
         this.svg = svg;
     }
 
     init(cardConfig: CardConfigWrapper, measurementProvider: HomeAssistantMeasurementProvider): void {
+        this.log.debug("init()");
         this.initReady = true;
         this.measurementsReady = false;
         this.cardConfig = cardConfig;
@@ -83,10 +86,10 @@ export class WindRoseDirigent {
 
     refreshData(): Promise<boolean> {
         if (this.initReady) {
-            Log.debug('refreshData()');
+            this.log.debug('refreshData()');
             return this.measurementProvider.getMeasurements().then((matchedGroups) => {
                 this.windRoseData = [];
-                Log.debug('Matched measurements:', matchedGroups);
+                this.log.debug('Matched measurements:', matchedGroups);
                 for (let i = 0; i < matchedGroups.length; i++) {
                     this.measurementCounter.init(this.cardConfig.windspeedEntities[i].speedUnit);
                     for (const measurement of matchedGroups[i]) {
@@ -99,7 +102,7 @@ export class WindRoseDirigent {
                 return Promise.resolve(true);
             });
         } else {
-            Log.debug('refreshData() ignored, not inited yet');
+            this.log.debug('refreshData() ignored, not inited yet');
             return Promise.resolve(false);
         }
     }
@@ -107,23 +110,25 @@ export class WindRoseDirigent {
     render(): void {
         this.svg.clear();
         if (this.initReady && this.measurementsReady) {
-            Log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
+            this.log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
             if (this.cardConfig.showCurrentDirectionArrow) {
-                this.currentDirectionRenderer.drawCurrentWindDirection(0, true);
+                this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
             }
             this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
             }
         } else {
-            Log.error("render(): Could not render, no svg or windRoseData", this.svg, this.windRoseData);
+            this.log.error("render(): Could not render, init or measurementsn not ready " + this.initReady + " - "  + this.measurementsReady);
         }
     }
 
-    updateEntityStates(entityStates: EntityStates, svg: Snap.Paper) {
+    updateEntityStates(entityStates: EntityStates) {
+        this.log.debug("updateEntityStates()", entityStates);
+        this.entityStates = entityStates;
         if (entityStates.updateWindDirection) {
-            this.degreesCalculator.setWindDirectionDegrees(entityStates.currentWindDirection as number);
-            this.currentDirectionRenderer.drawCurrentWindDirection(entityStates.currentWindDirection as number, false);
+            this.degreesCalculator.setWindDirectionDegrees(+(entityStates.currentWindDirection as number));
+            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
         }
     }
 

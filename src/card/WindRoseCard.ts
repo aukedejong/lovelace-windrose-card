@@ -9,6 +9,7 @@ import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssi
 import {EntityChecker} from "../entity-checker/EntityChecker";
 import Snap from "snapsvg";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
+import {Log2} from "../util/Log2";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -30,6 +31,8 @@ export class WindRoseCard extends LitElement {
     public static getStubConfig(): Record<string, unknown> {
         return CardConfigWrapper.exampleConfig();
     }
+    
+    private readonly log = new Log2("WindRoseCard");
 
     @query('#svg-container') svgContainer!: HTMLElement;
     @query('.card-content') parentDiv!: HTMLDivElement;
@@ -40,6 +43,7 @@ export class WindRoseCard extends LitElement {
     entityChecker!: EntityChecker;
 
     config!: CardConfig;
+    refreshCardConfigOnHass = false;
     cardConfig!: CardConfigWrapper;
     updateInterval: NodeJS.Timer | undefined;
     _hass!: HomeAssistant;
@@ -54,15 +58,46 @@ export class WindRoseCard extends LitElement {
 
     }
 
+    setConfig(config: any): void {
+        this.config = config;
+        this.cardConfig = new CardConfigWrapper(config);
+
+        Log.setLevel(this.cardConfig.logLevel);
+        Log2.setLevel(this.cardConfig.logLevel);
+        this.log.debug('setConfig(): ', config, this._hass);
+
+        if (this._hass) { //Later config changes, also refresh.
+            this.refreshCardConfig();
+        } else {
+            this.refreshCardConfigOnHass = true;
+        }
+    }
+
     set hass(hass: HomeAssistant) {
+        if (this.refreshCardConfigOnHass) {
+            Log.debug("hass(), refreshCardConfigOnHass");
+            this.refreshCardConfigOnHass = false;
+            this._hass = hass;
+            this.refreshCardConfig();
+        }
         this._hass = hass;
         const entityStates = this.entityStateProcessor.updatedHass(hass);
-        this.windRoseDirigent.updateEntityStates(entityStates, this.svg);
+        this.windRoseDirigent.updateEntityStates(entityStates);
+    }
+
+    refreshCardConfig() {
+        this.log.debug("refreshCardConfig");
+        this.entityChecker.checkEntities(this.cardConfig, this._hass);
+        this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
+        this.measurementProvider.setHass(this._hass);
+        this.windRoseDirigent.init(this.cardConfig, this.measurementProvider);
+        this.entityStateProcessor.init(this.cardConfig)
+        this.refreshMeasurements();
     }
 
     render(): TemplateResult {
         super.render();
-        Log.debug('card render()');
+        this.log.debug('card render()');
         return html`
             <ha-card header="${this.cardConfig?.title}">
                 <div class="card-content" id="svg-container">
@@ -72,25 +107,24 @@ export class WindRoseCard extends LitElement {
     }
 
     firstUpdated(): void {
-        Log.debug('firstUpdated()');
-        Log.debug('SVG container found: ', this.svgContainer, this.measurementProvider);
+        this.log.debug('firstUpdated()');
+        this.log.debug('SVG container found: ', this.svgContainer, this.measurementProvider);
         this.svgContainer.appendChild(this.svg.node);
-        this.refreshCardConfig();
     }
 
     update(changedProperties: PropertyValues): void {
-        Log.debug('update()');
+        this.log.debug('update()');
         super.update(changedProperties);
         this.windRoseDirigent.render();
     }
 
     private initInterval() {
-        Log.debug('initInterval()');
+        this.log.debug('initInterval()');
         if (this.cardConfig && this.updateInterval === undefined) {
 
             this.updateInterval = setInterval(
                 () => this.refreshMeasurements(),this.cardConfig.refreshInterval * 1000);
-            Log.info('Interval running with ' + this.cardConfig.refreshInterval + ' seconds.');
+            this.log.info('Interval running with ' + this.cardConfig.refreshInterval + ' seconds.');
         }
     }
 
@@ -107,36 +141,25 @@ export class WindRoseCard extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        Log.debug('connectedCallBack()');
+        this.log.debug('connectedCallBack()');
         this.initInterval();
 
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        Log.debug('disconnectedCallback()');
+        this.log.debug('disconnectedCallback()');
         clearInterval(this.updateInterval);
 
     }
 
-    setConfig(config: any): void {
-        this.config = config;
-        this.cardConfig = new CardConfigWrapper(config);
-        Log.setLevel(this.cardConfig.logLevel);
-        Log.debug('setConfig(): ', config, this._hass);
-
-        if (this._hass && this.svg) {
-            this.refreshCardConfig();
-        }
-    }
-
     getCardSize(): number {
-        Log.debug('getCardSize()');
+        this.log.debug('getCardSize()');
         return 9;
     }
 
     // public getLayoutOptions() {
-    //     Log.debug('getLayoutOptions()');
+    //     this.log.debug('getLayoutOptions()');
     //     return {
     //         grid_rows: 8,
     //         grid_columns: 6,
@@ -144,18 +167,10 @@ export class WindRoseCard extends LitElement {
     //     };
     // }
 
-    refreshCardConfig() {
-        this.entityChecker.checkEntities(this.cardConfig, this._hass);
-        this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
-        this.measurementProvider.setHass(this._hass);
-        this.windRoseDirigent.init(this.cardConfig, this.measurementProvider);
-        this.entityStateProcessor.init(this.cardConfig)
-        this.refreshMeasurements();
-    }
 
     refreshMeasurements(): void {
         this.windRoseDirigent.refreshData().then((refresh: boolean) => {
-            Log.debug('refreshData() ready, requesting update.');
+            this.log.debug('refreshData() ready, requesting update.');
             if (refresh) {
                 this.requestUpdate();
             }
