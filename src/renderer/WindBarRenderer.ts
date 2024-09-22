@@ -14,16 +14,23 @@ import {ColorUtil} from "../util/ColorUtil";
 
 export class WindBarRenderer {
 
-    config: WindBarConfig;
-    svgUtil!: SvgUtil;
-    readonly outputUnitName: string;
-    readonly speedRanges: SpeedRange[];
-    readonly dimensionCalculator: WindBarDimensionCalculator;
-    readonly positionIndex: number;
+    private readonly config: WindBarConfig;
+    private readonly svg: Snap.Paper;
+    private readonly svgUtil!: SvgUtil;
+    private readonly outputUnitName: string;
+    private readonly speedRanges: SpeedRange[];
+    private readonly dimensionCalculator: WindBarDimensionCalculator;
+    private readonly positionIndex: number;
 
-    constructor(config: WindBarConfig, dimensionConfig: DimensionConfig, outputSpeedUnit: SpeedUnit, positionIndex: number) {
+    constructor(config: WindBarConfig,
+                dimensionConfig: DimensionConfig,
+                outputSpeedUnit: SpeedUnit,
+                positionIndex: number,
+                svg: Snap.Paper) {
+
         Log.debug('WindBarRenderer init', config, outputSpeedUnit);
         this.config = config;
+        this.svg = svg;
         if (config.outputUnitLabel) {
             this.outputUnitName = config.outputUnitLabel;
         } else if (config.speedRangeBeaufort) {
@@ -33,16 +40,16 @@ export class WindBarRenderer {
         }
         this.speedRanges = outputSpeedUnit.speedRanges;
         this.positionIndex = positionIndex;
+        this.svgUtil = new SvgUtil(this.svg);
         this.dimensionCalculator = new WindBarDimensionCalculator(dimensionConfig);
     }
 
-    drawWindBar(windBarData: WindRoseData, svg: Snap.Paper) {
+    drawWindBar(windBarData: WindRoseData) {
         if (windBarData === undefined) {
             Log.error("drawWindBar(): Can't draw bar, windRoseData not set.");
             return;
         }
         Log.trace('drawWindBar(): ', windBarData);
-        this.svgUtil = new SvgUtil(svg);
 
         if (this.config.orientation === 'horizontal') {
             this.drawBarLegendHorizontal(windBarData.speedRangePercentages);

@@ -37,8 +37,13 @@ export class WindRoseDirigent {
     //Calculated data
     private windRoseData: WindRoseData[] = [];
 
+    private readonly svg: Snap.Paper;
     private initReady = false;
     private measurementsReady = false;
+
+    constructor(svg: Snap.Paper) {
+        this.svg = svg;
+    }
 
     init(cardConfig: CardConfigWrapper, measurementProvider: HomeAssistantMeasurementProvider): void {
         this.initReady = true;
@@ -55,18 +60,18 @@ export class WindRoseDirigent {
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
-            this.windRoseRenderer = new WindRoseRendererCenterCalm(windRoseConfig, this.dimensionConfig, this.windSpeedConverter.getSpeedRanges());
+            this.windRoseRenderer = new WindRoseRendererCenterCalm(windRoseConfig, this.dimensionConfig, this.windSpeedConverter.getSpeedRanges(), this.svg);
         } else {
             this.percentageCalculator = new PercentageCalculator();
-            this.windRoseRenderer = new WindRoseRendererStandaard(windRoseConfig, this.dimensionConfig, this.windSpeedConverter.getSpeedRanges());
+            this.windRoseRenderer = new WindRoseRendererStandaard(windRoseConfig, this.dimensionConfig, this.windSpeedConverter.getSpeedRanges(), this.svg);
         }
-        this.currentDirectionRenderer = new CurrentDirectionRenderer(windRoseConfig, this.dimensionConfig);
+        this.currentDirectionRenderer = new CurrentDirectionRenderer(windRoseConfig, this.dimensionConfig, this.svg);
 
         this.windBarRenderers = [];
         if (!cardConfig.hideWindspeedBar) {
             const barConfigs = this.configFactory.createWindBarConfigs();
             for (let i = 0; i < cardConfig.windBarCount(); i++) {
-                this.windBarRenderers.push(new WindBarRenderer(barConfigs[i], this.dimensionConfig, this.windSpeedConverter.getOutputSpeedUnit(), i));
+                this.windBarRenderers.push(new WindBarRenderer(barConfigs[i], this.dimensionConfig, this.windSpeedConverter.getOutputSpeedUnit(), i, this.svg));
             }
         }
 
@@ -96,22 +101,25 @@ export class WindRoseDirigent {
         }
     }
 
-    render(svg: Snap.Paper): void {
-        svg.clear();
-        if (svg && this.initReady && this.measurementsReady) {
-            Log.debug('render()', svg, this.windRoseData, this.windBarRenderers);
-            this.windRoseRenderer.drawWindRose(this.windRoseData[0], svg);
+    render(): void {
+        this.svg.clear();
+        if (this.initReady && this.measurementsReady) {
+            Log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
+            if (this.cardConfig.showCurrentDirectionArrow) {
+                this.currentDirectionRenderer.drawCurrentWindDirection(0, true);
+            }
+            this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
-                this.windBarRenderers[i].drawWindBar(this.windRoseData[i], svg);
+                this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
             }
         } else {
-            Log.error("render(): Could not render, no svg or windRoseData", svg, this.windRoseData);
+            Log.error("render(): Could not render, no svg or windRoseData", this.svg, this.windRoseData);
         }
     }
 
     updateEntityStates(entityStates: EntityStates, svg: Snap.Paper) {
         if (entityStates.updateWindDirection) {
-            this.currentDirectionRenderer.drawCurrentWindDirection(entityStates.currentWindDirection as number, svg);
+            this.currentDirectionRenderer.drawCurrentWindDirection(entityStates.currentWindDirection as number, false);
         }
     }
 

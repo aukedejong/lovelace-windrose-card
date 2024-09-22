@@ -43,14 +43,15 @@ export class WindRoseCard extends LitElement {
     cardConfig!: CardConfigWrapper;
     updateInterval: NodeJS.Timer | undefined;
     _hass!: HomeAssistant;
-    svg!: Snap.Paper;
+    svg: Snap.Paper;
 
     constructor() {
         super();
-        this.windRoseDirigent = new WindRoseDirigent();
+        this.svg = Snap("100%", "100%");
+        this.windRoseDirigent = new WindRoseDirigent(this.svg);
         this.entityStateProcessor = new EntityStatesProcessor();
         this.entityChecker = new EntityChecker();
-        this.svg = Snap("100%", "100%");
+
     }
 
     set hass(hass: HomeAssistant) {
@@ -80,7 +81,7 @@ export class WindRoseCard extends LitElement {
     update(changedProperties: PropertyValues): void {
         Log.debug('update()');
         super.update(changedProperties);
-        this.windRoseDirigent.render(this.svg);
+        this.windRoseDirigent.render();
     }
 
     private initInterval() {
@@ -107,7 +108,6 @@ export class WindRoseCard extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         Log.debug('connectedCallBack()');
-        //this.ro.observe(this);
         this.initInterval();
 
     }

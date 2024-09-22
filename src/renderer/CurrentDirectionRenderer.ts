@@ -10,20 +10,22 @@ export class CurrentDirectionRenderer {
     private config: WindRoseConfig;
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     private readonly cfg!: DimensionConfig;
+    private readonly svg: Snap.Paper;
     private svgUtil!: SvgUtil;
     private indicator: Snap.Element | undefined = undefined;
     private readonly roseCenter: Coordinate;
 
-    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig) {
+    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Snap.Paper) {
         this.config = config;
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
+        this.svg = svg;
+        this.svgUtil = new SvgUtil(svg);
         this.cfg = this.dimensionCalculator.cfg;
         this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
-    drawCurrentWindDirection(currentWindDirection: number, svg: Snap.Paper): void {
-        this.svgUtil = new SvgUtil(svg);
-        if (this.indicator === undefined) {
+    drawCurrentWindDirection(currentWindDirection: number, redraw: boolean): void {
+        if (this.indicator === undefined || redraw) {
             this.dimensionCalculator.roseCenter()
             const x = this.roseCenter.x + this.cfg.roseRadius - 20;
             const y = this.roseCenter.y;

@@ -11,58 +11,62 @@ import {Coordinate} from "./Coordinate";
 import {DimensionConfig} from "./DimensionConfig";
 
 export class WindRoseRendererStandaard {
-    private config: WindRoseConfig;
+    private readonly config: WindRoseConfig;
     private readonly speedRanges: SpeedRange[];
+    private readonly svg: Snap.Paper;
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
 
-    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, speedRanges: SpeedRange[]) {
+    constructor(config: WindRoseConfig,
+                dimensionConfig: DimensionConfig,
+                speedRanges: SpeedRange[],
+                svg: Snap.Paper) {
         this.config = config;
         this.speedRanges = speedRanges;
+        this.svg = svg;
+        this.svgUtil = new SvgUtil(svg);
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
     }
 
-    drawWindRose(windRoseData: WindRoseData, svg: Snap.Paper): void {
+    drawWindRose(windRoseData: WindRoseData): void {
         if (windRoseData === undefined) {
             Log.error("drawWindRose(): Can't draw, no windrose data set.");
             return;
         }
         Log.trace('drawWindRose()', windRoseData);
-        this.svgUtil = new SvgUtil(svg);
 
-        svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
+        this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
 
         this.windRoseData = windRoseData;
 
-        const backgroundLines = this.drawBackgroundLines(svg);
-        const windDirectionText = this.drawWindDirectionText(svg);
-        const windDirections = this.drawWindDirections(svg);
+        const backgroundLines = this.drawBackgroundLines();
+        const windDirectionText = this.drawWindDirectionText();
+        const windDirections = this.drawWindDirections();
 
         // Rotate
         if (this.config.windRoseDrawNorthOffset != 0) {
-            const rotateGroup = svg.group(windDirectionText, windDirections, backgroundLines);
+            const rotateGroup = this.svg.group(windDirectionText, windDirections, backgroundLines);
             var center = this.dimensionCalculator.roseCenter();
             rotateGroup.transform("r" + this.config.windRoseDrawNorthOffset + "," + center.x + "," + center.y);
         }
 
-        const circleLegend = this.drawCircleLegend(svg);
+        const circleLegend = this.drawCircleLegend();
     }
 
-    private drawWindDirections(svg: Snap.Paper): Snap.Paper {
-        const windDirections = svg.group();
+    private drawWindDirections(): Snap.Paper {
+        const windDirections = this.svg.group();
         for (let i = 0; i < this.windRoseData.directionPercentages.length; i++) {
             windDirections.add(
                 this.drawWindDirection(this.windRoseData.directionSpeedRangePercentages[i],
                     this.windRoseData.directionPercentages[i],
-                    this.windRoseData.directionDegrees[i], svg));
+                    this.windRoseData.directionDegrees[i]));
         }
         return windDirections;
     }
 
-    private drawWindDirection(speedRangePercentages: number[], directionPercentage: number, degrees: number,
-                              svg: Snap.Paper): Snap.Paper {
-        const windDirection = svg.group();
+    private drawWindDirection(speedRangePercentages: number[], directionPercentage: number, degrees: number): Snap.Paper {
+        const windDirection = this.svg.group();
         if (directionPercentage === 0) {
             return windDirection;
         }
@@ -82,7 +86,7 @@ export class WindRoseRendererStandaard {
             if (radius > 0) {
                 Log.trace("Degrees: " + (degrees - 90) + " radius: " + radius + " percentage: " + percentages[i]);
                 windDirection.add(
-                    this.drawSpeedPart(svg,
+                    this.drawSpeedPart(this.svg,
                         degrees - 90,
                         radius,
                         this.speedRanges[i].color));
@@ -110,11 +114,11 @@ export class WindRoseRendererStandaard {
         })).attr({'fill': color, stroke: this.config.roseLinesColor})
     }
 
-    private drawBackgroundLines(svg: Snap.Paper): Snap.Paper {
+    private drawBackgroundLines(): Snap.Paper {
         // Cross
         var lineHorizontal = this.svgUtil.drawLine(this.dimensionCalculator.crossHorizontalLine());
         var lineVertical = this.svgUtil.drawLine(this.dimensionCalculator.crossVerticalLine());
-        var roseLinesGroup = svg.group(lineHorizontal, lineVertical);
+        var roseLinesGroup = this.svg.group(lineHorizontal, lineVertical);
 
         // Circles
         const circleCount = this.windRoseData.circleCount;
@@ -130,7 +134,7 @@ export class WindRoseRendererStandaard {
         return roseLinesGroup;
     }
 
-    private drawWindDirectionText(svg: Snap.Paper): Snap.Paper {
+    private drawWindDirectionText(): Snap.Paper {
         // Wind direction text
         this.config.cardinalDirectionLetters
         const northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
@@ -150,11 +154,11 @@ export class WindRoseRendererStandaard {
             -this.config.windRoseDrawNorthOffset,
             this.config.roseDirectionLettersColor);
 
-        return svg.group(northText, eastText, southText, westText);
+        return this.svg.group(northText, eastText, southText, westText);
     }
 
-    private drawCircleLegend(svg: Snap.Paper): Snap.Paper {
-        const circleLegendGroup = svg.group();
+    private drawCircleLegend(): Snap.Paper {
+        const circleLegendGroup = this.svg.group();
         const radiusStep = this.dimensionCalculator.cfg.roseRadius / this.windRoseData.circleCount;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
         const center = this.dimensionCalculator.roseCenter();
