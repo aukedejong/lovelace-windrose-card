@@ -25,7 +25,7 @@ export class CurrentDirectionRenderer {
         this.svgUtil = new SvgUtil(svg);
         if (this.indicator === undefined) {
             this.dimensionCalculator.roseCenter()
-            const x = this.roseCenter.x + this.cfg.roseRadius + 20;
+            const x = this.roseCenter.x + this.cfg.roseRadius - 20;
             const y = this.roseCenter.y;
 
             this.indicator = this.svgUtil.drawArrow(x, y, 40);
