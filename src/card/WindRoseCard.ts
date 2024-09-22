@@ -145,13 +145,12 @@ export class WindRoseCard extends LitElement {
     // }
 
     refreshCardConfig() {
-        this.entityChecker.checkEntities(this.cardConfig, this._hass).then(() => {
-            this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
-            this.measurementProvider.setHass(this._hass);
-            this.windRoseDirigent.init(this.cardConfig, this.measurementProvider);
-            this.entityStateProcessor.init(this.cardConfig)
-            this.refreshMeasurements();
-        });
+        this.entityChecker.checkEntities(this.cardConfig, this._hass);
+        this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
+        this.measurementProvider.setHass(this._hass);
+        this.windRoseDirigent.init(this.cardConfig, this.measurementProvider);
+        this.entityStateProcessor.init(this.cardConfig)
+        this.refreshMeasurements();
     }
 
     refreshMeasurements(): void {
