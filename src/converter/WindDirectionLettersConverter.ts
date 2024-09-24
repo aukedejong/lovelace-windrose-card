@@ -40,7 +40,8 @@ export class WindDirectionLettersConverter {
             NWXN: 326.25,
             NNW: 337.5,
             NXW: 348.5,
-            CALM: 0
+            CALM: 0,
+            VRB: 0
         };
     }
 

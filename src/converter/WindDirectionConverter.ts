@@ -20,11 +20,15 @@ export class WindDirectionConverter {
                 return undefined;
             }
         } else {
-            if (isNaN(direction as number)) {
+            if (direction === 'VRB') {
+                degrees = 0;
+            } else if (isNaN(direction as number)) {
                 Log.info("Direction " + direction + " is not a number.");
                 return undefined;
+            } else {
+                degrees = direction as number;
             }
-            degrees = direction as number;
+
         }
         return this.compensateDirection(degrees);
     }
