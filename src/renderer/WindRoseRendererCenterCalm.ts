@@ -60,10 +60,28 @@ export class WindRoseRendererCenterCalm {
 
         //Rotate
         this.roseGroup = this.svg.group(windDirectionText, windDirections, background);
-        this.roseGroup.transform("r" +this.degreesCalculator.getRoseRenderDegrees() + "," + this.roseCenter.x + "," + this.roseCenter.y);
+        this.roseGroup.transform("R" +this.degreesCalculator.getRoseRenderDegrees() + "," + this.roseCenter.x + "," + this.roseCenter.y);
 
         const circleLegend = this.drawCircleLegend();
         const centerZeroSpeed = this.drawCenterZeroSpeed();
+    }
+
+    rotateWindRose() {
+        if (this.roseGroup === undefined) {
+            return;
+        }
+        const deg = this.degreesCalculator.getRoseRenderDegrees();
+        const transform = "R" + deg + "," + this.roseCenter.x + "," + this.roseCenter.y;
+        this.roseGroup.animate({ transform: transform }, 700, mina.easeinout);
+
+        const transformNorth = "R" + (-deg) + "," + this.dimensionCalculator.north().x + "," + this.dimensionCalculator.north().y;
+        this.northText.animate({ transform: transformNorth}, 700, mina.easeinout);
+        const transformEast = "R" + (-deg) + "," + this.dimensionCalculator.east().x + "," + this.dimensionCalculator.east().y;
+        this.eastText.animate({ transform: transformEast}, 700, mina.easeinout);
+        const transformSouth = "R" + (-deg) + "," + this.dimensionCalculator.south().x + "," + this.dimensionCalculator.south().y;
+        this.southText.animate({ transform: transformSouth}, 700, mina.easeinout);
+        const transformWest = "R" + (-deg) + "," + this.dimensionCalculator.west().x + "," + this.dimensionCalculator.west().y;
+        this.westText.animate({ transform: transformWest}, 700, mina.easeinout);
     }
 
     private drawWindDirections(): Snap.Paper {

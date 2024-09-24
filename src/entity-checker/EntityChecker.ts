@@ -13,6 +13,9 @@ export class EntityChecker {
                 entity.speedUnit = hass.states[entity.entity].attributes.unit_of_measurement as string;
             }
         }
+        if (cardConfig.compassConfig && cardConfig.compassConfig.autoRotate && cardConfig.compassConfig.entity) {
+            this.checkEntity(cardConfig.compassConfig.entity, hass);
+        }
     }
 
     private checkEntity(entity: string, hass: HomeAssistant) {

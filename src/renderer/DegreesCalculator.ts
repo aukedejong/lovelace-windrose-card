@@ -8,13 +8,13 @@ export class DegreesCalculator {
     private windDirectionRenderDegrees = 0;
 
     constructor(private readonly northOfffset: number,
-                private readonly autoRotateByEntity: boolean) {
+                private readonly autoRotate: boolean) {
         this.log.debug("constructor");
         this.updateRenderDegrees();
     }
 
     private updateRenderDegrees() {
-        if (this.autoRotateByEntity) {
+        if (this.autoRotate) {
 
             this.roseRenderDegrees = +this.northOfffset + this.compassDegrees;
             this.windDirectionRenderDegrees = -90 + this.northOfffset + this.compassDegrees + this.windDirectionDegrees;

@@ -7,6 +7,8 @@ import {WindSpeedEntity} from "./WindSpeedEntity";
 import {WindDirectionEntity} from "./WindDirectionEntity";
 import {DataPeriod} from "./DataPeriod";
 import {CardConfigDataPeriod} from "../card/CardConfigDataPeriod";
+import {CompassConfig} from "./CompassConfig";
+import {CardConfigCompass} from "../card/CardConfigCompass";
 
 export class CardConfigWrapper {
 
@@ -31,6 +33,7 @@ export class CardConfigWrapper {
     speedRanges: SpeedRange[] = [];
     matchingStrategy: string;
     cardColor: CardColors;
+    compassConfig: CompassConfig;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -65,6 +68,10 @@ export class CardConfigWrapper {
             speed_ranges: undefined,
             windrose_draw_north_offset: 0,
             show_current_direction_arrow: true,
+            compass_direction: {
+                auto_rotate: false,
+                entity: ''
+            },
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
             center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
@@ -96,6 +103,7 @@ export class CardConfigWrapper {
         this.matchingStrategy = this.checkMatchingStrategy();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.cardColor = this.checkCardColors();
+        this.compassConfig = this.checkCompassConfig(cardConfig.compass_direction);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
         Log.info('Config check OK');
     }
@@ -381,6 +389,22 @@ export class CardConfigWrapper {
         return this.windDirectionEntity + ',' + this.windspeedEntities
             .map(config => config.entity)
             .join(',');
+    }
+
+    private checkCompassConfig(compassDirection: CardConfigCompass | undefined): CompassConfig {
+        let entity = undefined;
+        let autoRotate = false;
+        if (compassDirection) {
+            autoRotate = this.checkBooleanDefaultFalse(compassDirection.auto_rotate);
+            if (autoRotate) {
+                if (compassDirection.entity) {
+                    entity = compassDirection.entity;
+                } else {
+                    throw new Error('WindRoseCard: compass direction auto rotate set to true, but no entity configured.');
+                }
+            }
+        }
+       return new CompassConfig(autoRotate, entity);
     }
 
     createRawEntitiesArray(): string[] {

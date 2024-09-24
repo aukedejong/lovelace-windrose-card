@@ -12,9 +12,9 @@ import {WindRoseRenderer} from "./WindRoseRenderer";
 import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {DimensionConfig} from "./DimensionConfig";
 import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
-import {EntityStates} from "../entity-state-processing/EntityStates";
 import {DegreesCalculator} from "./DegreesCalculator";
 import {Log2} from "../util/Log2";
+import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 
 export class WindRoseDirigent {
     //Util
@@ -27,6 +27,7 @@ export class WindRoseDirigent {
 
     //Measurements
     private measurementProvider!: HomeAssistantMeasurementProvider;
+    private entityStatesProcessor!: EntityStatesProcessor;
     private measurementCounter!: MeasurementCounter;
     private percentageCalculator!: PercentageCalculator;
 
@@ -43,18 +44,21 @@ export class WindRoseDirigent {
     private readonly svg: Snap.Paper;
     private initReady = false;
     private measurementsReady = false;
-    private entityStates!: EntityStates;
 
     constructor(svg: Snap.Paper) {
         this.svg = svg;
     }
 
-    init(cardConfig: CardConfigWrapper, measurementProvider: HomeAssistantMeasurementProvider): void {
+    init(cardConfig: CardConfigWrapper,
+         measurementProvider: HomeAssistantMeasurementProvider,
+         entityStatesProcessor: EntityStatesProcessor): void {
+
         this.log.debug("init()");
         this.initReady = true;
         this.measurementsReady = false;
         this.cardConfig = cardConfig;
         this.measurementProvider = measurementProvider;
+        this.entityStatesProcessor = entityStatesProcessor;
         this.configFactory = new WindRoseConfigFactory(cardConfig);
         const windRoseConfig = this.configFactory.createWindRoseConfig();
         this.windSpeedConverter = new WindSpeedConverter(cardConfig.outputSpeedUnit, cardConfig.speedRangeBeaufort,
@@ -62,7 +66,7 @@ export class WindRoseDirigent {
 
         this.measurementCounter = new MeasurementCounter(windRoseConfig, this.windSpeedConverter);
         this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation);
-        this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, false);
+        this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate);
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
@@ -123,30 +127,15 @@ export class WindRoseDirigent {
         }
     }
 
-    updateEntityStates(entityStates: EntityStates) {
-        this.log.debug("updateEntityStates()", entityStates);
-        this.entityStates = entityStates;
-        if (entityStates.updatedWindDirection) {
-            this.degreesCalculator.setWindDirectionDegrees(+(entityStates.currentWindDirection as number));
+    updateRender(): void {
+        if (this.entityStatesProcessor.hasWindDirectionUpdate()) {
+            this.degreesCalculator.setWindDirectionDegrees(this.entityStatesProcessor.getWindDirection());
             this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
         }
+        if (this.entityStatesProcessor.hasCompassDirectionUpdate()) {
+            this.degreesCalculator.setCompassDegrees(this.entityStatesProcessor.getCompassDirection());
+            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
+            this.windRoseRenderer.rotateWindRose();
+        }
     }
-
-    // updateEntityStates(entityStates: EntityStates, svg: Snap.Paper) {
-    //     if (entityStates.hasUpdates()) {
-    //         if (entityStates.currentCompassDirection !== undefined) {
-    //             this.degreesCalculator.setCompassDegrees(entityStates.currentCompassDirection);
-    //         }
-    //         if (entityStates.currentWindDirection !== undefined) {
-    //             this.degreesCalculator.setWindDirectionDegrees(entityStates.currentWindDirection);
-    //         }
-    //         if (this.cardConfig.showCurrentDirectionArrow) {
-    //             this.currentDirectionRenderer.drawCurrentWindDirection(svg);
-    //         }
-    //         if (this.cardConfig.autoRotateByEntity) {
-    //             this.windRoseRenderer.rotateWindRose();
-    //         }
-    //     }
-    // }
-
 }
