@@ -53,9 +53,11 @@ export class MeasurementCounter {
         }
         const windDirectionIndex = this.windDirections.findIndex(
             windDirection => windDirection.checkDirection(convertedDirection));
-
+        if (windDirectionIndex < 0) {
+            Log.info("Wind direction not found: " + convertedDirection);
+            return;
+        }
         Log.trace("Wind measurement: ", direction, speed, windDirectionIndex, speedRangeIndex);
-
         this.windData.add(windDirectionIndex, speedRangeIndex);
     }
 

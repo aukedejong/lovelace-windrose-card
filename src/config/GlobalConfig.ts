@@ -5,7 +5,6 @@ export class GlobalConfig {
     static defaultHoursToShow = 4;
     static defaultRefreshInterval = 300;
     static defaultWindDirectionCount = 16;
-    static defaultWindDirectionUnit = 'degrees';
     static defaultInputSpeedUnit = 'auto';
     static defaultOutputSpeedUnit = 'mps';
     static defaultWindspeedBarFull = true;
@@ -13,5 +12,7 @@ export class GlobalConfig {
     static defaultCenterCalmPercentage = true;
     static defaultLogLevel: 'NONE';
     static defaultSpeedRangeBeaufort = true;
+    static defaultCurrentDirectionArrowSize = 50;
+    static defaultCurrentDirectionCircleSize = 30;
 
 }

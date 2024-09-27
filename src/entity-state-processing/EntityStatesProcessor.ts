@@ -2,9 +2,11 @@ import {HomeAssistant} from "custom-card-helpers";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {WindDirectionConverter} from "../converter/WindDirectionConverter";
 import {WindRoseConfigFactory} from "../config/WindRoseConfigFactory";
+import {Log2} from "../util/Log2";
 
 export class EntityStatesProcessor {
 
+    private log = new Log2("EntityStatesProcessor");
     private initReady = false;
     private cardConfig!: CardConfigWrapper;
     private windDirectionConverter!: WindDirectionConverter;
@@ -23,11 +25,15 @@ export class EntityStatesProcessor {
     }
 
     updateHass(hass: HomeAssistant): void {
+        //this.log.debug("Before updated values: "  + this.windDirectionUpdated + "  " + this.compassDirectionUpdated);
         if (this.initReady) {
+            this.windDirectionUpdated = false;
+            this.compassDirectionUpdated = false;
 
-            if (this.cardConfig.showCurrentDirectionArrow) {
+            if (this.cardConfig.currentDirection.showArrow) {
                 const newWindDirectionState = hass.states[this.cardConfig.windDirectionEntity.entity].state;
-                if (newWindDirectionState !== undefined && this.windDirectionState !== newWindDirectionState) {
+                this.log.debug("Old: " + this.windDirectionState + " new: " + newWindDirectionState);
+                if (this.windDirectionState != newWindDirectionState) {
                     this.windDirectionUpdated = true;
                     this.windDirectionState = newWindDirectionState;
                 }
@@ -35,12 +41,13 @@ export class EntityStatesProcessor {
 
             if (this.cardConfig.compassConfig.autoRotate) {
                 const newCompassDirectionState = hass.states[this.cardConfig.compassConfig.entity as string].state;
-                if (newCompassDirectionState !== undefined && this.compassDirectionState !== newCompassDirectionState) {
+                if (newCompassDirectionState !== undefined && this.compassDirectionState != newCompassDirectionState) {
                     this.compassDirectionUpdated = true;
                     this.compassDirectionState = newCompassDirectionState;
                 }
             }
-
+            this.log.debug("Updated wind values: "  + this.windDirectionUpdated + "  " + this.windDirectionState);
+            this.log.debug("Updated compass values: "  + this.compassDirectionUpdated + "  " + this.compassDirectionState);
         }
     }
 
@@ -52,13 +59,14 @@ export class EntityStatesProcessor {
         return this.windDirectionUpdated;
     }
 
-    getWindDirection(): number {
+    getWindDirection(): number | undefined {
         if (this.windDirectionState === undefined) {
-            throw new Error("Current wind direction is undefined.");
+            return undefined;
         }
         const converted = this.windDirectionConverter.convertDirection(this.windDirectionState);
+        this.log.debug("Wind state: " + this.windDirectionState + " Converted: " + converted);
         if (converted === undefined) {
-            throw new Error("Current converted wind direction is undefined.");
+            return undefined;
         }
         this.windDirectionUpdated = false
         return +converted;

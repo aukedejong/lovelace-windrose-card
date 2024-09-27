@@ -1,3 +1,5 @@
+import {Log} from "../util/Log";
+
 export class WindCounts {
 
     total = 0;
@@ -21,6 +23,7 @@ export class WindCounts {
         this.total++;
         this.speedRangeCounts[speedRangeIndex]++;
         this.directionTotals[windDirectionIndex]++;
+        Log.debug("Add " + windDirectionIndex + " - " + speedRangeIndex, this.directionSpeedRangeCounts);
         this.directionSpeedRangeCounts[windDirectionIndex][speedRangeIndex]++;
     }
 }

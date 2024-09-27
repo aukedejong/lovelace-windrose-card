@@ -11,24 +11,22 @@ export class WindDirectionConverter {
         this.windDirectionLettersConverter = new WindDirectionLettersConverter(config.cardinalDirectionLetters);
     }
 
-    public convertDirection(direction: number | string): number | undefined {
-        let degrees = 0;
-        if (this.config.windDirectionUnit === 'letters') {
+    public convertDirection(direction: number | string | undefined): number | undefined {
+        let degrees: number | undefined;
+        if (direction === undefined || direction === null || direction === '') {
+            return undefined;
+
+        } else if (Number.isNaN(Number(direction))) {
             degrees = this.windDirectionLettersConverter.getDirection(direction as string);
-            if (isNaN(degrees)) {
+            if (isNaN(degrees as any)) {
                 Log.info("Could not convert direction " + direction + " to degrees.");
                 return undefined;
             }
         } else {
-            if (direction === 'VRB') {
-                degrees = 0;
-            } else if (isNaN(direction as number)) {
-                Log.info("Direction " + direction + " is not a number.");
-                return undefined;
-            } else {
-                degrees = direction as number;
-            }
-
+            degrees = +direction;
+        }
+        if (degrees === undefined) {
+            return undefined;
         }
         return this.compensateDirection(degrees);
     }

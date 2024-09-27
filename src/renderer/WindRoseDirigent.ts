@@ -119,7 +119,7 @@ export class WindRoseDirigent {
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
             }
-            if (this.cardConfig.showCurrentDirectionArrow) {
+            if (this.cardConfig.currentDirection.showArrow) {
                 this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
             }
         } else {

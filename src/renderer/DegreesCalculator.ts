@@ -3,9 +3,9 @@ import {Log2} from "../util/Log2";
 export class DegreesCalculator {
     private readonly log = new Log2("DegreesCalculator");
     private compassDegrees = 0;
-    private windDirectionDegrees = 0;
+    private windDirectionDegrees: number | undefined;
     private roseRenderDegrees = 0;
-    private windDirectionRenderDegrees = 0;
+    private windDirectionRenderDegrees: number | undefined;
 
     constructor(private readonly northOfffset: number,
                 private readonly autoRotate: boolean) {
@@ -17,19 +17,27 @@ export class DegreesCalculator {
         if (this.autoRotate) {
 
             this.roseRenderDegrees = +this.northOfffset + this.compassDegrees;
-            this.windDirectionRenderDegrees = -90 + this.northOfffset + this.compassDegrees + this.windDirectionDegrees;
+            if (this.windDirectionDegrees === undefined) {
+                this.windDirectionRenderDegrees = undefined;
+            } else {
+                this.windDirectionRenderDegrees = -90 + this.northOfffset + this.compassDegrees + this.windDirectionDegrees;
+            }
 
         } else {
 
             this.roseRenderDegrees = this.northOfffset;
-            this.windDirectionRenderDegrees = -90 + this.northOfffset + this.windDirectionDegrees;
+            if (this.windDirectionDegrees === undefined) {
+                this.windDirectionRenderDegrees = undefined;
+            } else {
+                this.windDirectionRenderDegrees = -90 + this.northOfffset + this.windDirectionDegrees;
+            }
 
         }
         this.log.debug("updateRenderDegrees: Degrees sensor: ", this.windDirectionDegrees, this.compassDegrees)
         this.log.debug("updateRenderDegrees: Degrees for rendering: ", this.roseRenderDegrees, this.windDirectionRenderDegrees);
     }
 
-    getWindDirectionRenderDegrees(): number {
+    getWindDirectionRenderDegrees(): number | undefined {
         return this.windDirectionRenderDegrees;
     }
 
@@ -37,7 +45,7 @@ export class DegreesCalculator {
         return this.roseRenderDegrees;
     }
 
-    setWindDirectionDegrees(degrees: number) {
+    setWindDirectionDegrees(degrees: number | undefined) {
         this.log.debug("setWindDirectionDegrees: Set windsensor degrees: " + degrees);
         this.windDirectionDegrees = degrees;
         this.updateRenderDegrees();

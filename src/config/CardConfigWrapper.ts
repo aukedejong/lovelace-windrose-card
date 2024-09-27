@@ -9,6 +9,8 @@ import {DataPeriod} from "./DataPeriod";
 import {CardConfigDataPeriod} from "../card/CardConfigDataPeriod";
 import {CompassConfig} from "./CompassConfig";
 import {CardConfigCompass} from "../card/CardConfigCompass";
+import {CurrentDirectionConfig} from "./CurrentDirectionConfig";
+
 
 export class CardConfigWrapper {
 
@@ -24,7 +26,7 @@ export class CardConfigWrapper {
     cardinalDirectionLetters: string;
     windDirectionCount: number;
     windRoseDrawNorthOffset: number;
-    showCurrentDirectionArrow: boolean;
+    currentDirection: CurrentDirectionConfig;
     outputSpeedUnit: string;
     outputSpeedUnitLabel: string | undefined;
     speedRangeBeaufort: boolean;
@@ -49,7 +51,6 @@ export class CardConfigWrapper {
             windspeed_bar_full: GlobalConfig.defaultWindspeedBarFull,
             wind_direction_entity: {
                 entity: '',
-                direction_unit: GlobalConfig.defaultWindDirectionUnit,
                 use_statistics: false,
                 direction_compensation: 0
             },
@@ -67,7 +68,11 @@ export class CardConfigWrapper {
             speed_range_max: undefined,
             speed_ranges: undefined,
             windrose_draw_north_offset: 0,
-            show_current_direction_arrow: true,
+            current_direction: {
+                show_arrow: false,
+                arrow_size: 50,
+                center_circle_size: 30
+            },
             compass_direction: {
                 auto_rotate: false,
                 entity: ''
@@ -86,7 +91,7 @@ export class CardConfigWrapper {
         this.windDirectionEntity = this.checkWindDirectionEntity();
         this.windspeedEntities = this.checkWindspeedEntities();
         this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
-        this.showCurrentDirectionArrow = this.checkBooleanDefaultFalse(cardConfig.show_current_direction_arrow);
+        this.currentDirection = this.checkCurrentDirection()
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.windspeedBarFull = this.checkBooleanDefaultTrue(cardConfig.windspeed_bar_full);
         this.hideWindspeedBar = this.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
@@ -167,24 +172,22 @@ export class CardConfigWrapper {
             }
             const entity = entityConfig.entity;
             const useStatistics = this.checkBooleanDefaultFalse(entityConfig.use_statistics);
-            const directionUnit = this.checkWindDirectionUnit(entityConfig.direction_unit);
             const directionCompensation = this.checkDirectionCompensation(entityConfig.direction_compensation);
-            const directionLetters = this.checkDirectionLetters(directionUnit, entityConfig.direction_letters);
-            return new WindDirectionEntity(entity, useStatistics, directionUnit, directionCompensation, directionLetters);
+            const directionLetters = this.checkDirectionLetters(entityConfig.direction_letters);
+            return new WindDirectionEntity(entity, useStatistics, directionCompensation, directionLetters);
         }
         throw new Error("WindRoseCard: No wind_direction_entity configured.");
     }
 
-    private checkWindDirectionUnit(unit: string): string {
-        if (unit) {
-            if (unit !== 'degrees'
-                && unit !== 'letters') {
-                throw new Error('Invalid wind direction unit configured: ' + unit +
-                    '. Valid options: degrees, letters');
-            }
-            return unit;
+    private checkCurrentDirection(): CurrentDirectionConfig {
+        if (this.cardConfig.current_direction) {
+            return new CurrentDirectionConfig(
+                this.checkBooleanDefaultFalse(this.cardConfig.current_direction.show_arrow),
+                this.checkNummerOrDefault(this.cardConfig.current_direction.arrow_size, GlobalConfig.defaultCurrentDirectionArrowSize),
+                this.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize)
+            )
         }
-        return GlobalConfig.defaultWindDirectionUnit;
+        return new CurrentDirectionConfig(false, undefined, undefined);
     }
 
     private checkWindspeedEntities(): WindSpeedEntity[] {
@@ -229,17 +232,13 @@ export class CardConfigWrapper {
         return 0;
     }
 
-    private checkDirectionLetters(directionUnit: string, directionLetters: string): string | undefined {
+    private checkDirectionLetters(directionLetters: string): string | undefined {
         if (directionLetters) {
-            if (directionUnit === 'letters') {
-                if (directionLetters && directionLetters.length === 5) {
-                    return directionLetters.toUpperCase();
-                } else {
-                    throw new Error('WindRoseCard: direction_letters config should be 5 letters.');
-                }
 
+            if (directionLetters && directionLetters.length === 5) {
+                return directionLetters.toUpperCase();
             } else {
-                throw new Error('WindRoseCard: config direction_letters should only be use in combination with direction_unit letters.');
+                throw new Error('WindRoseCard: direction_letters config should be 5 letters.');
             }
         }
         return undefined;
@@ -459,4 +458,13 @@ export class CardConfigWrapper {
         }
         return cardColors;
     }
+
+
+    private checkNummerOrDefault(number: string | number, defaultNumber: number): number {
+        if (isNaN(number as any)) {
+            return defaultNumber;
+        }
+        return +number;
+    }
+
 }

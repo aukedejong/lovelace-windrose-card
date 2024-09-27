@@ -2,7 +2,7 @@ import {Log} from "../util/Log";
 
 export class WindDirectionLettersConverter {
 
-    directions: Record<string, number>;
+    directions: Record<string, number | undefined>;
     defaultLetters: string[] = ['N', 'E', 'S', 'W'];
 
     constructor(private readonly windDirectionLetters: string | undefined) {
@@ -40,12 +40,12 @@ export class WindDirectionLettersConverter {
             NWXN: 326.25,
             NNW: 337.5,
             NXW: 348.5,
-            CALM: 0,
-            VRB: 0
+            CALM: undefined,
+            VRB: undefined
         };
     }
 
-    getDirection(direction: string): number {
+    getDirection(direction: string): number | undefined {
 
         let convertedDirection = direction.toUpperCase();
 

@@ -4,6 +4,7 @@ import {CardConfigWindSpeedEntity} from "./CardConfigWindSpeedEntity";
 import {CardConfigWindDirectionEntity} from "./CardConfigWindDirectionEntity";
 import {CardConfigDataPeriod} from "./CardConfigDataPeriod";
 import {CardConfigCompass} from "./CardConfigCompass";
+import {CardConfigCurrentDirection} from "./CardConfigCurrentDirection";
 
 export interface CardConfig {
     type: string;
@@ -25,7 +26,7 @@ export interface CardConfig {
     center_calm_percentage: boolean;
     windrose_draw_north_offset: number;
     compass_direction: CardConfigCompass;
-    show_current_direction_arrow: boolean;
+    current_direction: CardConfigCurrentDirection;
     windspeed_bar_location: string;
     windspeed_bar_full: boolean;
     hide_windspeed_bar: boolean;
