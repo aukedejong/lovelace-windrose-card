@@ -84,6 +84,7 @@ Select "Manage Resources"
 | windrose_draw_north_offset | number  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                                                  |
 | compass_direction          | object  |                              |    -     | Configuration for using a compass sensor to rotate the windrose to the correct direction, for use on for example a boat.                                                                             |
 | current_direction          | object  |                              |    -     | Shows the last reported wind direction with a red arrow on the wind rose.                                                                                                                            |
+| corner_info                | object  |                              |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                       |
 | matching_strategy          | string  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first`                                |
 | colors                     | object  |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                                                            |
 | log_level                  | string  |             WARN             |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                                                         |
@@ -169,6 +170,27 @@ You can also make a helper number entity to rotate the windrose on manual input.
 |-------------|:-------:|:-------:|:--------:|-----------------------------------------------------------|
 | auto_rotate | boolean |         |    x     | Use auto rotation, false to turn off.                     |
 | entity      | string  |         |    x     | Compass or other direction entity, needs degrees as unit. |
+
+
+### Ojbect corner_info
+Configuration for displaying information in the corners around the windrose.
+
+| Name         |  Type  | Default | Required | Description                          |
+|--------------|:------:|:-------:|:--------:|--------------------------------------|
+| top_left     | object |         |          | Configration for top left corner     |
+| top_right    | object |         |          | Configration for top right corner    |
+| bottom_left  | object |         |          | Configration for bottom left corner  |
+| bottom_right | object |         |          | Configration for bottom right corner |
+
+
+###  Object top_left, top_right_ bottom_left and bottom_right
+
+| Name   |  Type  |        Default        | Required | Description                                                                                |
+|--------|:------:|:---------------------:|:--------:|--------------------------------------------------------------------------------------------|
+| label  | string |                       |          | Label                                                                                      |
+| unit   | string |                       |          | Unit, displayed after the state, without a space. If you need space, add it to the config. |
+| color  | string | --primary-text-color  |          | Color of the text.                                                                         |
+| entity | string |                       |    x     | State of the entity will be displayed                                                      |
 
 
 ### Object colors
