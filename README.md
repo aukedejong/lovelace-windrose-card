@@ -182,6 +182,23 @@ Configuration for displaying information in the corners around the windrose.
 | bottom_left  | object |         |          | Configration for bottom left corner  |
 | bottom_right | object |         |          | Configration for bottom right corner |
 
+### Example corner_info yaml
+```yaml
+corner_info:
+  top_left:
+    label: Current windspeed
+    unit: ' kph'
+    entity: sensor.wind_gust
+  top_right:
+    label: Wind direction
+    unit: °
+    color: red
+    entity: sensor.wind_direction
+  bottom_left:
+    label: Compass
+    unit: °
+    entity: input_number.compass
+```
 
 ###  Object top_left, top_right_ bottom_left and bottom_right
 
