@@ -1,3 +1,5 @@
+import {CornersInfo} from "./CornersInfo";
+
 export class WindRoseConfig {
 
     constructor(
@@ -11,6 +13,7 @@ export class WindRoseConfig {
         public centerCalmPercentage: boolean,
         public currentDirectionArrowSize: number | undefined,
         public currentDirectionCenterCircleSize: number | undefined,
+        public cornersInfo: CornersInfo,
 
         public roseLinesColor: string,
         public roseDirectionLettersColor: string,

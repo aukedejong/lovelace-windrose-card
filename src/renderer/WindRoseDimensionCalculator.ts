@@ -48,7 +48,7 @@ export class WindRoseDimensionCalculator {
         if (this.cfg.barCount === 1) {
             width = this.cfg.marginLeft + roseHeight + this.cfg.marginRight + barRightCfg.barMarginLeft + barRightCfg.barWidth + barRightCfg.barMarginRight;
         } else {
-            width = this.cfg.marginLeft + roseHeight + this.cfg.marginRight + (barRightCfg.barWidth * this.cfg.barCount) +
+            width = this.cfg.marginLeft + roseHeight + this.cfg.marginRight + barRightCfg.barMarginLeft + (barRightCfg.barWidth * this.cfg.barCount) +
                 (barRightCfg.multiBarSpacing * (this.cfg.barCount - 1)) + this.cfg.marginRight;
         }
         return "0 0 " + width + " " + height;
@@ -82,6 +82,44 @@ export class WindRoseDimensionCalculator {
 
     west(): Coordinate{
         return new Coordinate(this.cfg.marginLeft - this.cfg.directionLetterMargin, this.cfg.marginTop + this.cfg.roseRadius);
+    }
+
+    infoCornerLeftTop(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft * 0.1, this.cfg.marginTop);
+    }
+
+    infoCornerRightTop(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius + this.cfg.roseRadius + (this.cfg.marginRight * 0.9),
+            this.cfg.marginTop);
+    }
+
+    infoCornetLeftBottom(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft * 0.1,
+            this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius - 30);
+    }
+
+    infoCornetRightBottom(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius + this.cfg.roseRadius + (this.cfg.marginRight * 0.9),
+            this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius - 30);
+    }
+
+    infoCornerLabelLeftTop(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft * 0.1, this.cfg.marginTop * 0.1);
+    }
+
+    infoCornerLabelRightTop(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius + this.cfg.roseRadius + (this.cfg.marginRight * 0.9),
+            this.cfg.marginTop * 0.1);
+    }
+
+    infoCornetLabelLeftBottom(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft * 0.1,
+            this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius);
+    }
+
+    infoCornetLabelRightBottom(): Coordinate {
+        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius + this.cfg.roseRadius + (this.cfg.marginRight * 0.9),
+            this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius)
     }
 
 }

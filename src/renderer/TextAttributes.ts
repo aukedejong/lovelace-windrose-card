@@ -6,6 +6,22 @@ export class TextAttributes {
         "font-family": "arial",
     }
 
+    static infoCornerAttribute(color: string) {
+        return {
+            fill: color,
+            "font-size": 80,
+            "font-family": "arial"
+        }
+    }
+
+    static infoCornerLabelAttribute(color: string) {
+        return {
+            fill: color,
+            "font-size": 50,
+            "font-family": "arial"
+        }
+    }
+
     static roseLegendAttribute(color: string) {
         return {
             fill: color,

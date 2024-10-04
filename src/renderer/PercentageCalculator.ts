@@ -70,7 +70,10 @@ export class PercentageCalculator {
         const maxRosePercentage = maxDirectionTotal / (total / 100);
         let percentagePerCircle = 0;
         let numberOfCircles = 0;
-        if (maxRosePercentage <= 30) {
+        if (maxRosePercentage === 0) {
+            percentagePerCircle = 25;
+            numberOfCircles = 4;
+        } else if (maxRosePercentage > 0 && maxRosePercentage <= 30) {
             percentagePerCircle = Math.ceil(maxRosePercentage / 6);
             numberOfCircles = Math.ceil(maxRosePercentage / percentagePerCircle);
         } else {

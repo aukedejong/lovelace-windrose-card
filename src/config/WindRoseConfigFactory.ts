@@ -19,6 +19,7 @@ export class WindRoseConfigFactory {
             this.cardConfig.centerCalmPercentage,
             this.cardConfig.currentDirection.arrowSize,
             this.cardConfig.currentDirection.centerCircleSize,
+            this.cardConfig.cornersInfo,
             this.cardConfig.cardColor.roseLines,
             this.cardConfig.cardColor.roseDirectionLetters,
             this.cardConfig.cardColor.roseCenterPercentage,

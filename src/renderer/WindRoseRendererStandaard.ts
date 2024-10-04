@@ -56,11 +56,12 @@ export class WindRoseRendererStandaard {
         const windDirections = this.drawWindDirections();
 
         // Rotate
-        this.roseGroup = this.svg.group(windDirectionText, windDirections, backgroundLines);
+        this.roseGroup = this.svg.group(backgroundLines, windDirectionText, windDirections);
         this.roseGroup.transform("R" + this.degreesCalculator.getRoseRenderDegrees() + "," + this.roseCenter.x + "," + this.roseCenter.y);
 
         const circleLegend = this.drawCircleLegend();
     }
+
     rotateWindRose() {
         if (this.roseGroup === undefined) {
             return;

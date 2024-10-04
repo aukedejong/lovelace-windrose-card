@@ -10,6 +10,8 @@ import {CardConfigDataPeriod} from "../card/CardConfigDataPeriod";
 import {CompassConfig} from "./CompassConfig";
 import {CardConfigCompass} from "../card/CardConfigCompass";
 import {CurrentDirectionConfig} from "./CurrentDirectionConfig";
+import {CornersInfo} from "./CornersInfo";
+import {ConfigCheckUtils} from "./ConfigCheckUtils";
 
 
 export class CardConfigWrapper {
@@ -36,6 +38,7 @@ export class CardConfigWrapper {
     matchingStrategy: string;
     cardColor: CardColors;
     compassConfig: CompassConfig;
+    cornersInfo: CornersInfo;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -93,14 +96,14 @@ export class CardConfigWrapper {
         this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
         this.currentDirection = this.checkCurrentDirection()
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
-        this.windspeedBarFull = this.checkBooleanDefaultTrue(cardConfig.windspeed_bar_full);
-        this.hideWindspeedBar = this.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
-        this.centerCalmPercentage = this.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
+        this.windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.windspeed_bar_full);
+        this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
+        this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
         this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
         this.windDirectionCount = this.checkWindDirectionCount();
         this.outputSpeedUnit = this.checkOutputSpeedUnit();
         this.outputSpeedUnitLabel = this.checkOutputSpeedUnitLabel();
-        this.speedRangeBeaufort = this.checkBooleanDefaultTrue(cardConfig.speed_range_beaufort);
+        this.speedRangeBeaufort = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.speed_range_beaufort);
         this.speedRangeStep = this.checkSpeedRangeStep();
         this.speedRangeMax = this.checkSpeedRangeMax();
         this.speedRanges = this.checkSpeedRanges();
@@ -109,6 +112,7 @@ export class CardConfigWrapper {
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.cardColor = this.checkCardColors();
         this.compassConfig = this.checkCompassConfig(cardConfig.compass_direction);
+        this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
         Log.info('Config check OK');
     }
@@ -171,7 +175,7 @@ export class CardConfigWrapper {
                 throw new Error("WindRoseCard: No wind_direction_entity.entity configured.");
             }
             const entity = entityConfig.entity;
-            const useStatistics = this.checkBooleanDefaultFalse(entityConfig.use_statistics);
+            const useStatistics = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.use_statistics);
             const directionCompensation = this.checkDirectionCompensation(entityConfig.direction_compensation);
             const directionLetters = this.checkDirectionLetters(entityConfig.direction_letters);
             return new WindDirectionEntity(entity, useStatistics, directionCompensation, directionLetters);
@@ -182,9 +186,9 @@ export class CardConfigWrapper {
     private checkCurrentDirection(): CurrentDirectionConfig {
         if (this.cardConfig.current_direction) {
             return new CurrentDirectionConfig(
-                this.checkBooleanDefaultFalse(this.cardConfig.current_direction.show_arrow),
-                this.checkNummerOrDefault(this.cardConfig.current_direction.arrow_size, GlobalConfig.defaultCurrentDirectionArrowSize),
-                this.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize)
+                ConfigCheckUtils.checkBooleanDefaultFalse(this.cardConfig.current_direction.show_arrow),
+                ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.arrow_size, GlobalConfig.defaultCurrentDirectionArrowSize),
+                ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize)
             )
         }
         return new CurrentDirectionConfig(false, undefined, undefined);
@@ -198,9 +202,9 @@ export class CardConfigWrapper {
         for (const entityConfig of this.cardConfig.windspeed_entities) {
             const entity = entityConfig.entity;
             const name = entityConfig.name;
-            const useStatistics = this.checkBooleanDefaultFalse(entityConfig.use_statistics);
+            const useStatistics = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.use_statistics);
             const inputSpeedUnit = this.checkInputSpeedUnit(entityConfig.speed_unit);
-            const renderRelativeScale = this.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
+            const renderRelativeScale = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
             entities.push(new WindSpeedEntity(entity, name, useStatistics, renderRelativeScale, inputSpeedUnit))
         }
         return entities;
@@ -264,19 +268,6 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultWindspeedBarLocation;
     }
 
-    private checkBooleanDefaultFalse(value: boolean | undefined): boolean {
-        if (value === undefined || value === null) {
-            return false;
-        }
-        return value;
-    }
-
-    private checkBooleanDefaultTrue(value: boolean | undefined): boolean {
-        if (value === undefined || value === null) {
-            return true;
-        }
-        return value;
-    }
 
     private checkCardinalDirectionLetters(): string {
         if (this.cardConfig.cardinal_direction_letters) {
@@ -394,7 +385,7 @@ export class CardConfigWrapper {
         let entity = undefined;
         let autoRotate = false;
         if (compassDirection) {
-            autoRotate = this.checkBooleanDefaultFalse(compassDirection.auto_rotate);
+            autoRotate = ConfigCheckUtils.checkBooleanDefaultFalse(compassDirection.auto_rotate);
             if (autoRotate) {
                 if (compassDirection.entity) {
                     entity = compassDirection.entity;
@@ -457,14 +448,6 @@ export class CardConfigWrapper {
             }
         }
         return cardColors;
-    }
-
-
-    private checkNummerOrDefault(number: string | number, defaultNumber: number): number {
-        if (isNaN(number as any)) {
-            return defaultNumber;
-        }
-        return +number;
     }
 
 }

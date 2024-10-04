@@ -15,6 +15,7 @@ import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
 import {DegreesCalculator} from "./DegreesCalculator";
 import {Log2} from "../util/Log2";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
+import {InfoCornersRenderer} from "./InfoCornersRenderer";
 
 export class WindRoseDirigent {
     //Util
@@ -37,6 +38,7 @@ export class WindRoseDirigent {
     private windRoseRenderer!: WindRoseRenderer;
     private windBarRenderers: WindBarRenderer[] = [];
     private currentDirectionRenderer!: CurrentDirectionRenderer;
+    private infoCornersRendeerer!: InfoCornersRenderer;
 
     //Calculated data
     private windRoseData: WindRoseData[] = [];
@@ -75,7 +77,12 @@ export class WindRoseDirigent {
             this.percentageCalculator = new PercentageCalculator();
             this.windRoseRenderer = new WindRoseRendererStandaard(windRoseConfig, this.dimensionConfig, this.windSpeedConverter.getSpeedRanges(), this.svg, this.degreesCalculator);
         }
-        this.currentDirectionRenderer = new CurrentDirectionRenderer(windRoseConfig, this.dimensionConfig, this.svg);
+        if (this.cardConfig.currentDirection.showArrow) {
+            this.currentDirectionRenderer = new CurrentDirectionRenderer(windRoseConfig, this.dimensionConfig, this.svg);
+        }
+        if (this.cardConfig.cornersInfo.isCornerInfoSet()) {
+            this.infoCornersRendeerer = new InfoCornersRenderer(windRoseConfig, this.dimensionConfig, this.svg);
+        }
 
         this.windBarRenderers = [];
         if (!cardConfig.hideWindspeedBar) {
@@ -119,11 +126,11 @@ export class WindRoseDirigent {
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
             }
-            if (this.cardConfig.currentDirection.showArrow) {
-                this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
-            }
+            this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
+            this.infoCornersRendeerer?.drawCornerLabel();
+            this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
         } else {
-            this.log.error("render(): Could not render, init or measurementsn not ready " + this.initReady + " - "  + this.measurementsReady);
+            this.log.error("render(): Could not render, init or measurements not ready " + this.initReady + " - "  + this.measurementsReady);
         }
     }
 
@@ -136,6 +143,9 @@ export class WindRoseDirigent {
             this.degreesCalculator.setCompassDegrees(this.entityStatesProcessor.getCompassDirection());
             this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
             this.windRoseRenderer.rotateWindRose();
+        }
+        if (this.entityStatesProcessor.hasCornerInfoUpdates()) {
+            this.infoCornersRendeerer.updateCornerValues(this.entityStatesProcessor.getCornerInfoStates());
         }
     }
 }

@@ -11,7 +11,6 @@ export class CurrentDirectionRenderer {
     private config: WindRoseConfig;
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     private readonly cfg!: DimensionConfig;
-    private readonly svg: Snap.Paper;
     private svgUtil!: SvgUtil;
 
     private arrowElement: Snap.Element | undefined = undefined;
@@ -22,7 +21,6 @@ export class CurrentDirectionRenderer {
     constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Snap.Paper) {
         this.config = config;
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
-        this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
         this.cfg = this.dimensionCalculator.cfg;
         this.roseCenter = this.dimensionCalculator.roseCenter();
@@ -52,8 +50,6 @@ export class CurrentDirectionRenderer {
             Log.debug("Animate", currentWindDirection, transform);
             this.arrowElement!.animate({ transform: transform }, 700, mina.easeinout);
         }
-
-
     }
 
     private drawArrow() {

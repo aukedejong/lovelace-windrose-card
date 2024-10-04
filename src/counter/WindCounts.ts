@@ -23,7 +23,7 @@ export class WindCounts {
         this.total++;
         this.speedRangeCounts[speedRangeIndex]++;
         this.directionTotals[windDirectionIndex]++;
-        Log.debug("Add " + windDirectionIndex + " - " + speedRangeIndex, this.directionSpeedRangeCounts);
+        Log.trace("Add " + windDirectionIndex + " - " + speedRangeIndex, this.directionSpeedRangeCounts);
         this.directionSpeedRangeCounts[windDirectionIndex][speedRangeIndex]++;
     }
 }

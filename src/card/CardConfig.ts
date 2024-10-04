@@ -5,6 +5,7 @@ import {CardConfigWindDirectionEntity} from "./CardConfigWindDirectionEntity";
 import {CardConfigDataPeriod} from "./CardConfigDataPeriod";
 import {CardConfigCompass} from "./CardConfigCompass";
 import {CardConfigCurrentDirection} from "./CardConfigCurrentDirection";
+import {CardConfigCorners} from "./CardConfigCorners";
 
 export interface CardConfig {
     type: string;
@@ -34,6 +35,7 @@ export interface CardConfig {
     wind_direction_count: number;
     matching_strategy: string;
     log_level: string;
+    corner_info: CardConfigCorners;
 
     colors: CardConfigColors;
 }

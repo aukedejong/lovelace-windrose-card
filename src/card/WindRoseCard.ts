@@ -89,12 +89,18 @@ export class WindRoseCard extends LitElement {
 
     refreshCardConfig() {
         this.log.debug("refreshCardConfig()");
-        this.entityChecker.checkEntities(this.cardConfig, this._hass);
-        this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
-        this.measurementProvider.setHass(this._hass);
-        this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor);
-        this.entityStateProcessor.init(this.cardConfig)
-        this.refreshMeasurements();
+        try {
+            this.entityChecker.checkEntities(this.cardConfig, this._hass);
+            this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
+            this.measurementProvider.setHass(this._hass);
+            this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor);
+            this.entityStateProcessor.init(this.cardConfig)
+            this.refreshMeasurements();
+        } catch(e) {
+            Log.error("Error during init: ", e);
+            this.svg.remove();
+        }
+
     }
 
     render(): TemplateResult {

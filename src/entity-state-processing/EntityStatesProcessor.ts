@@ -3,6 +3,8 @@ import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {WindDirectionConverter} from "../converter/WindDirectionConverter";
 import {WindRoseConfigFactory} from "../config/WindRoseConfigFactory";
 import {Log2} from "../util/Log2";
+import {Log} from "../util/Log";
+import {EntityState} from "./EntityState";
 
 export class EntityStatesProcessor {
 
@@ -11,78 +13,102 @@ export class EntityStatesProcessor {
     private cardConfig!: CardConfigWrapper;
     private windDirectionConverter!: WindDirectionConverter;
 
-    private windDirectionState: string | undefined;
-    private windDirectionUpdated = false;
+    private windDirectionState!: EntityState;
+    private compassDirectionState!: EntityState;
+    private cornerTopLeftState!: EntityState;
+    private cornerTopRightState!: EntityState;
+    private cornerBottomLeftState!: EntityState;
+    private cornerBottomRightState!: EntityState;
 
-    private compassDirectionState: string | undefined;
-    private compassDirectionUpdated = false;
-
+    private entityStates: EntityState[] = [];
+    private cornerInfoStates: EntityState[] = [];
 
     init(cardConfig: CardConfigWrapper) {
         this.cardConfig = cardConfig;
         this.windDirectionConverter = new WindDirectionConverter(new WindRoseConfigFactory(cardConfig).createWindRoseConfig());
+
+        this.windDirectionState = new EntityState(this.cardConfig.currentDirection.showArrow, this.cardConfig.windDirectionEntity.entity);
+        this.compassDirectionState = new EntityState(this.cardConfig.compassConfig.autoRotate, this.cardConfig.compassConfig.entity);
+
+        const cornerInfo = this.cardConfig.cornersInfo;
+        this.cornerTopLeftState = new EntityState(cornerInfo.topLeftInfo.show, cornerInfo.topLeftInfo.entity);
+        this.cornerTopRightState = new EntityState(cornerInfo.topRightInfo.show, cornerInfo.topRightInfo.entity);
+        this.cornerBottomLeftState = new EntityState(cornerInfo.bottomLeftInfo.show, cornerInfo.bottomLeftInfo.entity);
+        this.cornerBottomRightState = new EntityState(cornerInfo.bottomRightInfo.show, cornerInfo.bottomRightInfo.entity);
+
+
+        this.cornerInfoStates = [this.cornerTopLeftState, this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
+        this.entityStates = [this.windDirectionState, this.compassDirectionState, this.cornerTopLeftState,
+                this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
         this.initReady = true;
     }
 
     updateHass(hass: HomeAssistant): void {
         //this.log.debug("Before updated values: "  + this.windDirectionUpdated + "  " + this.compassDirectionUpdated);
         if (this.initReady) {
-            this.windDirectionUpdated = false;
-            this.compassDirectionUpdated = false;
+            this.windDirectionState.updated = false;
+            this.compassDirectionState.updated = false;
 
-            if (this.cardConfig.currentDirection.showArrow) {
-                const newWindDirectionState = hass.states[this.cardConfig.windDirectionEntity.entity].state;
-                this.log.debug("Old: " + this.windDirectionState + " new: " + newWindDirectionState);
-                if (this.windDirectionState != newWindDirectionState) {
-                    this.windDirectionUpdated = true;
-                    this.windDirectionState = newWindDirectionState;
-                }
-            }
+            this.entityStates.forEach((state: EntityState) => {
+                this.procesState(hass, state);
+            });
 
-            if (this.cardConfig.compassConfig.autoRotate) {
-                const newCompassDirectionState = hass.states[this.cardConfig.compassConfig.entity as string].state;
-                if (newCompassDirectionState !== undefined && this.compassDirectionState != newCompassDirectionState) {
-                    this.compassDirectionUpdated = true;
-                    this.compassDirectionState = newCompassDirectionState;
-                }
-            }
-            this.log.debug("Updated wind values: "  + this.windDirectionUpdated + "  " + this.windDirectionState);
-            this.log.debug("Updated compass values: "  + this.compassDirectionUpdated + "  " + this.compassDirectionState);
+            this.log.debug("Updated wind values: "  + this.windDirectionState.updated + "  " + this.windDirectionState.state);
+            this.log.debug("Updated compass values: "  + this.compassDirectionState.updated + "  " + this.compassDirectionState.state);
+        }
+    }
+
+    private procesState(hass: HomeAssistant, entityState: EntityState) {
+        if (entityState.entity === undefined || !entityState.active) {
+            return;
+        }
+        const newState = hass.states[entityState.entity].state;
+        if (newState !== undefined && entityState.state != newState) {
+            entityState.updated = true;
+            entityState.state = newState;
         }
     }
 
     hasUpdates(): boolean {
-        return this.windDirectionUpdated || this.compassDirectionUpdated;
+        return this.entityStates.some(state => state.updated);
     }
 
     hasWindDirectionUpdate(): boolean {
-        return this.windDirectionUpdated;
+        return this.windDirectionState.updated;
     }
 
     getWindDirection(): number | undefined {
-        if (this.windDirectionState === undefined) {
+        if (this.windDirectionState.state === undefined) {
             return undefined;
         }
-        const converted = this.windDirectionConverter.convertDirection(this.windDirectionState);
-        this.log.debug("Wind state: " + this.windDirectionState + " Converted: " + converted);
+        const converted = this.windDirectionConverter.convertDirection(this.windDirectionState.state);
+        this.log.debug("Wind state: " + this.windDirectionState.state + " Converted: " + converted);
         if (converted === undefined) {
             return undefined;
         }
-        this.windDirectionUpdated = false
+        this.windDirectionState.updated = false
         return +converted;
     }
 
     hasCompassDirectionUpdate(): boolean {
-        return this.compassDirectionUpdated;
+        return this.compassDirectionState.updated;
     }
 
     getCompassDirection(): number {
-        if (this.compassDirectionState === undefined) {
-            throw new Error("Current compass direction is undefined.");
+        if (this.compassDirectionState.state === undefined) {
+            Log.warn("Current compass direction is undefined, showing north");
+            this.compassDirectionState.state = "0";
         }
-        this.compassDirectionUpdated = false;
-        return +this.compassDirectionState;
+        this.compassDirectionState.updated = false;
+        return +this.compassDirectionState.state;
     }
 
+    hasCornerInfoUpdates(): boolean {
+        return this.cornerInfoStates.some((state) => state.updated);
+    }
+
+    getCornerInfoStates(): EntityState[] {
+        return [this.cornerTopLeftState, this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
+    }
 
 }

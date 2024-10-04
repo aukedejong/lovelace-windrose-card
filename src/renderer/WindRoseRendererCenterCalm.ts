@@ -59,7 +59,7 @@ export class WindRoseRendererCenterCalm {
         const background = this.drawBackground();
 
         //Rotate
-        this.roseGroup = this.svg.group(windDirectionText, windDirections, background);
+        this.roseGroup = this.svg.group(background, windDirectionText, windDirections);
         this.roseGroup.transform("R" +this.degreesCalculator.getRoseRenderDegrees() + "," + this.roseCenter.x + "," + this.roseCenter.y);
 
         const circleLegend = this.drawCircleLegend();
