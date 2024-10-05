@@ -19,7 +19,8 @@ export class WindRoseConfig {
         public roseDirectionLettersColor: string,
         public roseCenterPercentageColor: string,
         public rosePercentagesColor: string,
-        public roseCurrentDirectionArrowColor: string) {
+        public roseCurrentDirectionArrowColor: string,
+        public backgroundImage: string | undefined) {
     }
 
 }

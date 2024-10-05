@@ -22,4 +22,12 @@ export class ConfigCheckUtils {
         }
         return value;
     }
+
+    public static checkString(value: string | undefined | null): string | undefined {
+        if (value === undefined || value === null || value.trim() === '') {
+            return undefined;
+        }
+        return value;
+    }
+
 }

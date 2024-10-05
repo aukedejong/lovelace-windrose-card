@@ -34,6 +34,7 @@ export interface CardConfig {
     cardinal_direction_letters: string;
     wind_direction_count: number;
     matching_strategy: string;
+    background_image: string;
     log_level: string;
     corner_info: CardConfigCorners;
 

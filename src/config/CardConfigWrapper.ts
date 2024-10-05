@@ -39,6 +39,7 @@ export class CardConfigWrapper {
     cardColor: CardColors;
     compassConfig: CompassConfig;
     cornersInfo: CornersInfo;
+    backgroundImage: string | undefined;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -83,6 +84,7 @@ export class CardConfigWrapper {
             cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
             center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
+            background_image: undefined,
             log_level: GlobalConfig.defaultLogLevel
         };
     }
@@ -113,6 +115,7 @@ export class CardConfigWrapper {
         this.cardColor = this.checkCardColors();
         this.compassConfig = this.checkCompassConfig(cardConfig.compass_direction);
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
+        this.backgroundImage = ConfigCheckUtils.checkString(cardConfig.background_image);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
         Log.info('Config check OK');
     }

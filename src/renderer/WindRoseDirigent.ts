@@ -122,6 +122,9 @@ export class WindRoseDirigent {
         this.svg.clear();
         if (this.initReady && this.measurementsReady) {
             this.log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
+            if (this.cardConfig.backgroundImage !== undefined) {
+                this.svg.image(this.cardConfig.backgroundImage, 80, 80, 1000, 1000);
+            }
             this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
