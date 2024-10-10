@@ -131,9 +131,13 @@ export class CardConfigWrapper {
         const oldHoursToShowCheck = this.checkHoursToShow(oldHoursToShow);
         const hoursToShowCheck = this.checkHoursToShow(dataPeriod?.hours_to_show);
         const fromHourOfDayCheck = this.checkFromHourOfDay(dataPeriod?.from_hour_of_day);
+        let timeInterval = ConfigCheckUtils.checkNummerOrDefault(dataPeriod.time_interval, 60);
+        if (timeInterval === 0) {
+            timeInterval = 60;
+        }
         if (oldHoursToShowCheck) {
             Log.warn('WindRoseCard: hours_to_show config is deprecated, use the data_period object.');
-            return new DataPeriod(oldHoursToShow, undefined);
+            return new DataPeriod(oldHoursToShow, undefined, timeInterval);
         }
         if (hoursToShowCheck && fromHourOfDayCheck) {
             throw new Error('WindRoseCard: Only one is allowed: hours_to_show or from_hour_of_day');
@@ -141,7 +145,7 @@ export class CardConfigWrapper {
         if (!hoursToShowCheck && !fromHourOfDayCheck) {
             throw new Error('WindRoseCard: One config option object data_period should be filled.');
         }
-        return new DataPeriod(dataPeriod.hours_to_show, dataPeriod.from_hour_of_day);
+        return new DataPeriod(dataPeriod.hours_to_show, dataPeriod.from_hour_of_day, timeInterval);
     }
 
     private checkHoursToShow(hoursToShow: number): boolean {
@@ -369,7 +373,8 @@ export class CardConfigWrapper {
 
     private checkMatchingStrategy(): string {
         if (this.cardConfig.matching_strategy) {
-            if (this.cardConfig.matching_strategy !== 'direction-first' && this.cardConfig.matching_strategy !== 'speed-first') {
+            if (this.cardConfig.matching_strategy !== 'direction-first' && this.cardConfig.matching_strategy !== 'speed-first'
+                && this.cardConfig.matching_strategy !== 'time-frame') {
                 throw new Error('Invalid matching stategy ' + this.cardConfig.matching_strategy +
                     '. Valid options: direction-first, speed-first');
             }

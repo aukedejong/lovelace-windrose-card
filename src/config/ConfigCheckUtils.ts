@@ -2,7 +2,7 @@ export class ConfigCheckUtils {
 
 
     public static checkNummerOrDefault(number: string | number, defaultNumber: number): number {
-        if (isNaN(number as any)) {
+        if (number === null || number === undefined || isNaN(+number as any)) {
             return defaultNumber;
         }
         return +number;

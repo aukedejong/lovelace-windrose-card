@@ -4,6 +4,9 @@ import {Log} from "../util/Log";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
 import {DataPeriod} from "../config/DataPeriod";
+import {SpeedFirstMatcher} from "../matcher/SpeedFirstMatcher";
+import {DirectionFirstMatcher} from "../matcher/DirectionFirstMatcher";
+import {TimeFrameMatcher} from "../matcher/TimeFrameMatcher";
 
 export class HomeAssistantMeasurementProvider {
 
@@ -11,14 +14,21 @@ export class HomeAssistantMeasurementProvider {
     private cardConfig: CardConfigWrapper;
     private rawEntities: string[];
     private statsEntities: string[];
-    private measurementMatcher: MeasurementMatcher;
+    private measurementMatcher!: MeasurementMatcher;
     private waitingForMeasurements = false;
 
     constructor(cardConfig: CardConfigWrapper) {
         this.cardConfig = cardConfig;
         this.rawEntities = cardConfig.createRawEntitiesArray();
         this.statsEntities = cardConfig.createStatisticsEntitiesArray();
-        this.measurementMatcher = new MeasurementMatcher(this.cardConfig.matchingStrategy);
+
+        if (this.cardConfig.matchingStrategy === 'speed-first') {
+            this.measurementMatcher = new SpeedFirstMatcher();
+        } else if (this.cardConfig.matchingStrategy === 'direction-first') {
+            this.measurementMatcher = new DirectionFirstMatcher();
+        } else if (this.cardConfig.matchingStrategy === 'time-frame') {
+           this.measurementMatcher = new TimeFrameMatcher(this.cardConfig.dataPeriod.timeInterval);
+        }
     }
 
     setHass(hass: HomeAssistant): void {
@@ -97,12 +107,14 @@ export class HomeAssistantMeasurementProvider {
             } else {
                 Log.info(`Matched measurements, direction-first: ${matchedMeasurements}`);
             }
-        } else {
+        } else if (this.cardConfig.matchingStrategy === 'speed-first') {
             if (matchedMeasurements < speedMeasurements) {
                 Log.warn(`Matching results entity ${speedEntity}, ${speedMeasurements - matchedMeasurements}  not matched of total ${speedMeasurements} speed measurements`);
             } else {
-                Log.info(`Matched measurements, speed-first: ${matchedMeasurements}`);
+
             }
+        } else {
+            Log.info(`Matched measurements: ${matchedMeasurements}`);
         }
     }
 
