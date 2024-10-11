@@ -163,23 +163,32 @@ export class WindRoseRendererCenterCalm {
     private drawWindDirectionText(): Snap.Paper {
         // Wind direction text
         const roseRenderDegrees = this.degreesCalculator.getRoseRenderDegrees();
-        this.config.cardinalDirectionLetters
+
         this.northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
             this.config.cardinalDirectionLetters[0],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor);
+            this.config.roseDirectionLettersColor,
+            "middle",
+            "central"
+        );
         this.eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
             this.config.cardinalDirectionLetters[1],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor);
+            this.config.roseDirectionLettersColor,
+            "middle",
+            "central");
         this.southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
             this.config.cardinalDirectionLetters[2],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor);
+            this.config.roseDirectionLettersColor,
+            "middle",
+            "central");
         this.westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
             this.config.cardinalDirectionLetters[3],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor);
+            this.config.roseDirectionLettersColor,
+            "middle",
+            "central");
 
         return this.svg.group(this.northText, this.eastText, this.southText, this.westText);
     }

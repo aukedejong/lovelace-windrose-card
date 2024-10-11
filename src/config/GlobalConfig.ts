@@ -1,6 +1,6 @@
 export class GlobalConfig {
 
-    static defaultCardinalDirectionLetters = "NESW";
+    static defaultCardinalDirectionLetters = ["N", "E", "S", "W"];
     static defaultWindspeedBarLocation = 'bottom';
     static defaultHoursToShow = 4;
     static defaultRefreshInterval = 300;
@@ -14,5 +14,4 @@ export class GlobalConfig {
     static defaultSpeedRangeBeaufort = true;
     static defaultCurrentDirectionArrowSize = 50;
     static defaultCurrentDirectionCircleSize = 30;
-
 }

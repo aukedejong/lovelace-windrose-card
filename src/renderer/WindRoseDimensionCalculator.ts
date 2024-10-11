@@ -16,7 +16,7 @@ export class WindRoseDimensionCalculator {
         var y = this.cfg.marginTop + this.cfg.roseRadius;
         return new LineCoordinates(
             new Coordinate(this.cfg.marginLeft, y),
-            new Coordinate(this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius, y));
+            new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius + this.cfg.roseRadius, y));
     }
 
     crossVerticalLine(): LineCoordinates {
@@ -69,19 +69,19 @@ export class WindRoseDimensionCalculator {
     }
 
     north(): Coordinate{
-        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius, this.cfg.marginTop - this.cfg.directionLetterMargin);
+        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius, this.cfg.marginTop / 2);
     }
 
     east(): Coordinate{
-        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius + this.cfg.roseRadius + this.cfg.directionLetterMargin, this.cfg.marginTop + this.cfg.roseRadius);
+        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius + this.cfg.roseRadius + (this.cfg.marginRight / 2), this.cfg.marginTop + this.cfg.roseRadius);
     }
 
     south(): Coordinate{
-        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius, this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius + this.cfg.directionLetterMargin);
+        return new Coordinate(this.cfg.marginLeft + this.cfg.roseRadius, this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius + (this.cfg.marginBottom / 2));
     }
 
     west(): Coordinate{
-        return new Coordinate(this.cfg.marginLeft - this.cfg.directionLetterMargin, this.cfg.marginTop + this.cfg.roseRadius);
+        return new Coordinate((this.cfg.marginLeft / 2), this.cfg.marginTop + this.cfg.roseRadius);
     }
 
     infoCornerLeftTop(): Coordinate {

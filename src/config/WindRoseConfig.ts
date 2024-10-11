@@ -7,7 +7,7 @@ export class WindRoseConfig {
         public windDirectionCount: number,
         public windDirectionLetters: string | undefined,
         public leaveArc: number,
-        public cardinalDirectionLetters: string,
+        public cardinalDirectionLetters: string[],
         public directionCompensation: number,
         public windRoseDrawNorthOffset: number,
         public centerCalmPercentage: boolean,

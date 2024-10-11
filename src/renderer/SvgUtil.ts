@@ -54,10 +54,18 @@ export class SvgUtil {
         }));
     }
 
-    public drawWindDirectionText(coord: Coordinate, text: string, rotateDegrees: number, color: string): Snap.Element {
-        var textElement = this.drawText(coord, text,  TextAttributes.windBarAttribute(color, 50, "middle", "middle"));
+    public drawWindDirectionText(coord: Coordinate, text: string, rotateDegrees: number, color: string, anchor: string, baseline: string): Snap.Element {
+        var textElement = this.drawText(coord, text,  TextAttributes.windBarAttribute(color, 50, baseline, anchor));
         this.rotate(textElement, rotateDegrees, coord);
         return textElement;
+    }
+
+    public getTextLength(text: string, size: number): number{
+        var element = this.svg.text(-1000, -1000, text) as Snap.Element;
+        element.attr({ "font-size": size, "font-family": "Arial" });
+        const width = element.getBBox().width;
+        element.remove();
+        return width;
     }
 
     public rotate(element: Snap.Element, degrees: number, center: Coordinate) {

@@ -11,9 +11,8 @@ export class SpeedFirstMatcher implements MeasurementMatcher {
         for (const speed of speedHistory) {
             const direction = MatchUtils.findStatsAtTime(speed.lu * 1000, directionStats);
             if (direction) {
-                directionSpeed.push(new DirectionSpeed(direction.mean, +speed.s));
-                if (speed.s === '' || speed.s === null || isNaN(+speed.s)) {
-                    Log.warn("Speed " + speed.s + " at timestamp " + direction.start + " is not a number.");
+                if (direction.mean === null || direction.mean === undefined) {
+                    Log.warn("Direction " + direction.mean + " at timestamp " + direction.start + " is not valid.");
                 } else {
                     directionSpeed.push(new DirectionSpeed(direction.mean, +speed.s));
                 }
@@ -31,8 +30,8 @@ export class SpeedFirstMatcher implements MeasurementMatcher {
         for (const speed of speedStats) {
             const direction = MatchUtils.findHistoryInPeriod(speed, directionHistory);
             if (direction) {
-                if (direction.s === '' || direction.s === null || isNaN(+direction.s)) {
-                    Log.warn("Direction " + direction.s + " at timestamp " + direction.lu + " is not a number.");
+                if (direction.s === '' || direction.s === null || direction.s === undefined) {
+                    Log.warn("Direction " + direction.s + " at timestamp " + direction.lu + " is not valid.");
                 } else {
                     directionSpeed.push(new DirectionSpeed(direction.s, speed.mean));
                 }
@@ -51,8 +50,8 @@ export class SpeedFirstMatcher implements MeasurementMatcher {
             if (MatchUtils.isValidSpeed(speed.s)) {
                 const direction = MatchUtils.findHistoryBackAtTime(speed.lu, directionHistory);
                 if (direction) {
-                    if (direction.s === '' || direction.s === null || isNaN(+direction.s)) {
-                        Log.warn("Speed " + speed.s + " at timestamp " + speed.lu + " is not a number.");
+                    if (direction.s === '' || direction.s === null || direction.s === undefined) {
+                        Log.warn("Direction " + direction.s + " at timestamp " + direction.lu + " is not valid.");
                     } else {
                         directionSpeed.push(new DirectionSpeed(direction.s, +speed.s));
                     }

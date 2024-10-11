@@ -25,7 +25,7 @@ export class CardConfigWrapper {
     windspeedBarFull: boolean;
     hideWindspeedBar: boolean;
     centerCalmPercentage: boolean;
-    cardinalDirectionLetters: string;
+    cardinalDirectionLetters: string[];
     windDirectionCount: number;
     windRoseDrawNorthOffset: number;
     currentDirection: CurrentDirectionConfig;
@@ -275,13 +275,17 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultWindspeedBarLocation;
     }
 
-
-    private checkCardinalDirectionLetters(): string {
-        if (this.cardConfig.cardinal_direction_letters) {
-            if (this.cardConfig.cardinal_direction_letters.length !== 4) {
+    private checkCardinalDirectionLetters(): string[] {
+        if (this.cardConfig.cardinal_direction_letters || this.cardConfig.cardinal_direction_letters === '') {
+            const length = this.cardConfig.cardinal_direction_letters.length
+            if (length > 0 && length < 4) {
                 throw new Error("Cardinal direction letters option should contain 4 letters.");
+            } else if (length === 0) {
+                return ['', '', '', ''];
+            } else if (length === 4) {
+                return this.cardConfig.cardinal_direction_letters.split('')
             }
-            return this.cardConfig.cardinal_direction_letters;
+            return this.cardConfig.cardinal_direction_letters.split(',');
         }
         return GlobalConfig.defaultCardinalDirectionLetters;
     }

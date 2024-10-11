@@ -67,7 +67,7 @@ export class WindRoseDirigent {
             cardConfig.speedRangeStep, cardConfig.speedRangeMax, cardConfig.speedRanges);
 
         this.measurementCounter = new MeasurementCounter(windRoseConfig, this.windSpeedConverter);
-        this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation);
+        this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation, cardConfig.cardinalDirectionLetters, this.svg);
         this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate);
 
         if (this.cardConfig.centerCalmPercentage) {

@@ -80,7 +80,7 @@ Select "Manage Resources"
 | speed_range_step           |                 number                  | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                                                                                           |
 | speed_range_max            |                 number                  | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                                                            |
 | speed_ranges               |     [object](#Object-speed_ranges)      | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                                                                                          |
-| cardinal_direction_letters |                 string                  |             NESW             |    -     | The cardinal letters used in the windrose.                                                                                                                                                                                                      |
+| cardinal_direction_letters |                 string                  |             NESW             |    -     | The cardinal letters used in the windrose. More info at [Cardinal direction letters](#Cardinal-direction-letters)                                                                                                                               |
 | wind_direction_count       |                 string                  |              16              |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                                                                                                                |
 | windrose_draw_north_offset |                 number                  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                                                                                             |
 | compass_direction          |   [object](#Ojbect-compass_direction)   |                              |    -     | Configuration for using a compass sensor to rotate the windrose to the correct direction, for use on for example a boat.                                                                                                                        |
@@ -151,6 +151,31 @@ When your windspeed entity uses an unit of measurement not mentioned in the tabl
 |------------|:------:|:-------:|:--------:|------------------------------|
 | from_value | number |         |    x     | Start speed of a speed range |
 | color      | string |         |    x     | Color CSS value              |
+
+
+### Cardinal direction letters
+
+Configuration property: cardinal_direction_letters
+
+The property is used to configure what is displayed on the windrose.
+It is not used to parse sensor states. The direction_letters property is used for that. 
+
+- Version 1.10.0 and earlier:
+
+  Only four letters are allowed. One letter for every direction in this order: north, east, south, west.
+  Default value is NESW.
+
+- Version 1.11.0 and later:
+
+  New options:
+    - Comma seperaated list, for example: 
+      ```yaml
+      cardinal_direction_letters: North,East,South,West
+      ```
+    - Empty string, to hide the labels.
+      ```yaml
+      cardinal_direction_letters: ''
+      ```
 
 
 ### Object current_direction

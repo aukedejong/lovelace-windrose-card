@@ -17,7 +17,7 @@ export class TimeFrameMatcher implements MeasurementMatcher {
             let direction = MatchUtils.findStatsAtTime(end * 1000, directionStats);
             let speed = MatchUtils.findHistoryBackAtTime(end, speedHistory);
 
-            if (this.checkMeasurementStats(direction, end, "Direction") && this.checkMeasurement(speed, end, "Speed")) {
+            if (this.checkMeasurementStats(direction, end, 'Direction') && this.checkSpeedMeasurement(speed, end)) {
                 directionSpeed.push(new DirectionSpeed(direction!.mean, +speed!.s));
             }
             end -= this.periodSeconds;
@@ -34,7 +34,7 @@ export class TimeFrameMatcher implements MeasurementMatcher {
             let direction = MatchUtils.findHistoryBackAtTime(end, directionHistory);
             let speed = MatchUtils.findStatsAtTime(end * 1000, speedStats);
 
-            if (this.checkMeasurement(direction, end, "Direction") && this.checkMeasurementStats(speed, end, "Speed")) {
+            if (this.checkDirectionMeasurement(direction, end) && this.checkMeasurementStats(speed, end, "Speed")) {
                 directionSpeed.push(new DirectionSpeed(direction!.s, +speed!.mean));
             }
             end -= this.periodSeconds;
@@ -51,7 +51,7 @@ export class TimeFrameMatcher implements MeasurementMatcher {
             let direction = MatchUtils.findHistoryBackAtTime(end, directionHistory);
             let speed = MatchUtils.findHistoryBackAtTime(end, speedHistory);
 
-            if (this.checkMeasurement(direction, end, "Direction") && this.checkMeasurement(speed, end, "Speed")) {
+            if (this.checkDirectionMeasurement(direction, end) && this.checkSpeedMeasurement(speed, end)) {
                 directionSpeed.push(new DirectionSpeed(direction!.s, +speed!.s));
             }
             end -= this.periodSeconds;
@@ -76,14 +76,26 @@ export class TimeFrameMatcher implements MeasurementMatcher {
         return directionSpeed;
     }
 
-    private checkMeasurement(measurement: HistoryData | undefined, timestamp: number, logText: string): boolean {
+    private checkDirectionMeasurement(measurement: HistoryData | undefined, timestamp: number): boolean {
+        if (measurement) {
+            if (measurement.s === undefined || measurement.s === null) {
+                return true;
+            }
+            //Log.warn("Direction " + measurement.s + " at timestamp " + MatchUtils.cleanDate(measurement.lu) + " is not a number.");
+        } else {
+            Log.warn("No direction found for timestamp " + MatchUtils.cleanDate(timestamp));
+        }
+        return true;
+    }
+
+    private checkSpeedMeasurement(measurement: HistoryData | undefined, timestamp: number): boolean {
         if (measurement) {
             if (MatchUtils.isNumber(measurement.s)) {
                 return true;
             }
-            Log.warn(logText + " " + measurement.s + " at timestamp " + MatchUtils.cleanDate(measurement.lu) + " is not a number.");
+            Log.warn("Speed " + measurement.s + " at timestamp " + MatchUtils.cleanDate(measurement.lu) + " is not a number.");
         } else {
-            Log.warn("No " + logText + " found for timestamp " + MatchUtils.cleanDate(timestamp));
+            Log.warn("No speed found for timestamp " + MatchUtils.cleanDate(timestamp));
         }
         return false;
     }

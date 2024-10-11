@@ -8,7 +8,7 @@ export class WindDirectionConverter {
 
     constructor(private readonly config: WindRoseConfig) {
 
-        this.windDirectionLettersConverter = new WindDirectionLettersConverter(config.cardinalDirectionLetters);
+        this.windDirectionLettersConverter = new WindDirectionLettersConverter(config.windDirectionLetters);
     }
 
     public convertDirection(direction: number | string | undefined): number | undefined {
