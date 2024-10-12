@@ -63,7 +63,7 @@ export class WindRoseRendererCenterCalm {
         this.roseGroup.transform("R" +this.degreesCalculator.getRoseRenderDegrees() + "," + this.roseCenter.x + "," + this.roseCenter.y);
 
         const circleLegend = this.drawCircleLegend();
-        const centerZeroSpeed = this.drawCenterZeroSpeed();
+        this.drawCenterZeroSpeed();
     }
 
     rotateWindRose() {
@@ -211,7 +211,7 @@ export class WindRoseRendererCenterCalm {
         return circleLegendGroup;
     }
 
-    private drawCenterZeroSpeed(): Snap.Paper {
+    private drawCenterZeroSpeed(): void {
         const center = this.dimensionCalculator.roseCenter();
         const centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
             this.config.centerRadius));
@@ -223,10 +223,10 @@ export class WindRoseRendererCenterCalm {
         if (this.config.roseCenterPercentageColor === 'auto') {
              textColor = ColorUtil.getTextColorBasedOnBackground(this.speedRanges[0].color);
         }
-        const centerPercentage = this.svgUtil.drawText(center, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
-            TextAttributes.windBarAttribute(textColor, 40, "middle", "middle"));
-
-        return this.svg.group(centerCircle, centerPercentage);
+        if (!isNaN(this.windRoseData.speedRangePercentages[0])) {
+            this.svgUtil.drawText(center, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
+                TextAttributes.windBarAttribute(textColor, 40, "middle", "middle"));
+        }
     }
 
 }

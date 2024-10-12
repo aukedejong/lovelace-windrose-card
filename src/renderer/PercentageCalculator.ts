@@ -67,6 +67,9 @@ export class PercentageCalculator {
     }
 
     private calculateCirclePercentages(maxDirectionTotal: number, total: number): number[] {
+        if (total === 0) {
+            return [5, 10, 50];
+        }
         const maxRosePercentage = maxDirectionTotal / (total / 100);
         let percentagePerCircle = 0;
         let numberOfCircles = 0;
