@@ -131,7 +131,7 @@ export class CardConfigWrapper {
         const oldHoursToShowCheck = this.checkHoursToShow(oldHoursToShow);
         const hoursToShowCheck = this.checkHoursToShow(dataPeriod?.hours_to_show);
         const fromHourOfDayCheck = this.checkFromHourOfDay(dataPeriod?.from_hour_of_day);
-        let timeInterval = ConfigCheckUtils.checkNummerOrDefault(dataPeriod.time_interval, 60);
+        let timeInterval = ConfigCheckUtils.checkNummerOrDefault(dataPeriod?.time_interval, 60);
         if (timeInterval === 0) {
             timeInterval = 60;
         }
@@ -143,7 +143,7 @@ export class CardConfigWrapper {
             throw new Error('WindRoseCard: Only one is allowed: hours_to_show or from_hour_of_day');
         }
         if (!hoursToShowCheck && !fromHourOfDayCheck) {
-            throw new Error('WindRoseCard: One config option object data_period should be filled.');
+            throw new Error('WindRoseCard: One config option of object data_period should be filled.');
         }
         return new DataPeriod(dataPeriod.hours_to_show, dataPeriod.from_hour_of_day, timeInterval);
     }
