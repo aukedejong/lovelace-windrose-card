@@ -45,12 +45,12 @@ export class SvgUtil {
         return this.svg.path(Snap.format('M {x} {y} l {dx1} {dy1} l {dx2} {dy2} l {dx3} {dy3} Z', {
             x: x,
             y: y,
-            dx1: size,
-            dy1: -size/2,
-            dx2: -(size/4),
-            dy2: size/2,
-            dx3: size/4,
-            dy3: size/2
+            dx1: -size/2,
+            dy1: -size,
+            dx2: size/2,
+            dy2: size/4,
+            dx3: size/2,
+            dy3: -size/4
         }));
     }
 

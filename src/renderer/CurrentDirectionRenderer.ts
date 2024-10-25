@@ -38,7 +38,7 @@ export class CurrentDirectionRenderer {
             this.arrowElement!.attr({ visibility: "hidden" })
             this.centerElement!.attr({ visibility: "visible" })
 
-            Log.debug("No direction, show circle", this.arrowElement, this.centerElement);
+            Log.debug("Cur No direction, show circle", this.arrowElement, this.centerElement);
 
         } else {
 
@@ -53,8 +53,8 @@ export class CurrentDirectionRenderer {
     }
 
     private drawArrow() {
-        const x = this.roseCenter.x + this.cfg.roseRadius - (this.config.currentDirectionArrowSize! / 2);
-        const y = this.roseCenter.y;
+        const x = this.roseCenter.x;
+        const y = this.roseCenter.y - this.cfg.roseRadius + (this.config.currentDirectionArrowSize! / 2);
 
         this.arrowElement = this.svgUtil.drawArrow(x, y, this.config.currentDirectionArrowSize!);
         this.arrowElement.attr({

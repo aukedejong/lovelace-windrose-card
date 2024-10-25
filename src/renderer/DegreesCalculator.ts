@@ -20,7 +20,7 @@ export class DegreesCalculator {
             if (this.windDirectionDegrees === undefined) {
                 this.windDirectionRenderDegrees = undefined;
             } else {
-                this.windDirectionRenderDegrees = -90 + this.northOfffset + this.compassDegrees + this.windDirectionDegrees;
+                this.windDirectionRenderDegrees = this.northOfffset + this.compassDegrees + this.windDirectionDegrees;
             }
 
         } else {
@@ -29,7 +29,7 @@ export class DegreesCalculator {
             if (this.windDirectionDegrees === undefined) {
                 this.windDirectionRenderDegrees = undefined;
             } else {
-                this.windDirectionRenderDegrees = -90 + this.northOfffset + this.windDirectionDegrees;
+                this.windDirectionRenderDegrees = this.northOfffset + this.windDirectionDegrees;
             }
 
         }
