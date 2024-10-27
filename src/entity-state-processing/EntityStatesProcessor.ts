@@ -1,10 +1,10 @@
-import {HomeAssistant} from "custom-card-helpers";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {WindDirectionConverter} from "../converter/WindDirectionConverter";
 import {WindRoseConfigFactory} from "../config/WindRoseConfigFactory";
 import {Log2} from "../util/Log2";
 import {Log} from "../util/Log";
 import {EntityState} from "./EntityState";
+import {HomeAssistant} from "../util/HomeAssistant";
 
 export class EntityStatesProcessor {
 

@@ -1,10 +1,8 @@
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {HomeAssistant} from "custom-card-helpers";
 import {CornerInfo} from "../config/CornerInfo";
+import {HomeAssistant} from "../util/HomeAssistant";
 
 export class EntityChecker {
-
-    private hass!: HomeAssistant;
 
     public checkEntities(cardConfig: CardConfigWrapper, hass: HomeAssistant) {
 
@@ -30,11 +28,12 @@ export class EntityChecker {
     private checkCornerInfo(cornerInfo: CornerInfo, hass: HomeAssistant) {
         if (cornerInfo.show && cornerInfo.entity) {
             this.checkEntity(cornerInfo.entity, hass);
+            cornerInfo.precision = hass.entities[cornerInfo.entity].display_precision;
         }
     }
 
     private checkEntity(entity: string, hass: HomeAssistant) {
-        if (hass.states[entity] === undefined) {
+        if (hass.entities[entity] === undefined) {
             throw new Error(`Entity ${entity} not found.`);
         }
     }

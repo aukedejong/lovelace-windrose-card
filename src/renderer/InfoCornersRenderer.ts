@@ -7,6 +7,7 @@ import {TextAttributes} from "./TextAttributes";
 import {EntityState} from "../entity-state-processing/EntityState";
 import {CornerInfo} from "../config/CornerInfo";
 import SVG, {Svg} from "@svgdotjs/svg.js";
+import {round} from "custom-card-helpers";
 
 export class InfoCornersRenderer {
 
@@ -107,10 +108,14 @@ export class InfoCornersRenderer {
         if (entityState === undefined || entityState === null) {
             return "";
         }
-        if (config.unit) {
-            return entityState.state! + config.unit;
+        let stateValue = entityState.state;
+        if (!isNaN(+entityState.state!) && !isNaN(config.precision!)) {
+            stateValue = '' + round(+entityState.state!, config.precision);
         }
-        return entityState.state!;
+        if (config.unit) {
+            return stateValue + config.unit;
+        }
+        return stateValue!;
     }
 
 }

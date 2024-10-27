@@ -4,4 +4,5 @@ export class CornerInfo {
     color!: string;
     unit: string | undefined;
     label: string | undefined;
+    precision: number | undefined;
 }

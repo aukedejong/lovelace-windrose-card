@@ -1,4 +1,4 @@
-import {HomeAssistant} from "custom-card-helpers";
+import {HomeAssistant} from "../util/HomeAssistant";
 import {DirectionSpeed} from "../matcher/DirectionSpeed";
 import {Log} from "../util/Log";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";

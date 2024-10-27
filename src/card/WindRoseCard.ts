@@ -1,4 +1,4 @@
-import {HomeAssistant} from "custom-card-helpers";
+import {HomeAssistant} from "../util/HomeAssistant";
 import {css, CSSResultGroup, html, LitElement, PropertyValues, TemplateResult} from "lit";
 import {customElement, query} from "lit/decorators.js"
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
