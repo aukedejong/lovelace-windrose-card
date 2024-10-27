@@ -1,9 +1,10 @@
 import typescript from 'rollup-plugin-typescript2';
 import multi from '@rollup/plugin-multi-entry';
-import nodeResolve from "rollup-plugin-node-resolve";
-import commonjs from "rollup-plugin-commonjs";
-import {terser} from "rollup-plugin-terser";
+
+import commonjs from "@rollup/plugin-commonjs";
+import nodeResolve from "@rollup/plugin-node-resolve";
 import json from "@rollup/plugin-json";
+import terser from "@rollup/plugin-terser";
 
 const dev = false;
 
@@ -20,10 +21,17 @@ export default {
         file: 'build/windrose-card.js'
     },
     plugins: [
-        typescript(),
         multi(),
-        nodeResolve(),
-        commonjs(),
+        nodeResolve({
+            browser: true,
+            preserveSymlinks: true
+        }),
+        commonjs({
+            include: 'node_modules/**',
+            ignoreGlobal: true,
+            strictRequires: true
+        }),
+        typescript(),
         json(),
         !dev && terser()],
 };

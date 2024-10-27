@@ -16,6 +16,7 @@ import {DegreesCalculator} from "./DegreesCalculator";
 import {Log2} from "../util/Log2";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {InfoCornersRenderer} from "./InfoCornersRenderer";
+import {Svg} from "@svgdotjs/svg.js";
 
 export class WindRoseDirigent {
     //Util
@@ -43,11 +44,11 @@ export class WindRoseDirigent {
     //Calculated data
     private windRoseData: WindRoseData[] = [];
 
-    private readonly svg: Snap.Paper;
+    private readonly svg: Svg;
     private initReady = false;
     private measurementsReady = false;
 
-    constructor(svg: Snap.Paper) {
+    constructor(svg: Svg) {
         this.svg = svg;
     }
 
@@ -123,7 +124,7 @@ export class WindRoseDirigent {
         if (this.initReady && this.measurementsReady) {
             this.log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
             if (this.cardConfig.backgroundImage !== undefined) {
-                this.svg.image(this.cardConfig.backgroundImage, 80, 80, 1000, 1000);
+                this.svg.image(this.cardConfig.backgroundImage).size(1000, 1000).move(80, 80);
             }
             this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {

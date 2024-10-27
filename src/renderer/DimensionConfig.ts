@@ -1,4 +1,5 @@
 import {SvgUtil} from "./SvgUtil";
+import {Svg} from "@svgdotjs/svg.js";
 
 export class DimensionConfig {
 
@@ -28,7 +29,7 @@ export class DimensionConfig {
     constructor(readonly barCount: number,
                 readonly barLocation: string,
                 readonly cardinalDirectionLetters: string[],
-                readonly svg: Snap.Paper) {
+                readonly svg: Svg) {
 
         const svgUtil = new SvgUtil(svg);
 

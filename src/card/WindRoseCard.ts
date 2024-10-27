@@ -1,13 +1,13 @@
 import {HomeAssistant} from "custom-card-helpers";
 import {css, CSSResultGroup, html, LitElement, PropertyValues, TemplateResult} from "lit";
-import {customElement, query} from "lit/decorators"
+import {customElement, query} from "lit/decorators.js"
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardConfig} from "./CardConfig";
 import {Log} from "../util/Log";
 import {WindRoseDirigent} from "../renderer/WindRoseDirigent";
 import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {EntityChecker} from "../entity-checker/EntityChecker";
-import Snap from "snapsvg";
+import {Svg, SVG} from "@svgdotjs/svg.js";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {Log2} from "../util/Log2";
 
@@ -20,7 +20,7 @@ import {Log2} from "../util/Log2";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.6.0 `,
+    `%c  WINROSE-CARD  %c Version 1.11.3 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -47,11 +47,11 @@ export class WindRoseCard extends LitElement {
     cardConfig!: CardConfigWrapper;
     updateInterval: NodeJS.Timer | undefined;
     _hass!: HomeAssistant;
-    svg: Snap.Paper;
+    svg: Svg;
 
     constructor() {
         super();
-        this.svg = Snap("100%", "100%");
+        this.svg = SVG().height('100%').width('100%');
         this.windRoseDirigent = new WindRoseDirigent(this.svg);
         this.entityStateProcessor = new EntityStatesProcessor();
         this.entityChecker = new EntityChecker();
@@ -117,7 +117,7 @@ export class WindRoseCard extends LitElement {
     firstUpdated(): void {
         this.log.debug('firstUpdated()');
         this.log.debug('SVG container found: ', this.svgContainer, this.measurementProvider);
-        this.svgContainer.appendChild(this.svg.node);
+        this.svg.addTo(this.svgContainer);
     }
 
     update(changedProperties: PropertyValues): void {

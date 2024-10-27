@@ -3,7 +3,6 @@ import {DrawUtil} from "../util/DrawUtil";
 import {SpeedRange} from "../converter/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
 import {Log} from "../util/Log";
-import Snap from "snapsvg";
 import {SvgUtil} from "./SvgUtil";
 import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {DimensionConfig} from "./DimensionConfig";
@@ -12,27 +11,28 @@ import {CircleCoordinate} from "./CircleCoordinate";
 import {Coordinate} from "./Coordinate";
 import {ColorUtil} from "../util/ColorUtil";
 import {DegreesCalculator} from "./DegreesCalculator";
+import SVG, {Svg} from "@svgdotjs/svg.js";
 
 export class WindRoseRendererCenterCalm {
     private readonly config: WindRoseConfig;
     private readonly speedRanges: SpeedRange[];
-    private readonly svg: Snap.Paper;
+    private readonly svg: Svg;
 
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     private readonly degreesCalculator: DegreesCalculator;
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
     private readonly roseCenter: Coordinate;
-    private roseGroup!: Snap.Paper;
-    private northText!: Snap.Element;
-    private eastText!: Snap.Element;
-    private southText!: Snap.Element;
-    private westText!: Snap.Element;
+    private roseGroup!: SVG.G;
+    private northText!: SVG.Text;
+    private eastText!: SVG.Text;
+    private southText!: SVG.Text;
+    private westText!: SVG.Text;
 
     constructor(config: WindRoseConfig,
                 dimensionConfig: DimensionConfig,
                 speedRanges: SpeedRange[],
-                svg: Snap.Paper,
+                svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.config = config;
         this.speedRanges = speedRanges;
@@ -59,8 +59,8 @@ export class WindRoseRendererCenterCalm {
         const background = this.drawBackground();
 
         //Rotate
-        this.roseGroup = this.svg.group(background, windDirectionText, windDirections);
-        this.roseGroup.transform("R" +this.degreesCalculator.getRoseRenderDegrees() + "," + this.roseCenter.x + "," + this.roseCenter.y);
+        this.roseGroup = this.svg.group().add(background).add(windDirectionText).add(windDirections);
+        this.roseGroup.rotate(this.degreesCalculator.getRoseRenderDegrees(), this.roseCenter.x, this.roseCenter.y);
 
         const circleLegend = this.drawCircleLegend();
         this.drawCenterZeroSpeed();
@@ -71,20 +71,25 @@ export class WindRoseRendererCenterCalm {
             return;
         }
         const deg = this.degreesCalculator.getRoseRenderDegrees();
-        const transform = "R" + deg + "," + this.roseCenter.x + "," + this.roseCenter.y;
-        this.roseGroup.animate({ transform: transform }, 700, mina.easeinout);
 
-        const transformNorth = "R" + (-deg) + "," + this.dimensionCalculator.north().x + "," + this.dimensionCalculator.north().y;
-        this.northText.animate({ transform: transformNorth}, 700, mina.easeinout);
-        const transformEast = "R" + (-deg) + "," + this.dimensionCalculator.east().x + "," + this.dimensionCalculator.east().y;
-        this.eastText.animate({ transform: transformEast}, 700, mina.easeinout);
-        const transformSouth = "R" + (-deg) + "," + this.dimensionCalculator.south().x + "," + this.dimensionCalculator.south().y;
-        this.southText.animate({ transform: transformSouth}, 700, mina.easeinout);
-        const transformWest = "R" + (-deg) + "," + this.dimensionCalculator.west().x + "," + this.dimensionCalculator.west().y;
-        this.westText.animate({ transform: transformWest}, 700, mina.easeinout);
+        this.roseGroup.animate(700, 0, 'now')
+            .transform({ rotate: deg, originX: this.roseCenter.x, originY: this.roseCenter.y})
+            .ease('<>');
+        this.northText.animate(700, 0, 'now')
+            .transform({ rotate: -deg, originX: this.dimensionCalculator.north().x, originY: this.dimensionCalculator.north().y})
+            .ease('<>');
+        this.eastText.animate(700, 0, 'now')
+            .transform({ rotate: -deg, originX: this.dimensionCalculator.east().x, originY: this.dimensionCalculator.east().y})
+            .ease('<>');
+        this.southText.animate(700, 0, 'now')
+            .transform({ rotate: -deg, originX: this.dimensionCalculator.south().x, originY: this.dimensionCalculator.south().y})
+            .ease('<>');
+        this.westText.animate(700, 0, 'now')
+            .transform({ rotate: -deg, originX: this.dimensionCalculator.west().x, originY: this.dimensionCalculator.west().y})
+            .ease('<>');
     }
 
-    private drawWindDirections(): Snap.Paper {
+    private drawWindDirections(): SVG.G {
         const windDirections = this.svg.group();
         for (let i = 0; i < this.windRoseData.directionPercentages.length; i++) {
             windDirections.add(
@@ -95,7 +100,7 @@ export class WindRoseRendererCenterCalm {
         return windDirections;
     }
 
-    private drawWindDirection(speedRangePercentages: number[], directionPercentage: number, degrees: number): Snap.Paper {
+    private drawWindDirection(speedRangePercentages: number[], directionPercentage: number, degrees: number): SVG.G {
         const windDirection = this.svg.group();
         if (directionPercentage === 0) {
             return windDirection;
@@ -121,7 +126,7 @@ export class WindRoseRendererCenterCalm {
         return windDirection;
     }
 
-    private drawSpeedPart(svg: Snap.Paper, degrees: number, radius: number, color: string): Snap.Element {
+    private drawSpeedPart(svg: Svg, degrees: number, radius: number, color: string): SVG.Path {
 
         var radians1 = DrawUtil.toRadians(degrees - (this.config.leaveArc / 2));
         var radians2 = DrawUtil.toRadians(degrees + (this.config.leaveArc / 2));
@@ -131,18 +136,15 @@ export class WindRoseRendererCenterCalm {
         var x2 = center.x + Math.round(Math.cos(radians2) * radius);
         var y2 = center.y + Math.round(Math.sin(radians2) * radius);
 
-        return svg.path(Snap.format('M {centerX} {centerY} L {x1} {y1} A{radius} {radius} 0 0 1 {x2} {y2} Z ', {
-            centerX: center.x,
-            centerY: center.y,
-            x1, y1, x2, y2, radius
-        })).attr({'fill': color, stroke: this.config.roseLinesColor});
+        return svg.path(`M ${center.x} ${center.y} L ${x1} ${y1} A${radius} ${radius} 0 0 1 ${x2} ${y2} Z`)
+            .attr({'fill': color, stroke: this.config.roseLinesColor});
     }
 
-    private drawBackground(): Snap.Paper {
+    private drawBackground(): SVG.G {
         // Cross
         var lineHorizontal = this.svgUtil.drawLine(this.dimensionCalculator.crossHorizontalLine());
         var lineVertical = this.svgUtil.drawLine(this.dimensionCalculator.crossVerticalLine());
-        var roseLinesGroup = this.svg.group(lineHorizontal, lineVertical);
+        var roseLinesGroup = this.svg.group().add(lineHorizontal).add(lineVertical);
 
         // Circles
         const circleCount = this.windRoseData.circleCount;
@@ -160,7 +162,7 @@ export class WindRoseRendererCenterCalm {
         return roseLinesGroup;
     }
 
-    private drawWindDirectionText(): Snap.Paper {
+    private drawWindDirectionText(): SVG.G {
         // Wind direction text
         const roseRenderDegrees = this.degreesCalculator.getRoseRenderDegrees();
 
@@ -190,10 +192,10 @@ export class WindRoseRendererCenterCalm {
             "middle",
             "central");
 
-        return this.svg.group(this.northText, this.eastText, this.southText, this.westText);
+        return this.svg.group().add(this.northText).add(this.eastText).add(this.southText).add(this.westText);
     }
 
-    private drawCircleLegend(): Snap.Paper {
+    private drawCircleLegend(): SVG.G {
         const circleLegendGroup = this.svg.group();
         const center = this.dimensionCalculator.roseCenter();
         const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.config.centerRadius) / this.windRoseData.circleCount;

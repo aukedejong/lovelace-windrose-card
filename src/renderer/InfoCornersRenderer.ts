@@ -6,13 +6,11 @@ import {Coordinate} from "./Coordinate";
 import {TextAttributes} from "./TextAttributes";
 import {EntityState} from "../entity-state-processing/EntityState";
 import {CornerInfo} from "../config/CornerInfo";
+import SVG, {Svg} from "@svgdotjs/svg.js";
 
 export class InfoCornersRenderer {
 
-    private config: WindRoseConfig;
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
-    private readonly cfg!: DimensionConfig;
-    private readonly svg: Snap.Paper;
     private svgUtil!: SvgUtil;
 
     private leftTopCoor: Coordinate;
@@ -25,20 +23,15 @@ export class InfoCornersRenderer {
     private leftBottomConfig: CornerInfo;
     private rightBottomConfig: CornerInfo;
 
-    private leftTopelement!: Snap.Element;
-    private rightTopElement!: Snap.Element;
-    private leftBottomElement!: Snap.Element;
-    private rightBottomElement!: Snap.Element;
+    private leftTopelement!: SVG.Text;
+    private rightTopElement!: SVG.Text;
+    private leftBottomElement!: SVG.Text;
+    private rightBottomElement!: SVG.Text;
 
-    private readonly roseCenter: Coordinate;
+    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Svg) {
 
-    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Snap.Paper) {
-        this.config = config;
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
-        this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
-        this.cfg = this.dimensionCalculator.cfg;
-        this.roseCenter = this.dimensionCalculator.roseCenter();
 
         this.leftTopCoor = this.dimensionCalculator.infoCornerLeftTop();
         this.rightTopCoor = this.dimensionCalculator.infoCornerRightTop();

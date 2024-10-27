@@ -5,6 +5,7 @@ import {DimensionConfig} from "./DimensionConfig";
 import {Coordinate} from "./Coordinate";
 import {Log} from "../util/Log";
 import {CircleCoordinate} from "./CircleCoordinate";
+import SVG, {Svg} from "@svgdotjs/svg.js";
 
 export class CurrentDirectionRenderer {
 
@@ -13,12 +14,12 @@ export class CurrentDirectionRenderer {
     private readonly cfg!: DimensionConfig;
     private svgUtil!: SvgUtil;
 
-    private arrowElement: Snap.Element | undefined = undefined;
-    private centerElement: Snap.Element | undefined = undefined;
+    private arrowElement: SVG.Path | undefined = undefined;
+    private centerElement: SVG.Circle | undefined = undefined;
 
     private readonly roseCenter: Coordinate;
 
-    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Snap.Paper) {
+    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Svg) {
         this.config = config;
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
         this.svgUtil = new SvgUtil(svg);
@@ -28,6 +29,7 @@ export class CurrentDirectionRenderer {
 
     drawCurrentWindDirection(currentWindDirection: number | undefined, redraw: boolean): void {
         if (this.arrowElement === undefined || redraw) {
+            Log.debug('Cur Init draw, redraw = ' + redraw);
             this.drawArrow();
         }
         if (this.centerElement === undefined || redraw) {
@@ -41,14 +43,11 @@ export class CurrentDirectionRenderer {
             Log.debug("Cur No direction, show circle", this.arrowElement, this.centerElement);
 
         } else {
-
             this.arrowElement!.attr({ visibility: "visible" })
             this.centerElement!.attr({ visibility: "hidden" })
-
-            var transform = "R" + currentWindDirection + "," + this.roseCenter.x + "," + this.roseCenter.y;
-
-            Log.debug("Animate", currentWindDirection, transform);
-            this.arrowElement!.animate({ transform: transform }, 700, mina.easeinout);
+            this.arrowElement!.animate(700, 0, 'now')
+                .transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y})
+                .ease('<>');
         }
     }
 
@@ -81,9 +80,6 @@ export class CurrentDirectionRenderer {
                 stroke: this.config.roseCurrentDirectionArrowColor,
                 fill: this.config.roseCurrentDirectionArrowColor
             });
-
         }
-
     }
-
 }
