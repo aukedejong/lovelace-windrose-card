@@ -28,12 +28,12 @@ export class EntityChecker {
     private checkCornerInfo(cornerInfo: CornerInfo, hass: HomeAssistant) {
         if (cornerInfo.show && cornerInfo.entity) {
             this.checkEntity(cornerInfo.entity, hass);
-            cornerInfo.precision = hass.entities[cornerInfo.entity].display_precision;
+            cornerInfo.precision = hass.entities[cornerInfo.entity]?.display_precision;
         }
     }
 
     private checkEntity(entity: string, hass: HomeAssistant) {
-        if (hass.entities[entity] === undefined) {
+        if (hass.states[entity] === undefined) {
             throw new Error(`Entity ${entity} not found.`);
         }
     }
