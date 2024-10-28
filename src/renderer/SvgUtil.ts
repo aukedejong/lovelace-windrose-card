@@ -50,8 +50,8 @@ export class SvgUtil {
     }
 
     public getTextLength(text: string, size: number): number{
-        const element = this.svg.text(text).move(-1000, -1000).attr({ "font-size": size, "font-family": "Arial" });
-        const textWidth = element.bbox().width
+        const element = this.svg.plain(text).move(-1000, -1000).attr({ "font-size": size, "font-family": "Arial" });
+        const textWidth = element.bbox().width;
         element.remove();
         return textWidth;
     }
@@ -65,6 +65,6 @@ export class SvgUtil {
     }
 
     public drawText(coordinate: Coordinate, text: string, attributes: TextAttributes): SVG.Text {
-        return this.svg.text(text).dmove(coordinate.x, coordinate.y).attr(attributes);
+        return this.svg.plain(text).dmove(coordinate.x, coordinate.y).attr(attributes);
     }
 }
