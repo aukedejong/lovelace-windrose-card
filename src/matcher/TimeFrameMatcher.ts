@@ -79,7 +79,7 @@ export class TimeFrameMatcher implements MeasurementMatcher {
     private checkDirectionMeasurement(measurement: HistoryData | undefined, timestamp: number): boolean {
         if (measurement) {
             if (measurement.s === undefined || measurement.s === null) {
-                return true;
+                return false;
             }
             //Log.warn("Direction " + measurement.s + " at timestamp " + MatchUtils.cleanDate(measurement.lu) + " is not a number.");
         } else {

@@ -32,7 +32,9 @@ export class WindRoseDimensionCalculator {
     }
 
     viewBox(): string {
-        if (this.cfg.barLocation === 'right') {
+        if (this.cfg.barCount === 0) {
+            return this.viewBoxRoseOnly();
+        } else if (this.cfg.barLocation === 'right') {
             return this.viewBoxBarRight();
         } else if (this.cfg.barLocation === 'bottom') {
             return this.viewBoxBarBotton();
@@ -40,7 +42,12 @@ export class WindRoseDimensionCalculator {
         throw new Error("Bar location should be right or bottom not: " + this.cfg.barLocation);
     }
 
-    viewBoxBarRight(): string {
+    private viewBoxRoseOnly(): string {
+        let width = this.cfg.marginTop + this.cfg.roseRadius + this.cfg.roseRadius + this.cfg.marginBottom;
+        return "0 0 " + width + " " + width;
+    }
+
+    private viewBoxBarRight(): string {
         var barRightCfg = this.cfg.barRight;
         var roseHeight = this.cfg.roseRadius + this.cfg.roseRadius;
         var height = this.cfg.marginTop + roseHeight + this.cfg.marginBottom;
@@ -54,7 +61,7 @@ export class WindRoseDimensionCalculator {
         return "0 0 " + width + " " + height;
     }
 
-    viewBoxBarBotton(): string {
+    private viewBoxBarBotton(): string {
         var barBottomCfg = this.cfg.barBottom;
         var roseWidth = this.cfg.roseRadius + this.cfg.roseRadius;
         var width = this.cfg.marginLeft + roseWidth + this.cfg.marginRight;
