@@ -1,6 +1,7 @@
 export class GlobalConfig {
 
     static defaultCardinalDirectionLetters = ["N", "E", "S", "W"];
+    static defaultCardinalDirectionLettersNotParsed = 'N,E,S,W';
     static defaultWindspeedBarLocation = 'bottom';
     static defaultHoursToShow = 4;
     static defaultRefreshInterval = 300;

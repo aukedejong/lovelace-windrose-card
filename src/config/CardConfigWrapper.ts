@@ -81,7 +81,7 @@ export class CardConfigWrapper {
                 auto_rotate: false,
                 entity: ''
             },
-            cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLetters,
+            cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLettersNotParsed,
             matching_strategy: GlobalConfig.defaultMatchingStategy,
             center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
             background_image: undefined,
