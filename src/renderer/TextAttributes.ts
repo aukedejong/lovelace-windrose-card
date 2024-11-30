@@ -6,18 +6,18 @@ export class TextAttributes {
         "font-family": "arial",
     }
 
-    static infoCornerAttribute(color: string) {
+    static infoCornerAttribute(color: string, textSize: number) {
         return {
             fill: color,
-            "font-size": 80,
+            "font-size": textSize,
             "font-family": "arial"
         }
     }
 
-    static infoCornerLabelAttribute(color: string) {
+    static infoCornerLabelAttribute(color: string, textSize: number) {
         return {
             fill: color,
-            "font-size": 50,
+            "font-size": textSize,
             "font-family": "arial"
         }
     }

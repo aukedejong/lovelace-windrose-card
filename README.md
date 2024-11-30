@@ -236,12 +236,14 @@ corner_info:
 
 ###  Object top_left, top_right, bottom_left and bottom_right
 
-| Name   |  Type  |        Default        | Required | Description                                                                                |
-|--------|:------:|:---------------------:|:--------:|--------------------------------------------------------------------------------------------|
-| label  | string |                       |          | Label                                                                                      |
-| unit   | string |                       |          | Unit, displayed after the state, without a space. If you need space, add it to the config. |
-| color  | string | --primary-text-color  |          | Color of the text.                                                                         |
-| entity | string |                       |    x     | State of the entity will be displayed                                                      |
+| Name            |  Type  |       Default        | Required | Description                                                                                |
+|-----------------|:------:|:--------------------:|:--------:|--------------------------------------------------------------------------------------------|
+| label           | string |                      |          | Label                                                                                      |
+| unit            | string |                      |          | Unit, displayed after the state, without a space. If you need space, add it to the config. |
+| color           | string | --primary-text-color |          | Color of the text.                                                                         |
+| label_text_size | number |          50          |          | The text size of the label.                                                                |
+| value_text_size | number |          80          |          | The text size of the entity's state.                                                       |
+| entity          | string |                      |    x     | State of the entity will be displayed                                                      |
 
 
 ### Matching strategies

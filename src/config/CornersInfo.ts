@@ -42,6 +42,8 @@ export class CornersInfo {
         const info = new CornerInfo();
         info.entity = cornerInfoConfig?.entity;
         info.color = cornerInfoConfig?.color === undefined ? defaultColor : cornerInfoConfig.color;
+        info.labelTextSize = cornerInfoConfig?.label_text_size === undefined ? 50 : cornerInfoConfig.label_text_size;
+        info.valueTextSize = cornerInfoConfig?.value_text_size === undefined ? 80 : cornerInfoConfig.value_text_size;
         info.label = cornerInfoConfig?.label;
         info.unit = cornerInfoConfig?.unit;
         if (info.entity || info.label) {
