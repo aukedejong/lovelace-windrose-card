@@ -43,7 +43,7 @@ export class MeasurementCounter {
         return this.windData;
     }
 
-    addWindMeasurements(direction: number | string, speed: number): void {
+    addWindMeasurements(direction: number | string, speed: number, seconds: number): void {
         const convertedSpeed = this.speedConverterFunction(speed);
         const speedRangeIndex = this.speedRangeFunction(convertedSpeed)
 
@@ -58,7 +58,7 @@ export class MeasurementCounter {
             return;
         }
         Log.trace("Wind measurement: ", direction, speed, windDirectionIndex, speedRangeIndex);
-        this.windData.add(windDirectionIndex, speedRangeIndex);
+        this.windData.add(windDirectionIndex, speedRangeIndex, seconds);
     }
 
 }

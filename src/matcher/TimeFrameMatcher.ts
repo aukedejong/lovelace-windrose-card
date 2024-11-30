@@ -9,7 +9,7 @@ export class TimeFrameMatcher implements MeasurementMatcher {
     }
 
     matchStatsHistory(directionStats: StatisticsData[], speedHistory: HistoryData[]): DirectionSpeed[] {
-        const maxBackTimestamp = directionStats[0].start > speedHistory[0].lu ? directionStats[0].start : speedHistory[0].lu
+        const maxBackTimestamp = directionStats[0].start / 1000 > speedHistory[0].lu ? directionStats[0].start / 1000 : speedHistory[0].lu
         let end = Date.now() / 1000;
         const directionSpeed: DirectionSpeed[] = [];
         while (end > maxBackTimestamp) {
@@ -18,7 +18,7 @@ export class TimeFrameMatcher implements MeasurementMatcher {
             let speed = MatchUtils.findHistoryBackAtTime(end, speedHistory);
 
             if (this.checkMeasurementStats(direction, end, 'Direction') && this.checkSpeedMeasurement(speed, end)) {
-                directionSpeed.push(new DirectionSpeed(direction!.mean, +speed!.s));
+                directionSpeed.push(new DirectionSpeed(direction!.mean, +speed!.s, 1));
             }
             end -= this.periodSeconds;
         }

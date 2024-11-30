@@ -378,9 +378,9 @@ export class CardConfigWrapper {
     private checkMatchingStrategy(): string {
         if (this.cardConfig.matching_strategy) {
             if (this.cardConfig.matching_strategy !== 'direction-first' && this.cardConfig.matching_strategy !== 'speed-first'
-                && this.cardConfig.matching_strategy !== 'time-frame') {
+                && this.cardConfig.matching_strategy !== 'time-frame' && this.cardConfig.matching_strategy !== 'full-time') {
                 throw new Error('Invalid matching stategy ' + this.cardConfig.matching_strategy +
-                    '. Valid options: direction-first, speed-first');
+                    '. Valid options: direction-first, speed-first, time-frame and full-time');
             }
             return this.cardConfig.matching_strategy;
         }

@@ -19,11 +19,11 @@ export class WindCounts {
         }
     }
 
-    add(windDirectionIndex: number, speedRangeIndex: number) {
-        this.total++;
-        this.speedRangeCounts[speedRangeIndex]++;
-        this.directionTotals[windDirectionIndex]++;
-        Log.trace("Add " + windDirectionIndex + " - " + speedRangeIndex, this.directionSpeedRangeCounts);
-        this.directionSpeedRangeCounts[windDirectionIndex][speedRangeIndex]++;
+    add(windDirectionIndex: number, speedRangeIndex: number, seconds: number) {
+        this.total += seconds;
+        this.speedRangeCounts[speedRangeIndex] += seconds;
+        this.directionTotals[windDirectionIndex] += seconds;
+        Log.trace("Add " + windDirectionIndex + " - " + speedRangeIndex + " - " + seconds, this.directionSpeedRangeCounts);
+        this.directionSpeedRangeCounts[windDirectionIndex][speedRangeIndex] += seconds;
     }
 }

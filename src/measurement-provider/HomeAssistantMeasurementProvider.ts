@@ -7,6 +7,7 @@ import {DataPeriod} from "../config/DataPeriod";
 import {SpeedFirstMatcher} from "../matcher/SpeedFirstMatcher";
 import {DirectionFirstMatcher} from "../matcher/DirectionFirstMatcher";
 import {TimeFrameMatcher} from "../matcher/TimeFrameMatcher";
+import {FullTimeMatcher} from "../matcher/FullTimeMatcher";
 
 export class HomeAssistantMeasurementProvider {
 
@@ -27,7 +28,9 @@ export class HomeAssistantMeasurementProvider {
         } else if (this.cardConfig.matchingStrategy === 'direction-first') {
             this.measurementMatcher = new DirectionFirstMatcher();
         } else if (this.cardConfig.matchingStrategy === 'time-frame') {
-           this.measurementMatcher = new TimeFrameMatcher(this.cardConfig.dataPeriod.timeInterval);
+            this.measurementMatcher = new TimeFrameMatcher(this.cardConfig.dataPeriod.timeInterval);
+        } else if (this.cardConfig.matchingStrategy === 'full-time') {
+            this.measurementMatcher = new FullTimeMatcher();
         }
     }
 

@@ -17,6 +17,7 @@ import {Log2} from "../util/Log2";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {InfoCornersRenderer} from "./InfoCornersRenderer";
 import {Svg} from "@svgdotjs/svg.js";
+import {DirectionSpeed} from "../matcher/DirectionSpeed";
 
 export class WindRoseDirigent {
     //Util
@@ -99,13 +100,13 @@ export class WindRoseDirigent {
     refreshData(): Promise<boolean> {
         if (this.initReady) {
             this.log.debug('refreshData()');
-            return this.measurementProvider.getMeasurements().then((matchedGroups) => {
+            return this.measurementProvider.getMeasurements().then((matchedGroups: DirectionSpeed[][]) => {
                 this.windRoseData = [];
                 this.log.debug('Matched measurements:', matchedGroups);
                 for (let i = 0; i < matchedGroups.length; i++) {
                     this.measurementCounter.init(this.cardConfig.windspeedEntities[i].speedUnit);
                     for (const measurement of matchedGroups[i]) {
-                        this.measurementCounter.addWindMeasurements(measurement.direction, measurement.speed);
+                        this.measurementCounter.addWindMeasurements(measurement.direction, measurement.speed, measurement.seconds);
                     }
                     const windCounts = this.measurementCounter.getMeasurementCounts();
                     this.windRoseData.push(this.percentageCalculator.calculate(windCounts));
