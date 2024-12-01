@@ -1,6 +1,5 @@
 import {GlobalConfig} from "./GlobalConfig";
 import {CardConfig} from "../card/CardConfig";
-import {SpeedRange} from "../converter/SpeedRange";
 import {CardColors} from "./CardColors";
 import {Log} from "../util/Log";
 import {WindSpeedEntity} from "./WindSpeedEntity";
@@ -12,6 +11,7 @@ import {CardConfigCompass} from "../card/CardConfigCompass";
 import {CurrentDirectionConfig} from "./CurrentDirectionConfig";
 import {CornersInfo} from "./CornersInfo";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
+import {CardConfigWindSpeedEntity} from "../card/CardConfigWindSpeedEntity";
 
 
 export class CardConfigWrapper {
@@ -22,19 +22,12 @@ export class CardConfigWrapper {
     windDirectionEntity: WindDirectionEntity;
     windspeedEntities: WindSpeedEntity[];
     windspeedBarLocation: string;
-    windspeedBarFull: boolean;
     hideWindspeedBar: boolean;
     centerCalmPercentage: boolean;
     cardinalDirectionLetters: string[];
     windDirectionCount: number;
     windRoseDrawNorthOffset: number;
     currentDirection: CurrentDirectionConfig;
-    outputSpeedUnit: string;
-    outputSpeedUnitLabel: string | undefined;
-    speedRangeBeaufort: boolean;
-    speedRangeStep: number | undefined;
-    speedRangeMax: number | undefined;
-    speedRanges: SpeedRange[] = [];
     matchingStrategy: string;
     cardColor: CardColors;
     compassConfig: CompassConfig;
@@ -52,7 +45,6 @@ export class CardConfigWrapper {
             },
             refresh_interval: GlobalConfig.defaultRefreshInterval,
             windspeed_bar_location: GlobalConfig.defaultWindspeedBarLocation,
-            windspeed_bar_full: GlobalConfig.defaultWindspeedBarFull,
             wind_direction_entity: {
                 entity: '',
                 use_statistics: false,
@@ -63,14 +55,15 @@ export class CardConfigWrapper {
                     entity: '',
                     name: '',
                     speed_unit: GlobalConfig.defaultInputSpeedUnit,
-                    use_statistics: false
+                    use_statistics: false,
+                    windspeed_bar_full: GlobalConfig.defaultWindspeedBarFull,
+                    output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
+                    speed_range_beaufort: GlobalConfig.defaultSpeedRangeBeaufort,
+                    speed_range_step: undefined,
+                    speed_range_max: undefined,
+                    speed_ranges: undefined,
                 }
             ],
-            output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
-            speed_range_beaufort: GlobalConfig.defaultSpeedRangeBeaufort,
-            speed_range_step: undefined,
-            speed_range_max: undefined,
-            speed_ranges: undefined,
             windrose_draw_north_offset: 0,
             current_direction: {
                 show_arrow: false,
@@ -98,18 +91,10 @@ export class CardConfigWrapper {
         this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
         this.currentDirection = this.checkCurrentDirection()
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
-        this.windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.windspeed_bar_full);
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
         this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
         this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
         this.windDirectionCount = this.checkWindDirectionCount();
-        this.outputSpeedUnit = this.checkOutputSpeedUnit();
-        this.outputSpeedUnitLabel = this.checkOutputSpeedUnitLabel();
-        this.speedRangeBeaufort = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.speed_range_beaufort);
-        this.speedRangeStep = this.checkSpeedRangeStep();
-        this.speedRangeMax = this.checkSpeedRangeMax();
-        this.speedRanges = this.checkSpeedRanges();
-        this.checkSpeedRangeCombi();
         this.matchingStrategy = this.checkMatchingStrategy();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.cardColor = this.checkCardColors();
@@ -206,32 +191,24 @@ export class CardConfigWrapper {
             throw new Error('WindRoseCard: No wind_speed_entities configured, minimal 1 needed.');
         }
         const entities:WindSpeedEntity[] = [];
+        const parentWindSpeedConfig = {
+            entity: '',
+            name: '',
+            use_statistics: false,
+            render_relative_scale: false,
+            windspeed_bar_full: this.cardConfig.windspeed_bar_full,
+            speed_unit: '',
+            output_speed_unit: this.cardConfig.output_speed_unit,
+            output_speed_unit_label: this.cardConfig.output_speed_unit_label,
+            speed_range_beaufort: this.cardConfig.speed_range_beaufort,
+            speed_range_step: this.cardConfig.speed_range_step,
+            speed_range_max: this.cardConfig.speed_range_max,
+            speed_ranges: this.cardConfig.speed_ranges
+        } as CardConfigWindSpeedEntity;
         for (const entityConfig of this.cardConfig.windspeed_entities) {
-            const entity = entityConfig.entity;
-            const name = entityConfig.name;
-            const useStatistics = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.use_statistics);
-            const inputSpeedUnit = this.checkInputSpeedUnit(entityConfig.speed_unit);
-            const renderRelativeScale = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
-            entities.push(new WindSpeedEntity(entity, name, useStatistics, renderRelativeScale, inputSpeedUnit))
+            entities.push(WindSpeedEntity.fromConfig(entityConfig, parentWindSpeedConfig))
         }
         return entities;
-    }
-
-    private checkInputSpeedUnit(inputSpeedUnit: string): string {
-        if (inputSpeedUnit) {
-            if (inputSpeedUnit !== 'mps'
-                && inputSpeedUnit !== 'bft'
-                && inputSpeedUnit !== 'kph'
-                && inputSpeedUnit !== 'mph'
-                && inputSpeedUnit !== 'fps'
-                && inputSpeedUnit !== 'knots'
-                && inputSpeedUnit !== 'auto') {
-                throw new Error('Invalid windspeed unit configured: ' + inputSpeedUnit +
-                    '. Valid options: mps, bft, fps, kph, mph, knots, auto');
-            }
-            return inputSpeedUnit;
-        }
-        return GlobalConfig.defaultInputSpeedUnit;
     }
 
     private checkDirectionCompensation(directionCompensation: number): number {
@@ -299,80 +276,6 @@ export class CardConfigWrapper {
             return this.cardConfig.wind_direction_count;
         }
         return GlobalConfig.defaultWindDirectionCount;
-    }
-
-    private checkOutputSpeedUnit(): string {
-        if (this.cardConfig.output_speed_unit) {
-            if (this.cardConfig.output_speed_unit !== 'mps'
-                && this.cardConfig.output_speed_unit !== 'kph'
-                && this.cardConfig.output_speed_unit !== 'mph'
-                && this.cardConfig.output_speed_unit !== 'fps'
-                && this.cardConfig.output_speed_unit !== 'knots') {
-                throw new Error('Invalid output windspeed unit configured: ' + this.cardConfig.output_speed_unit +
-                    '. Valid options: mps, fps, kph, mph, knots');
-            }
-            return this.cardConfig.output_speed_unit;
-        }
-        return GlobalConfig.defaultOutputSpeedUnit;
-    }
-
-    private checkOutputSpeedUnitLabel(): string | undefined {
-        if (this.cardConfig.output_speed_unit_label) {
-            return this.cardConfig.output_speed_unit_label
-        }
-        return undefined;
-    }
-
-    private checkSpeedRangeStep(): number | undefined {
-        if (this.cardConfig.speed_range_step && isNaN(this.cardConfig.speed_range_step)) {
-            throw new Error('WindRoseCard: Invalid speed_range_step, should be a positive number.');
-        } else if (this.cardConfig.speed_range_step <= 0) {
-            throw new Error('WindRoseCard: Invalid speed_range_step, should be a positive number.')
-        } else if (this.cardConfig.speed_range_step) {
-            return this.cardConfig.speed_range_step;
-        }
-        return undefined;
-    }
-
-    private checkSpeedRangeMax(): number | undefined {
-        if (this.cardConfig.speed_range_max && isNaN(this.cardConfig.speed_range_max)) {
-            throw new Error('WindRoseCard: Invalid speed_range_max, should be a positive number.');
-        } else if (this.cardConfig.speed_range_max <= 0) {
-            throw new Error('WindRoseCard: Invalid speed_range_max, should be a positive number.')
-        } else if (this.cardConfig.speed_range_max) {
-            return this.cardConfig.speed_range_max;
-        }
-        return undefined;
-    }
-
-    private checkSpeedRanges(): SpeedRange[] {
-        const speedRangeConfigs: SpeedRange[] = [];
-        if (this.cardConfig.speed_ranges && this.cardConfig.speed_ranges.length > 0) {
-            const sortSpeedRanges = this.cardConfig.speed_ranges.slice();
-            sortSpeedRanges.sort((a, b) => a.from_value - b.from_value)
-            const lastIndex = sortSpeedRanges.length - 1;
-            for (let i = 0; i < lastIndex; i++) {
-                speedRangeConfigs.push(new SpeedRange(i,
-                    sortSpeedRanges[i].from_value,
-                    sortSpeedRanges[i + 1].from_value,
-                    sortSpeedRanges[i].color));
-            }
-            speedRangeConfigs.push(new SpeedRange(lastIndex,
-                sortSpeedRanges[lastIndex].from_value,
-                -1,
-                sortSpeedRanges[lastIndex].color))
-        }
-        return speedRangeConfigs;
-    }
-
-    private checkSpeedRangeCombi(): void {
-        if (this.outputSpeedUnit === 'bft' && (this.speedRangeStep || this.speedRangeMax)) {
-            throw new Error("WindRoseCard: speed_range_step and/or speed_range_max should not be set when using output " +
-                "speed unit Beaufort (bft). Beaufort uses fixed speed ranges.");
-        }
-        if ((this.speedRangeStep && !this.speedRangeMax) || (!this.speedRangeStep && this.speedRangeMax)) {
-            throw new Error("WindRoseCard: speed_range_step and speed_range_max should both be set.")
-        }
     }
 
     private checkMatchingStrategy(): string {

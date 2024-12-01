@@ -17,13 +17,14 @@ export interface CardConfig {
     refresh_interval: number;
     wind_direction_entity: CardConfigWindDirectionEntity;
     windspeed_entities: CardConfigWindSpeedEntity[];
+    //Deprecated
     output_speed_unit: string;
     output_speed_unit_label: string;
     speed_range_beaufort: boolean;
     speed_range_step: number;
     speed_range_max: number;
     speed_ranges: CardConfigSpeedRange[];
-
+    //----------
     center_calm_percentage: boolean;
     windrose_draw_north_offset: number;
     compass_direction: CardConfigCompass;
