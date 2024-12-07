@@ -60,38 +60,44 @@ Select "Manage Resources"
 6. Click the check box for "Javascript Module" and
 7. Click the word "Create" in the corner to add the entry.
 
+### Example configurations:
+
+- Minimal: [click here](#minimal-configuration)
+- Maximum: [click here](#maximum-configuration)
+
 
 ### Card options
 
-| Name                                 |                                   Type                                   |           Default            | Required | Description                                                                                                                                                                                                                                                  |
-|--------------------------------------|:------------------------------------------------------------------------:|:----------------------------:|:--------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| type                                 |                                  string                                  |                              |    x     | `custom:windrose-card`.                                                                                                                                                                                                                                      |
-| title                                |                                  string                                  |                              |    -     | The card title.                                                                                                                                                                                                                                              |
-| wind_direction_entity                |               [object](#Object-wind_direction_entity)                    |            x                 |          | The wind direction entity, having directing in degrees as the state.                                                                                                                                                                                         |
-| windspeed_entities                   |                   [object](#Object-windspeed_entities)                   |                              |    x     | One are more windspeed entities. Only the first is used for the windrose.                                                                                                                                                                                    |
-| refresh_interval                     |                                  number                                  |             300              |    -     | Refresh interval in seconds                                                                                                                                                                                                                                  |
-| hours_to_show (DEPRECATED)           |                                  number                                  |                              |    -     | Deprecated. Still works for now. Use the data period object instead.                                                                                                                                                                                         |
-| data_period                          |                      [object](#Object-data_period)                       |                              |    x     | Configure what data period to query. See object data_period below. Only one options should be configured.                                                                                                                                                    |
-| windspeed_bar_location               |                                  string                                  |            bottom            |    -     | Location of the speed bar graph: `bottom`, `right`                                                                                                                                                                                                           |
-| center_calm_percentage               |                                 boolean                                  |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.                                                                                               |
-| hide_windspeed_bar                   |                                 boolean                                  |            false             |    -     | Hides all windspeed bars.                                                                                                                                                                                                                                    |
-| windspeed_bar_full (DEPRECATED)      |                                 boolean                                  |             true             |    -     | Deprecated. Moved to windspeed_entities object. When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                         |
-| output_speed_unit (DEPRECATED)       |                                  string                                  |             mps              |    -     | Deprecated. Moved to windspeed_entities object. Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                              |
-| output_speed_unit_label (DEPRECATED) |                                  string                                  |                              |    -     | Deprecated. Moved to windspeed_entities object. Overwrite the output speed units name, only for display.                                                                                                                                                     |
-| speed_range_beaufort (DEPRECATED)    |                                 boolean                                  |             true             |    -     | Deprecated. Moved to windspeed_entities object. Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false.         |
-| speed_range_step (DEPRECATED)        |                                  number                                  | depends on output speed unit |    -     | Deprecated. Moved to windspeed_entities object. Sets the speed range step to use. Not possible for output speed unit bft (Beaufort).                                                                                                                         |
-| speed_range_max (DEPRECATED)         |                                  number                                  | depends on output speed unit |    -     | Deprecated. Moved to windspeed_entities object. Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                         |
-| speed_ranges (DEPRECATED)            |                      [object](#Object-speed_ranges)                      | depends on output speed unit |    -     | Deprecated. Moved to windspeed_entities object. Define custom speedranges and colours.                                                                                                                                                                       |
-| cardinal_direction_letters           |                                  string                                  |             NESW             |    -     | The cardinal letters used in the windrose. More info at [Cardinal direction letters](#Cardinal-direction-letters)                                                                                                                                            |
-| wind_direction_count                 |                                  string                                  |              16              |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                                                                                                                             |
-| windrose_draw_north_offset           |                                  number                                  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                                                                                                          |
-| compass_direction                    |                   [object](#Ojbect-compass_direction)                    |                              |    -     | Configuration for using a compass sensor to rotate the windrose to the correct direction, for use on for example a boat.                                                                                                                                     |
-| current_direction                    |                   [object](#Object-current_direction)                    |                              |    -     | Shows the last reported wind direction with a red arrow on the wind rose.                                                                                                                                                                                    |
-| corner_info                          |                      [object](#Ojbect-corner_info)                       |                              |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                                                                               |
-| matching_strategy                    |                                  string                                  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first`, `time-frame` or `full-time`. More info at [Matching strategies](#Matching-strategies) |
-| background_image                     |                                  string                                  |                              |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                                                                                                              |
-| colors                               |                         [object](#Object-colors)                         |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                                                                                                                    |
-| log_level                            |                                  string                                  |             WARN             |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                                                                                                                 |
+| Name                                  |                  Type                   |           Default            | Required | Description                                                                                                                                                                                                                                                  |
+|---------------------------------------|:---------------------------------------:|:----------------------------:|:--------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| type                                  |                 string                  |                              |    x     | `custom:windrose-card`.                                                                                                                                                                                                                                      |
+| title                                 |                 string                  |                              |    -     | The card title.                                                                                                                                                                                                                                              |
+| wind_direction_entity                 | [object](#Object-wind_direction_entity) |              x               |          | The wind direction entity, having directing in degrees as the state.                                                                                                                                                                                         |
+| windspeed_entities      (NEW OPTIONS) |  [object](#Object-windspeed_entities)   |                              |    x     | One are more windspeed entities. Only the first is used for the windrose.                                                                                                                                                                                    |
+| refresh_interval                      |                 number                  |             300              |    -     | Refresh interval in seconds                                                                                                                                                                                                                                  |
+| hours_to_show (DEPRECATED)            |                 number                  |                              |    -     | Deprecated. Still works for now. Use the data period object instead.                                                                                                                                                                                         |
+| data_period                           |      [object](#Object-data_period)      |                              |    x     | Configure what data period to query. See object data_period below. Only one options should be configured.                                                                                                                                                    |
+| windspeed_bar_location                |                 string                  |            bottom            |    -     | Location of the speed bar graph: `bottom`, `right`                                                                                                                                                                                                           |
+| center_calm_percentage                |                 boolean                 |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.                                                                                               |
+| hide_windspeed_bar                    |                 boolean                 |            false             |    -     | Hides all windspeed bars.                                                                                                                                                                                                                                    |
+| windspeed_bar_full (DEPRECATED)       |                 boolean                 |             true             |    -     | Deprecated. Moved to windspeed_entities object. When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                         |
+| output_speed_unit (DEPRECATED)        |                 string                  |             mps              |    -     | Deprecated. Moved to windspeed_entities object. Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                              |
+| output_speed_unit_label (DEPRECATED)  |                 string                  |                              |    -     | Deprecated. Moved to windspeed_entities object. Overwrite the output speed units name, only for display.                                                                                                                                                     |
+| speed_range_beaufort (DEPRECATED)     |                 boolean                 |             true             |    -     | Deprecated. Moved to windspeed_entities object. Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false.         |
+| speed_range_step (DEPRECATED)         |                 number                  | depends on output speed unit |    -     | Deprecated. Moved to windspeed_entities object. Sets the speed range step to use. Not possible for output speed unit bft (Beaufort).                                                                                                                         |
+| speed_range_max (DEPRECATED)          |                 number                  | depends on output speed unit |    -     | Deprecated. Moved to windspeed_entities object. Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                         |
+| speed_ranges (DEPRECATED)             |     [object](#Object-speed_ranges)      | depends on output speed unit |    -     | Deprecated. Moved to windspeed_entities object. Define custom speedranges and colours.                                                                                                                                                                       |
+| cardinal_direction_letters            |                 string                  |             NESW             |    -     | The cardinal letters used in the windrose. More info at [Cardinal direction letters](#Cardinal-direction-letters)                                                                                                                                            |
+| wind_direction_count                  |                 string                  |              16              |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                                                                                                                             |
+| windrose_draw_north_offset            |                 number                  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                                                                                                          |
+| compass_direction                     |   [object](#Ojbect-compass_direction)   |                              |    -     | Configuration for using a compass sensor to rotate the windrose to the correct direction, for use on for example a boat.                                                                                                                                     |
+| current_direction                     |   [object](#Object-current_direction)   |                              |    -     | Shows the last reported wind direction with a red arrow on the wind rose.                                                                                                                                                                                    |
+| corner_info             (NEW OPTIONS) |      [object](#Ojbect-corner_info)      |                              |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                                                                               |
+| actions                      (NEW)    |        [object](#Ojbect-actions)        |                              |    -     | Configuration for HA actions, for example to display more-info popups.                                                                                                                                                                                       |
+| matching_strategy        (NEW OPTION) |                 string                  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first`, `time-frame` or `full-time`. More info at [Matching strategies](#Matching-strategies) |
+| background_image                      |                 string                  |                              |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                                                                                                              |
+| colors                                |        [object](#Object-colors)         |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                                                                                                                    |
+| log_level                             |                 string                  |             WARN             |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                                                                                                                 |
 
 
 ### Object data_period
@@ -228,9 +234,11 @@ Configuration for displaying information in the corners around the windrose.
 ```yaml
 corner_info:
   top_left:
-    label: Current windspeed
+    label: Current gust speed
     unit: ' kph'
     entity: sensor.wind_gust
+    label_text_size: 40
+    value_text_size: 30
   top_right:
     label: Wind direction
     unit: °
@@ -252,6 +260,65 @@ corner_info:
 | label_text_size | number |          50          |          | The text size of the label.                                                                |
 | value_text_size | number |          80          |          | The text size of the entity's state.                                                       |
 | entity          | string |                      |    x     | State of the entity will be displayed                                                      |
+
+
+### Ojbect actions
+
+The tap and double-tap actions described in the Home Assistant documentation are supported. See link:
+[Home Assistant action documentation](https://www.home-assistant.io/dashboards/actions/)
+
+See example yaml below on how to use.
+Btw, you can only configure actions for the first 2 speed bars.
+
+| Name         |  Type  | Default | Required | Description                          |
+|--------------|:------:|:-------:|:--------:|--------------------------------------|
+| top_left     | object |         |          | Configration for top left corner     |
+| top_right    | object |         |          | Configration for top right corner    |
+| bottom_left  | object |         |          | Configration for bottom left corner  |
+| bottom_right | object |         |          | Configration for bottom right corner |
+| windrose     | object |         |          | Configration for the windrose        |
+| speed_bar_1  | object |         |          | Configration for the first speedbar  |
+| speed_bar_2  | object |         |          | Configration for the second speedbar |
+
+
+Examples:
+- **top_right**: toggle light
+- **windrose**: navigate to an other page within Home Assitant.
+- **buttom_left**: open an url in an other browser tab.
+- **others**: show popup with more info about the entity.
+
+### Example actions yaml
+```yaml
+actions:
+  top_left:
+    tap_action:
+      entity: sensor.wind_gust
+      action: more-info
+  top_right:
+    double_tap_action:
+      entity: switch.light
+      action: toggle
+  windrose:
+    tap_action:
+      action: navigate
+      navigation_path: /lovelace/floorplan
+  bottom_right:
+    tap_action:
+      entity: sensor.wind_direction
+      action: more-info
+  bottom_left:
+    tap_action:
+      action: url
+      url_path: https://www.home-assistant.io
+  speed_bar_1:
+    tap_action:
+      entity: sensor.wind_speed
+      action: more-info
+  speed_bar_2:
+    tap_action:
+      entity: sensor.wind_gust
+      action: more-info
+```
 
 
 ### Matching strategies
@@ -388,6 +455,115 @@ windspeed_entities:
         color: orange
       - from_value: 40
         color: red
+```
+
+### Minimal configuration
+
+```yaml
+type: custom:windrose-card
+title: Minimal configuration
+data_period:
+  hours_to_show: 4
+wind_direction_entity:
+  entity: sensor.wind_direction
+windspeed_entities:
+  - entity: sensor.fwind_speed
+    name: Speed
+current_direction:
+  show_arrow: true
+```
+
+### Maximum configuration
+
+```yaml
+type: custom:windrose-card
+title: Maximum configuration
+data_period:
+  hours_to_show: 200
+refresh_interval: 300
+windspeed_bar_location: bottom
+wind_direction_entity:
+  entity: sensor.wind_direction_letters
+  use_statistics: false
+  direction_compensation: 0
+  direction_letters: NOZWX
+windspeed_entities:
+  - entity: sensor.wind_speed
+    name: Speed
+    speed_unit: auto
+    use_statistics: false
+    windspeed_bar_full: true
+    output_speed_unit: mps
+    speed_range_beaufort: true
+  - entity: sensor.wind_gust
+    name: Gust
+    speed_unit: auto
+    use_statistics: false
+    windspeed_bar_full: false
+    output_speed_unit: mps
+    speed_range_beaufort: false
+windrose_draw_north_offset: 10
+current_direction:
+  show_arrow: true
+  arrow_size: 50
+  center_circle_size: 30
+compass_direction:
+  auto_rotate: true
+  entity: input_number.compass
+corner_info:
+  top_left:
+    label: Current gust speed
+    unit: " kph"
+    entity: sensor.wind_gust
+    label_text_size: 50
+    value_text_size: 50
+  top_right:
+    label: Wind direction
+    unit: °
+    color: red
+    entity: sensor.wind_direction_azimuth
+  bottom_left:
+    label: Compass
+    unit: °
+    entity: input_number.compass
+    label_text_size: 40
+  bottom_right:
+    label: Outside light
+    entity: light.wind_station_light
+    label_text_size: 40
+actions:
+  top_left:
+    tap_action:
+      entity: sensor.wind_gust
+      action: more-info
+  top_right:
+    double_tap_action:
+      entity: switch.light
+      action: toggle
+  windrose:
+    tap_action:
+      action: navigate
+      navigation_path: /lovelace/plattegrond-tablet
+  bottom_right:
+    tap_action:
+      entity: sensor.rain
+      action: more-info
+  bottom_left:
+    tap_action:
+      action: url
+      url_path: https://www.home-assistant.io
+  speed_bar_1:
+    tap_action:
+      entity: sensor.temp_outside
+      action: more-info
+  speed_bar_2:
+    tap_action:
+      entity: sensor.max_temp_outside
+      action: more-info
+cardinal_direction_letters: N,E,S,W
+matching_strategy: full-time
+background_image: /hacsfiles/lovelace-windrose-card/bg.png
+center_calm_percentage: true
 ```
 
 ## Getting errors?

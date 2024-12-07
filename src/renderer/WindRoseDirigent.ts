@@ -18,6 +18,7 @@ import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProc
 import {InfoCornersRenderer} from "./InfoCornersRenderer";
 import {Svg} from "@svgdotjs/svg.js";
 import {DirectionSpeed} from "../matcher/DirectionSpeed";
+import {TouchFacesRenderer} from "./TouchFacesRenderer";
 
 export class WindRoseDirigent {
     //Util
@@ -41,16 +42,19 @@ export class WindRoseDirigent {
     private windBarRenderers: WindBarRenderer[] = [];
     private currentDirectionRenderer!: CurrentDirectionRenderer;
     private infoCornersRendeerer!: InfoCornersRenderer;
+    private touchFacesRenderer!: TouchFacesRenderer;
 
     //Calculated data
     private windRoseData: WindRoseData[] = [];
 
     private readonly svg: Svg;
+    private readonly sendEvent: (event: CustomEvent) => void;
     private initReady = false;
     private measurementsReady = false;
 
-    constructor(svg: Svg) {
+    constructor(svg: Svg, sendEvent: (event: CustomEvent) => void) {
         this.svg = svg;
+        this.sendEvent = sendEvent;
     }
 
     init(cardConfig: CardConfigWrapper,
@@ -76,6 +80,8 @@ export class WindRoseDirigent {
 
         this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation, cardConfig.cardinalDirectionLetters, this.svg);
         this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate);
+
+        this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionConfig, this.sendEvent, this.svg);
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
@@ -141,6 +147,7 @@ export class WindRoseDirigent {
             this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
             this.infoCornersRendeerer?.drawCornerLabel();
             this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
+            this.touchFacesRenderer.renderTouchFaces();
         } else {
             this.log.error("render(): Could not render, init or measurements not ready " + this.initReady + " - "  + this.measurementsReady);
         }

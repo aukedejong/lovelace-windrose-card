@@ -24,7 +24,7 @@ export class InfoCornersRenderer {
     private leftBottomConfig: CornerInfo;
     private rightBottomConfig: CornerInfo;
 
-    private leftTopelement!: SVG.Text;
+    private leftTopElement!: SVG.Text;
     private rightTopElement!: SVG.Text;
     private leftBottomElement!: SVG.Text;
     private rightBottomElement!: SVG.Text;
@@ -52,9 +52,9 @@ export class InfoCornersRenderer {
             leftTop.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
         }
         if (this.rightTopConfig.label) {
-            const leftTop = this.svgUtil.drawText(this.dimensionCalculator.infoCornerLabelRightTop(), this.rightTopConfig.label,
+            const rightTop = this.svgUtil.drawText(this.dimensionCalculator.infoCornerLabelRightTop(), this.rightTopConfig.label,
                 TextAttributes.infoCornerLabelAttribute(this.rightTopConfig.color, this.rightTopConfig.labelTextSize));
-            leftTop.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
+            rightTop.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
         }
         if (this.leftBottomConfig.label) {
             const leftBottom = this.svgUtil.drawText(this.dimensionCalculator.infoCornetLabelLeftBottom(), this.leftBottomConfig.label,
@@ -71,33 +71,37 @@ export class InfoCornersRenderer {
     drawCornerValues(entityStates: EntityState[]) {
 
         if (this.leftTopConfig.show && entityStates[0].active) {
-            this.leftTopelement = this.svgUtil.drawText(this.leftTopCoor,
+            this.leftTopElement = this.svgUtil.drawText(this.leftTopCoor,
                 this.getText(entityStates[0], this.leftTopConfig),
                 TextAttributes.infoCornerAttribute(this.leftTopConfig.color, this.leftTopConfig.valueTextSize));
-            this.leftTopelement.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
+            this.leftTopElement.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
+            this.leftTopElement.back();
         }
         if (entityStates[1].active) {
             this.rightTopElement = this.svgUtil.drawText(this.rightTopCoor,
                 this.getText(entityStates[1], this.rightTopConfig),
                 TextAttributes.infoCornerAttribute(this.rightTopConfig.color, this.rightTopConfig.valueTextSize));
             this.rightTopElement.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
+            this.rightTopElement.back();
         }
         if (entityStates[2].active) {
             this.leftBottomElement = this.svgUtil.drawText(this.leftBottomCoor,
                 this.getText(entityStates[2], this.leftBottomConfig),
                 TextAttributes.infoCornerAttribute(this.leftBottomConfig.color, this.leftBottomConfig.valueTextSize));
             this.leftBottomElement.attr({"text-anchor": "left", "dominant-baseline": "auto"});
+            this.leftBottomElement.back();
         }
         if (entityStates[3].active) {
             this.rightBottomElement = this.svgUtil.drawText(this.rightBottomCoor,
                 this.getText(entityStates[3], this.rightBottomConfig),
                 TextAttributes.infoCornerAttribute(this.rightBottomConfig.color, this.rightBottomConfig.valueTextSize));
             this.rightBottomElement.attr({"text-anchor": "end", "dominant-baseline": "auto"});
+            this.rightBottomElement.back();
         }
     }
 
     updateCornerValues(entityStates: EntityState[]) {
-        this.leftTopelement?.remove();
+        this.leftTopElement?.remove();
         this.rightTopElement?.remove();
         this.leftBottomElement?.remove();
         this.rightBottomElement?.remove();

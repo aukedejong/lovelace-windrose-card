@@ -30,7 +30,7 @@ export class SvgUtil {
     }
 
     public drawTriangle(x: number, y: number, dx1: number, dy1: number, dx2: number, dy2: number): SVG.Path {
-        return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} Z`));
+        return this.svg.path(new PathArray(`M ${x} ${y} L ${dx1} ${dy1} L ${dx2} ${dy2} Z`));
     }
 
     public drawArrow(x: number, y: number, size: number): SVG.Path {

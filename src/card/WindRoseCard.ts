@@ -52,10 +52,9 @@ export class WindRoseCard extends LitElement {
     constructor() {
         super();
         this.svg = SVG().height('100%').width('100%');
-        this.windRoseDirigent = new WindRoseDirigent(this.svg);
+        this.windRoseDirigent = new WindRoseDirigent(this.svg, this.sendEvent.bind(this));
         this.entityStateProcessor = new EntityStatesProcessor();
         this.entityChecker = new EntityChecker();
-
     }
 
     setConfig(config: any): void {
@@ -87,6 +86,11 @@ export class WindRoseCard extends LitElement {
         }
     }
 
+    sendEvent(event: CustomEvent): void {
+        this.log.debug("sendEvent()", event);
+        this.dispatchEvent(event);
+    }
+
     refreshCardConfig() {
         this.log.debug("refreshCardConfig()");
         try {
@@ -100,7 +104,6 @@ export class WindRoseCard extends LitElement {
             Log.error("Error during init: ", e);
             this.svg.remove();
         }
-
     }
 
     render(): TemplateResult {
@@ -140,11 +143,7 @@ export class WindRoseCard extends LitElement {
         return css`
           :host {
             display: block;
-          }
-          canvas {
-            background-color: var(--ha-card-background);
-            max-height: var(--chart-max-height);
-          }`;
+          }`
     }
 
     connectedCallback() {

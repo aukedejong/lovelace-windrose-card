@@ -51,7 +51,6 @@ export class FullTimeMatcher implements MeasurementMatcher {
             prevTds = tds;
         }
 
-        console.log('Merged list: ', mergedList);
         prevTds = undefined;
         const lastTdsValues = new TimeDirectionSpeed(-1);
         for (const tds of mergedList) {
@@ -73,9 +72,7 @@ export class FullTimeMatcher implements MeasurementMatcher {
         if (prevTds) {
             prevTds.seconds = (Date.now() / 1000) - prevTds.time;
         }
-        console.log('Mergedd list, fase 2: ', mergedList);
         return mergedList.map(tds => tds.toDirectionSpeed());
-
     }
 
     mergeMeasurements2(directionHistory: HistoryData[], speedHistory: HistoryData[]): TimeDirectionSpeed[] {
@@ -83,21 +80,17 @@ export class FullTimeMatcher implements MeasurementMatcher {
         let indexDirection = 0;
         let indexSpeed = 0;
         let prevTds: TimeDirectionSpeed | undefined;
-        console.log('While: ' + indexDirection + ' < ' + (directionHistory.length) + '  ||  ' + indexSpeed + ' < ' + (speedHistory.length));
         while (indexDirection < directionHistory.length || indexSpeed < speedHistory.length) {
-            console.log('Begin loop');
             const direction = directionHistory[indexDirection];
             const speed = speedHistory[indexSpeed];
             let tds: TimeDirectionSpeed;
             if (direction.lu === speed.lu) {
-                console.log('  Equal: ' + direction.lu)
                 tds = new TimeDirectionSpeed(direction.lu);
                 tds.direction = direction.s;
                 tds.speed = +speed.s;
                 if (indexDirection < directionHistory.length - 1) indexDirection++;
                 if (indexSpeed < speedHistory.length - 1) indexSpeed++;
             } else if (direction.lu > speed.lu) { //Speed measurement is earlier.
-                console.log('  Direction > Speed: ' + direction.lu + ' > ' + speed.lu);
                 tds = new TimeDirectionSpeed(speed.lu);
                 tds.direction = indexDirection === 0 ? undefined : directionHistory[indexDirection - 1].s;
                 tds.speed = +speed.s;
@@ -107,7 +100,6 @@ export class FullTimeMatcher implements MeasurementMatcher {
                     indexDirection++;
                 }
             } else {
-                console.log('  Direction < Speed: ' + direction.lu + ' < ' + speed.lu);
                 tds = new TimeDirectionSpeed(direction.lu);
                 tds.direction = direction.s;
                 tds.speed = indexSpeed === 0 ? undefined : +speedHistory[indexSpeed - 1].s;
@@ -122,8 +114,6 @@ export class FullTimeMatcher implements MeasurementMatcher {
                 prevTds.seconds = tds.time - prevTds.time;
             }
             prevTds = tds;
-            console.log('  While: ' + indexDirection + ' < ' + (directionHistory.length) + '  ||  ' + indexSpeed + ' < ' + (speedHistory.length));
-
         }
         return merged;
     }

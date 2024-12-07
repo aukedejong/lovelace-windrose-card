@@ -6,6 +6,7 @@ import {CardConfigDataPeriod} from "./CardConfigDataPeriod";
 import {CardConfigCompass} from "./CardConfigCompass";
 import {CardConfigCurrentDirection} from "./CardConfigCurrentDirection";
 import {CardConfigCorners} from "./CardConfigCorners";
+import {CardConfigActions} from "./CardConfigActions";
 
 export interface CardConfig {
     type: string;
@@ -38,6 +39,7 @@ export interface CardConfig {
     background_image: string;
     log_level: string;
     corner_info: CardConfigCorners;
+    actions: CardConfigActions;
 
     colors: CardConfigColors;
 }

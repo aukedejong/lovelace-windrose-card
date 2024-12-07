@@ -12,6 +12,7 @@ import {CurrentDirectionConfig} from "./CurrentDirectionConfig";
 import {CornersInfo} from "./CornersInfo";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
 import {CardConfigWindSpeedEntity} from "../card/CardConfigWindSpeedEntity";
+import {CardConfigActions} from "../card/CardConfigActions";
 
 
 export class CardConfigWrapper {
@@ -33,6 +34,7 @@ export class CardConfigWrapper {
     compassConfig: CompassConfig;
     cornersInfo: CornersInfo;
     backgroundImage: string | undefined;
+    actions: CardConfigActions | undefined;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -102,6 +104,7 @@ export class CardConfigWrapper {
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
         this.backgroundImage = ConfigCheckUtils.checkString(cardConfig.background_image);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
+        this.actions = cardConfig.actions;
         Log.info('Config check OK');
     }
 

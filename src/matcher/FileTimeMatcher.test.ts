@@ -66,7 +66,6 @@ describe('FullTimeMatcher tests', () => {
             {lu: 4, s: '30'},
         ];
         const merged = fullTimeMatcher.matchHistoryHistory(direction, speed);
-        console.log('Merged: ', merged);
         expect(merged).toEqual([
             { "direction": undefined, "seconds": 1, "speed": 10 },
             { "direction": "100", "seconds": 2, "speed": 20 },
