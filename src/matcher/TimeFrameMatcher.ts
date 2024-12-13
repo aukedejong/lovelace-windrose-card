@@ -1,79 +1,79 @@
 import {MeasurementMatcher} from "./MeasurementMatcher";
-import {DirectionSpeed} from "./DirectionSpeed";
 import {MatchUtils} from "./MatchUtils";
 import {Log} from "../util/Log";
+import {MatchedMeasurements} from "./MatchedMeasurements";
 
 export class TimeFrameMatcher implements MeasurementMatcher {
 
     constructor(private readonly periodSeconds: number) {
     }
 
-    matchStatsHistory(directionStats: StatisticsData[], speedHistory: HistoryData[]): DirectionSpeed[] {
+    matchStatsHistory(directionStats: StatisticsData[], speedHistory: HistoryData[]): MatchedMeasurements {
         const maxBackTimestamp = directionStats[0].start / 1000 > speedHistory[0].lu ? directionStats[0].start / 1000 : speedHistory[0].lu
         let end = Date.now() / 1000;
-        const directionSpeed: DirectionSpeed[] = [];
+        const matchedMeasurements = new MatchedMeasurements();
         while (end > maxBackTimestamp) {
 
             let direction = MatchUtils.findStatsAtTime(end * 1000, directionStats);
             let speed = MatchUtils.findHistoryBackAtTime(end, speedHistory);
 
             if (this.checkMeasurementStats(direction, end, 'Direction') && this.checkSpeedMeasurement(speed, end)) {
-                directionSpeed.push(new DirectionSpeed(direction!.mean, +speed!.s, 1));
+                matchedMeasurements.add(direction!.mean, +speed!.s);
             }
             end -= this.periodSeconds;
         }
-        return directionSpeed;
+        return matchedMeasurements;
     }
 
-    matchHistoryStats(directionHistory: HistoryData[], speedStats: StatisticsData[]): DirectionSpeed[] {
+    matchHistoryStats(directionHistory: HistoryData[], speedStats: StatisticsData[]): MatchedMeasurements {
         const maxBackTimestamp = directionHistory[0].lu > speedStats[0].start / 1000 ? directionHistory[0].lu : speedStats[0].start / 1000
         let end = Date.now() / 1000;
-        const directionSpeed: DirectionSpeed[] = [];
+        const matchedMeasurements = new MatchedMeasurements();
         while (end > maxBackTimestamp) {
 
             let direction = MatchUtils.findHistoryBackAtTime(end, directionHistory);
             let speed = MatchUtils.findStatsAtTime(end * 1000, speedStats);
 
             if (this.checkDirectionMeasurement(direction, end) && this.checkMeasurementStats(speed, end, "Speed")) {
-                directionSpeed.push(new DirectionSpeed(direction!.s, +speed!.mean));
+                matchedMeasurements.add(direction!.s, +speed!.mean);
             }
             end -= this.periodSeconds;
         }
-        return directionSpeed;
+        return matchedMeasurements;
     }
 
-    matchHistoryHistory(directionHistory: HistoryData[], speedHistory: HistoryData[]): DirectionSpeed[] {
+    matchHistoryHistory(directionHistory: HistoryData[], speedHistory: HistoryData[]): MatchedMeasurements {
         const maxBackTimestamp = directionHistory[0].lu > speedHistory[0].lu ? directionHistory[0].lu : speedHistory[0].lu
         let end = Date.now() / 1000;
-        const directionSpeed: DirectionSpeed[] = [];
+        const matchedMeasurements = new MatchedMeasurements();
         while (end > maxBackTimestamp) {
 
             let direction = MatchUtils.findHistoryBackAtTime(end, directionHistory);
             let speed = MatchUtils.findHistoryBackAtTime(end, speedHistory);
 
             if (this.checkDirectionMeasurement(direction, end) && this.checkSpeedMeasurement(speed, end)) {
-                directionSpeed.push(new DirectionSpeed(direction!.s, +speed!.s));
+                matchedMeasurements.add(direction!.s, +speed!.s);
             }
             end -= this.periodSeconds;
         }
-        return directionSpeed;
+        return matchedMeasurements;
     }
 
-    matchStatsStats(directionStats: StatisticsData[], speedStats: StatisticsData[]): DirectionSpeed[] {
+    matchStatsStats(directionStats: StatisticsData[], speedStats: StatisticsData[]): MatchedMeasurements {
         const maxBackTimestamp = directionStats[0].start > speedStats[0].start ? speedStats[0].start / 1000: speedStats[0].start / 1000;
         let end = Date.now() / 1000;
-        const directionSpeed: DirectionSpeed[] = [];
+        const matchedMeasurements = new MatchedMeasurements();
         while (end > maxBackTimestamp) {
 
             let direction = MatchUtils.findStatsAtTime(end * 1000, directionStats);
             let speed = MatchUtils.findStatsAtTime(end * 1000, speedStats);
 
             if (this.checkMeasurementStats(direction, end, "Direction") && this.checkMeasurementStats(speed, end, "Speed")) {
-                directionSpeed.push(new DirectionSpeed(direction!.mean, +speed!.mean));
+                matchedMeasurements.add(direction!.mean, +speed!.mean);
             }
             end -= this.periodSeconds;
         }
-        return directionSpeed;
+        return matchedMeasurements;
     }
 
     private checkDirectionMeasurement(measurement: HistoryData | undefined, timestamp: number): boolean {

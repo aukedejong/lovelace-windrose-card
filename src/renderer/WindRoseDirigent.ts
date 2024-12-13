@@ -17,8 +17,8 @@ import {Log2} from "../util/Log2";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {InfoCornersRenderer} from "./InfoCornersRenderer";
 import {Svg} from "@svgdotjs/svg.js";
-import {DirectionSpeed} from "../matcher/DirectionSpeed";
 import {TouchFacesRenderer} from "./TouchFacesRenderer";
+import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
 
 export class WindRoseDirigent {
     //Util
@@ -111,12 +111,12 @@ export class WindRoseDirigent {
     refreshData(): Promise<boolean> {
         if (this.initReady) {
             this.log.debug('refreshData()');
-            return this.measurementProvider.getMeasurements().then((matchedGroups: DirectionSpeed[][]) => {
+            return this.measurementProvider.getMeasurements().then((matchedGroups: MatchedMeasurements[]) => {
                 this.windRoseData = [];
                 this.log.debug('Matched measurements:', matchedGroups);
                 for (let i = 0; i < matchedGroups.length; i++) {
                     this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit);
-                    for (const measurement of matchedGroups[i]) {
+                    for (const measurement of matchedGroups[i].getMeasurements()) {
                         this.measurementCounters[i].addWindMeasurements(measurement.direction, measurement.speed, measurement.seconds);
                     }
                     const windCounts = this.measurementCounters[i].getMeasurementCounts();

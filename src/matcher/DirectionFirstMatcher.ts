@@ -1,12 +1,12 @@
 import {Log} from "../util/Log";
-import {DirectionSpeed} from "./DirectionSpeed";
 import {MeasurementMatcher} from "./MeasurementMatcher";
 import {MatchUtils} from "./MatchUtils";
+import {MatchedMeasurements} from "./MatchedMeasurements";
 
 export class DirectionFirstMatcher implements MeasurementMatcher {
 
-    matchStatsHistory(directionStats: StatisticsData[], speedHistory: HistoryData[]): DirectionSpeed[]  {
-        const directionSpeed: DirectionSpeed[] = [];
+    matchStatsHistory(directionStats: StatisticsData[], speedHistory: HistoryData[]): MatchedMeasurements  {
+        const matchedMeasurements = new MatchedMeasurements();
 
         for (const direction of directionStats) {
             const speed = MatchUtils.findHistoryInPeriod(direction, speedHistory);
@@ -14,33 +14,33 @@ export class DirectionFirstMatcher implements MeasurementMatcher {
                 if (MatchUtils.isInvalidSpeed(speed.s)) {
                     Log.warn("Speed " + speed.s + " at timestamp " + direction.start + " is not a number.");
                 } else {
-                    directionSpeed.push(new DirectionSpeed(direction.mean, +speed.s));
+                    matchedMeasurements.add(direction.mean, +speed.s);
                 }
             } else {
                 Log.trace('No matching speed found for direction ' + direction.mean + " at timestamp " + direction.start);
             }
         }
 
-        return directionSpeed;
+        return matchedMeasurements;
     }
 
-    matchHistoryStats(directionHistory: HistoryData[], speedStats: StatisticsData[]): DirectionSpeed[] {
-        const directionSpeed: DirectionSpeed[] = [];
+    matchHistoryStats(directionHistory: HistoryData[], speedStats: StatisticsData[]): MatchedMeasurements {
+        const matchedMeasurements = new MatchedMeasurements();
 
         for (const direction of directionHistory) {
             const speed = MatchUtils.findStatsAtTime(direction.lu * 1000, speedStats);
             if (speed) {
-                directionSpeed.push(new DirectionSpeed(direction.s, speed.mean));
+                matchedMeasurements.add(direction.s, speed.mean);
             } else {
                 Log.trace('No matching speed found for direction ' + direction.s + " at timestamp " + direction.lu);
             }
         }
 
-        return directionSpeed;
+        return matchedMeasurements;
     }
 
-    matchHistoryHistory(directionHistory: HistoryData[], speedHistory: HistoryData[]): DirectionSpeed[]  {
-        const directionSpeed: DirectionSpeed[] = [];
+    matchHistoryHistory(directionHistory: HistoryData[], speedHistory: HistoryData[]): MatchedMeasurements  {
+        const matchedMeasurements = new MatchedMeasurements();
 
         for (const direction of directionHistory) {
             const speed = MatchUtils.findHistoryBackAtTime(direction.lu, speedHistory);
@@ -48,27 +48,27 @@ export class DirectionFirstMatcher implements MeasurementMatcher {
                 if (MatchUtils.isInvalidSpeed(speed.s)) {
                     Log.warn("Speed " + speed.s + " at timestamp " + speed.lu + " is not a number.");
                 } else {
-                    directionSpeed.push(new DirectionSpeed(direction.s, +speed.s));
+                    matchedMeasurements.add(direction.s, +speed.s);
                 }
             } else {
                 Log.trace('No matching speed found for direction ' + direction.s + " at timestamp " + direction.lu);
             }
         }
 
-        return directionSpeed;
+        return matchedMeasurements;
     }
 
-    matchStatsStats(directionStats: StatisticsData[], speedStats: StatisticsData[]): DirectionSpeed[]  {
-        const directionSpeed: DirectionSpeed[] = [];
+    matchStatsStats(directionStats: StatisticsData[], speedStats: StatisticsData[]): MatchedMeasurements  {
+        const matchedMeasurements = new MatchedMeasurements();
         for (const directionStat of directionStats) {
             const matchedSpeed = MatchUtils.findMatchingStatistic(directionStat, speedStats);
             if (matchedSpeed) {
-                directionSpeed.push(new DirectionSpeed(directionStat.mean, matchedSpeed.mean));
+                matchedMeasurements.add(directionStat.mean, matchedSpeed.mean);
             } else {
                 Log.trace(`No matching speed found for direction ${directionStat.mean} at timestamp start:${directionStat.start} end:${directionStat.end}`);
             }
         }
 
-        return directionSpeed;
+        return matchedMeasurements;
     }
 }

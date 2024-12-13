@@ -1,34 +1,34 @@
 import {MeasurementMatcher} from "./MeasurementMatcher";
-import {DirectionSpeed} from "./DirectionSpeed";
 import {TimeDirectionSpeed} from "./TimeDirectionSpeed";
+import {MatchedMeasurements} from "./MatchedMeasurements";
 
 export class FullTimeMatcher implements MeasurementMatcher {
 
-    matchStatsHistory(directionStats: StatisticsData[], speedHistory: HistoryData[]): DirectionSpeed[] {
+    matchStatsHistory(directionStats: StatisticsData[], speedHistory: HistoryData[]): MatchedMeasurements {
         let tdsList = directionStats.map(data => TimeDirectionSpeed.directionFromStatsData(data));
         tdsList = tdsList.concat(speedHistory.map(data => TimeDirectionSpeed.speedFromHistoryData(data)));
         return this.mergeMeasurements(tdsList);
     }
 
-    matchHistoryStats(directionHistory: HistoryData[], speedStats: StatisticsData[]): DirectionSpeed[] {
+    matchHistoryStats(directionHistory: HistoryData[], speedStats: StatisticsData[]): MatchedMeasurements {
         let tdsList = directionHistory.map(data => TimeDirectionSpeed.directionFromHistoryData(data));
         tdsList = tdsList.concat(speedStats.map(data => TimeDirectionSpeed.speedFromStatsData(data)));
         return this.mergeMeasurements(tdsList);
     }
 
-    matchHistoryHistory(directionHistory: HistoryData[], speedHistory: HistoryData[]): DirectionSpeed[] {
+    matchHistoryHistory(directionHistory: HistoryData[], speedHistory: HistoryData[]): MatchedMeasurements {
         let tdsList = directionHistory.map(data => TimeDirectionSpeed.directionFromHistoryData(data));
         tdsList = tdsList.concat(speedHistory.map(data => TimeDirectionSpeed.speedFromHistoryData(data)));
         return this.mergeMeasurements(tdsList);
     }
 
-    matchStatsStats(directionStats: StatisticsData[], speedStats: StatisticsData[]): DirectionSpeed[] {
+    matchStatsStats(directionStats: StatisticsData[], speedStats: StatisticsData[]): MatchedMeasurements {
         let tdsList = directionStats.map(data => TimeDirectionSpeed.directionFromStatsData(data));
         tdsList = tdsList.concat(speedStats.map(data => TimeDirectionSpeed.speedFromStatsData(data)));
         return this.mergeMeasurements(tdsList);
     }
 
-    mergeMeasurements(tdsList: TimeDirectionSpeed[]) {
+    mergeMeasurements(tdsList: TimeDirectionSpeed[]): MatchedMeasurements {
         tdsList.sort((a, b) => a.time - b.time);
 
         const mergedList: TimeDirectionSpeed[] = [];
@@ -72,7 +72,9 @@ export class FullTimeMatcher implements MeasurementMatcher {
         if (prevTds) {
             prevTds.seconds = (Date.now() / 1000) - prevTds.time;
         }
-        return mergedList.map(tds => tds.toDirectionSpeed());
+        const matchedMeasurements = new MatchedMeasurements();
+        mergedList.forEach((tds) => matchedMeasurements.add(tds.direction!, tds.speed!, tds.time));
+        return matchedMeasurements;
     }
 
     mergeMeasurements2(directionHistory: HistoryData[], speedHistory: HistoryData[]): TimeDirectionSpeed[] {

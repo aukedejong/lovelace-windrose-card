@@ -1,5 +1,4 @@
 import {HomeAssistant} from "../util/HomeAssistant";
-import {DirectionSpeed} from "../matcher/DirectionSpeed";
 import {Log} from "../util/Log";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
@@ -8,6 +7,7 @@ import {SpeedFirstMatcher} from "../matcher/SpeedFirstMatcher";
 import {DirectionFirstMatcher} from "../matcher/DirectionFirstMatcher";
 import {TimeFrameMatcher} from "../matcher/TimeFrameMatcher";
 import {FullTimeMatcher} from "../matcher/FullTimeMatcher";
+import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
 
 export class HomeAssistantMeasurementProvider {
 
@@ -38,7 +38,7 @@ export class HomeAssistantMeasurementProvider {
         this.hass = hass;
     }
 
-    getMeasurements(): Promise<DirectionSpeed[][]> {
+    getMeasurements(): Promise<MatchedMeasurements[]> {
         Log.debug('getMeasurements()');
         if (this.hass === undefined) {
             Log.error('Cant read measurements, HASS not set.');
@@ -53,20 +53,20 @@ export class HomeAssistantMeasurementProvider {
             this.checkLoadedData(results);
             this.waitingForMeasurements = false;
             Log.debug("Measurements loaded:", results);
-            const directionSpeedData: DirectionSpeed[][] = [];
+            const matchedMeasurementsList: MatchedMeasurements[] = [];
             if (this.cardConfig.windDirectionEntity.useStatistics) {
                 const directionStats = results[1][this.cardConfig.windDirectionEntity.entity] as StatisticsData[];
                 for (let speedEntity of this.cardConfig.windspeedEntities) {
                     if (speedEntity.useStatistics) {
                         const speedStats = results[1][speedEntity.entity];
-                        const directionSpeeds = this.measurementMatcher.matchStatsStats(directionStats, speedStats)
-                        directionSpeedData.push(directionSpeeds);
-                        this.logMatchingStats(speedEntity.entity, directionStats.length, speedStats.length, directionSpeeds.length);
+                        const matchedMeasurements = this.measurementMatcher.matchStatsStats(directionStats, speedStats)
+                        matchedMeasurementsList.push(matchedMeasurements);
+                        this.logMatchingStats(speedEntity.entity, directionStats.length, speedStats.length, matchedMeasurements.getMeasurementCount());
                     } else {
                         const speedHistory = results[0][speedEntity.entity];
-                        const directionSpeeds = this.measurementMatcher.matchStatsHistory(directionStats, speedHistory);
-                        directionSpeedData.push(directionSpeeds);
-                        this.logMatchingStats(speedEntity.entity, directionStats.length, speedHistory.length, directionSpeeds.length);
+                        const matchedMeasurements = this.measurementMatcher.matchStatsHistory(directionStats, speedHistory);
+                        matchedMeasurementsList.push(matchedMeasurements);
+                        this.logMatchingStats(speedEntity.entity, directionStats.length, speedHistory.length, matchedMeasurements.getMeasurementCount());
                     }
                 }
 
@@ -75,18 +75,20 @@ export class HomeAssistantMeasurementProvider {
                 for (let speedEntity of this.cardConfig.windspeedEntities) {
                     if (speedEntity.useStatistics) {
                         const speedStats = results[1][speedEntity.entity];
-                        const directionSpeeds = this.measurementMatcher.matchHistoryStats(directionHistory, speedStats);
-                        directionSpeedData.push(directionSpeeds);
-                        this.logMatchingStats(speedEntity.entity, directionHistory.length, speedStats.length, directionSpeeds.length);
+                        const matchedMeasurements = this.measurementMatcher.matchHistoryStats(directionHistory, speedStats);
+                        matchedMeasurementsList.push(matchedMeasurements);
+                        this.logMatchingStats(speedEntity.entity, directionHistory.length, speedStats.length,
+                            matchedMeasurements.getMeasurementCount());
                     } else {
                         const speedHistory = results[0][speedEntity.entity];
-                        const directionSpeeds = this.measurementMatcher.matchHistoryHistory(directionHistory, speedHistory);
-                        directionSpeedData.push(directionSpeeds);
-                        this.logMatchingStats(speedEntity.entity, directionHistory.length, speedHistory.length, directionSpeeds.length);
+                        const matchedMeasurements = this.measurementMatcher.matchHistoryHistory(directionHistory, speedHistory);
+                        matchedMeasurementsList.push(matchedMeasurements);
+                        this.logMatchingStats(speedEntity.entity, directionHistory.length, speedHistory.length,
+                            matchedMeasurements.getMeasurementCount());
                     }
                 }
             }
-            return Promise.resolve(directionSpeedData);
+            return Promise.resolve(matchedMeasurementsList);
         });
     }
 
