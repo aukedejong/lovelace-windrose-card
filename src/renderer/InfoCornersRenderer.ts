@@ -8,6 +8,8 @@ import {EntityState} from "../entity-state-processing/EntityState";
 import {CornerInfo} from "../config/CornerInfo";
 import SVG, {Svg} from "@svgdotjs/svg.js";
 import {round} from "custom-card-helpers";
+import {WindSpeedConvertFunctionFactory} from "../converter/WindSpeedConvertFunctionFactory";
+import {WindDirectionLettersConverter} from "../converter/WindDirectionLettersConverter";
 
 export class InfoCornersRenderer {
 
@@ -24,10 +26,15 @@ export class InfoCornersRenderer {
     private leftBottomConfig: CornerInfo;
     private rightBottomConfig: CornerInfo;
 
-    private leftTopElement!: SVG.Text;
-    private rightTopElement!: SVG.Text;
-    private leftBottomElement!: SVG.Text;
-    private rightBottomElement!: SVG.Text;
+    private leftTopValue!: SVG.Text;
+    private rightTopValue!: SVG.Text;
+    private leftBottomValue!: SVG.Text;
+    private rightBottomValue!: SVG.Text;
+
+    private leftTopConverter: (input: any) => any;
+    private rightTopConverter: (input: any) => any;
+    private leftBottomConverter: (input: any) => any;
+    private rightBottomConverter: (input: any) => any;
 
     constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Svg) {
 
@@ -43,6 +50,26 @@ export class InfoCornersRenderer {
         this.rightTopConfig = config.cornersInfo.topRightInfo;
         this.leftBottomConfig = config.cornersInfo.bottomLeftInfo;
         this.rightBottomConfig = config.cornersInfo.bottomRightInfo;
+
+        const windConverterFactory = new WindSpeedConvertFunctionFactory();
+
+        this.leftTopConverter = this.getConverterFunction(this.leftTopConfig, windConverterFactory);
+        this.rightTopConverter = this.getConverterFunction(this.rightTopConfig, windConverterFactory);
+        this.leftBottomConverter = this.getConverterFunction(this.leftBottomConfig, windConverterFactory);
+        this.rightBottomConverter = this.getConverterFunction(this.rightBottomConfig, windConverterFactory);
+    }
+
+    private getConverterFunction(config: CornerInfo, windConverterfactory: WindSpeedConvertFunctionFactory): (input: any) => any | undefined {
+
+        if (config.inputUnit && config.outputUnit) {
+            if (config.inputUnit === 'degrees' && config.outputUnit === 'letters') {
+                return WindDirectionLettersConverter.getConvertToLettersFunc(config.directionLetters!);
+            } else if (config.inputUnit === 'letters' && config.outputUnit === 'degrees') {
+                return WindDirectionLettersConverter.getConvertToDegreesFunc(config.directionLetters!);
+            }
+            return windConverterfactory.getConverterFunction(config.inputUnit, config.outputUnit) as (input: any) => any;
+        }
+       return (input: any) => { return input };
     }
 
     drawCornerLabel() {
@@ -69,52 +96,51 @@ export class InfoCornersRenderer {
     }
 
     drawCornerValues(entityStates: EntityState[]) {
-
         if (this.leftTopConfig.show && entityStates[0].active) {
-            this.leftTopElement = this.svgUtil.drawText(this.leftTopCoor,
-                this.getText(entityStates[0], this.leftTopConfig),
+            this.leftTopValue = this.svgUtil.drawText(this.leftTopCoor,
+                this.getText(entityStates[0], this.leftTopConfig, this.leftTopConverter),
                 TextAttributes.infoCornerAttribute(this.leftTopConfig.color, this.leftTopConfig.valueTextSize));
-            this.leftTopElement.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
-            this.leftTopElement.back();
+            this.leftTopValue.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
+            this.leftTopValue.back();
         }
         if (entityStates[1].active) {
-            this.rightTopElement = this.svgUtil.drawText(this.rightTopCoor,
-                this.getText(entityStates[1], this.rightTopConfig),
+            this.rightTopValue = this.svgUtil.drawText(this.rightTopCoor,
+                this.getText(entityStates[1], this.rightTopConfig, this.rightTopConverter),
                 TextAttributes.infoCornerAttribute(this.rightTopConfig.color, this.rightTopConfig.valueTextSize));
-            this.rightTopElement.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
-            this.rightTopElement.back();
+            this.rightTopValue.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
+            this.rightTopValue.back();
         }
         if (entityStates[2].active) {
-            this.leftBottomElement = this.svgUtil.drawText(this.leftBottomCoor,
-                this.getText(entityStates[2], this.leftBottomConfig),
+            this.leftBottomValue = this.svgUtil.drawText(this.leftBottomCoor,
+                this.getText(entityStates[2], this.leftBottomConfig, this.leftBottomConverter),
                 TextAttributes.infoCornerAttribute(this.leftBottomConfig.color, this.leftBottomConfig.valueTextSize));
-            this.leftBottomElement.attr({"text-anchor": "left", "dominant-baseline": "auto"});
-            this.leftBottomElement.back();
+            this.leftBottomValue.attr({"text-anchor": "left", "dominant-baseline": "auto"});
+            this.leftBottomValue.back();
         }
         if (entityStates[3].active) {
-            this.rightBottomElement = this.svgUtil.drawText(this.rightBottomCoor,
-                this.getText(entityStates[3], this.rightBottomConfig),
+            this.rightBottomValue = this.svgUtil.drawText(this.rightBottomCoor,
+                this.getText(entityStates[3], this.rightBottomConfig, this.rightBottomConverter),
                 TextAttributes.infoCornerAttribute(this.rightBottomConfig.color, this.rightBottomConfig.valueTextSize));
-            this.rightBottomElement.attr({"text-anchor": "end", "dominant-baseline": "auto"});
-            this.rightBottomElement.back();
+            this.rightBottomValue.attr({"text-anchor": "end", "dominant-baseline": "auto"});
+            this.rightBottomValue.back();
         }
     }
 
     updateCornerValues(entityStates: EntityState[]) {
-        this.leftTopElement?.remove();
-        this.rightTopElement?.remove();
-        this.leftBottomElement?.remove();
-        this.rightBottomElement?.remove();
+        this.leftTopValue?.remove();
+        this.rightTopValue?.remove();
+        this.leftBottomValue?.remove();
+        this.rightBottomValue?.remove();
         this.drawCornerValues(entityStates);
     }
 
-    private getText(entityState: EntityState, config: CornerInfo): string {
+    private getText(entityState: EntityState, config: CornerInfo, converter: (input: any) => any): string {
         if (entityState === undefined || entityState === null) {
             return "";
         }
-        let stateValue = entityState.state;
-        if (!isNaN(+entityState.state!) && !isNaN(config.precision!)) {
-            stateValue = '' + round(+entityState.state!, config.precision);
+        let stateValue = converter(entityState.state);
+        if (!isNaN(stateValue!) && !isNaN(config.precision!)) {
+            stateValue = '' + round(+stateValue!, config.precision);
         }
         if (config.unit) {
             return stateValue + config.unit;

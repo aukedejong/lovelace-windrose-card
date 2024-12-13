@@ -3,7 +3,7 @@ import {Log} from "../util/Log";
 export class WindDirectionLettersConverter {
 
     directions: Record<string, number | undefined>;
-    defaultLetters: string[] = ['N', 'E', 'S', 'W'];
+    defaultLetters: string[] = ['N', 'E', 'S', 'W', 'X'];
 
     constructor(private readonly windDirectionLetters: string | undefined) {
 
@@ -45,18 +45,23 @@ export class WindDirectionLettersConverter {
         };
     }
 
-    getDirection(direction: string): number | undefined {
+    convertToDegrees(cardinalDirection: string): number | undefined {
 
-        let convertedDirection = direction.toUpperCase();
+        let convertedDirection = cardinalDirection.toUpperCase();
 
         if (this.windDirectionLetters) {
-            convertedDirection = this.convertDirectionLetters(direction);
+            convertedDirection = this.convertDirectionLettersToDefault(cardinalDirection);
         }
 
         return this.directions[convertedDirection];
     }
 
-    private convertDirectionLetters(direction: string): string {
+    static getConvertToDegreesFunc(directionLetters: string) {
+        const converter = new WindDirectionLettersConverter(directionLetters);
+        return converter.convertToDegrees.bind(converter);
+    }
+
+    private convertDirectionLettersToDefault(direction: string): string {
         let convertedDirection = '';
         for (let i = 0; i < direction.length; i++) {
             const index = this.windDirectionLetters!.indexOf(direction[i])
@@ -66,6 +71,41 @@ export class WindDirectionLettersConverter {
             convertedDirection += this.defaultLetters[index];
         }
         return convertedDirection;
+    }
+
+    convertToLetters(direction: number | undefined): string | undefined {
+        if (direction === undefined) {
+            return 'CALM';
+        }
+
+        let deling = 11.25 //DefaultLetters is 5
+        if (this.windDirectionLetters) {
+            deling = this.windDirectionLetters.length === 5 ? 11.25 : 22.5;
+        }
+
+        const index = Math.round(direction / deling);
+        const entries = Object.entries(this.directions);
+        if (this.windDirectionLetters) {
+            return this.convertDirectionLettersFromDefault(entries[index][0]);
+        }
+        return entries[index][0];
+    }
+
+    private convertDirectionLettersFromDefault(direction: string): string {
+        let convertedDirection = '';
+        for (let i = 0; i < direction.length; i++) {
+            const index = this.defaultLetters.indexOf(direction[i])
+            if (index < 0) {
+                Log.info('Could not translate cardinal direction, letters not found in config wind_direction_entity.direction_letters');
+            }
+            convertedDirection += this.windDirectionLetters![index];
+        }
+        return convertedDirection;
+    }
+
+    static getConvertToLettersFunc(directionLetters: string) {
+        const converter = new WindDirectionLettersConverter(directionLetters);
+        return converter.convertToLetters.bind(converter);
     }
 }
 

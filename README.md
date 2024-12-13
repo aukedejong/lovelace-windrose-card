@@ -127,21 +127,23 @@ When the state is numeric, a degree value is assumed. When the state is letters,
 
 ### Object windspeed_entities
 
-| Name                    |              Type              |           Default            | Required | Description                                                                                                                                                                                          |
-|-------------------------|:------------------------------:|:----------------------------:|:--------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| entity                  |             string             |                              |    x     | Wind speed entity.                                                                                                                                                                                   |
-| name                    |             string             |                              |    -     | Label, displayed with the windspeed bar.                                                                                                                                                             |
-| use_statistics          |            boolean             |            false             |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                 |
-| render_relative_scale   |            boolean             |             true             |   -      | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks.                                                                                 |
-| speed_unit              |             string             |             auto             |    -     | Windspeed unit of measurement, see Windspeed unit options bellow. When the speed_range_beaufort property is not set or set to true, the bars will show Beaufort ranges.                              |
-| windspeed_bar_full      |            boolean             |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                 |
-| output_speed_unit       |             string             |             mps              |    -     | Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                      |
-| output_speed_unit_label |             string             |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                                                             |
-| center_calm_percentage  |            boolean             |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.                                       |
-| speed_range_beaufort    |            boolean             |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false. |
-| speed_range_step        |             number             | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                                                |
-| speed_range_max         |             number             | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                 |
-| speed_ranges            | [object](#Object-speed_ranges) | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                                               |
+See [here](#Examples-using-custom-speed-ranges) for some example speed ragne configurations.
+
+| Name                    |               Type                |           Default            | Required | Description                                                                                                                                                                                          |
+|-------------------------|:---------------------------------:|:----------------------------:|:--------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entity                  |              string               |                              |    x     | Wind speed entity.                                                                                                                                                                                   |
+| name                    |              string               |                              |    -     | Label, displayed with the windspeed bar.                                                                                                                                                             |
+| use_statistics          |              boolean              |            false             |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                 |
+| render_relative_scale   |              boolean              |             true             |   -      | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks.                                                                                 |
+| speed_unit              | [string](#Windspeed-unit-options) |             auto             |    -     | Windspeed unit of measurement, see Windspeed unit options bellow. When the speed_range_beaufort property is not set or set to true, the bars will show Beaufort ranges.                              |
+| windspeed_bar_full      |              boolean              |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                 |
+| output_speed_unit       |              string               |             mps              |    -     | Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                      |
+| output_speed_unit_label |              string               |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                                                             |
+| center_calm_percentage  |              boolean              |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.                                       |
+| speed_range_beaufort    |              boolean              |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false. |
+| speed_range_step        |              number               | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                                                |
+| speed_range_max         |              number               | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                 |
+| speed_ranges            |  [object](#Object-speed_ranges)   | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                                               |
 
 
 ### Windspeed unit options:
@@ -230,37 +232,70 @@ Configuration for displaying information in the corners around the windrose.
 | bottom_left  | object |         |          | Configration for bottom left corner  |
 | bottom_right | object |         |          | Configration for bottom right corner |
 
+###  Object top_left, top_right, bottom_left and bottom_right
+
+| Name              |  Type  |       Default        | Required | Description                                                                                                                   |
+|-------------------|:------:|:--------------------:|:--------:|-------------------------------------------------------------------------------------------------------------------------------|
+| label             | string |                      |          | Label                                                                                                                         |
+| unit              | string |                      |          | Unit, displayed after the state, without a space. If you need space, add it to the config.                                    |
+| color             | string | --primary-text-color |          | Color of the text.                                                                                                            |
+| label_text_size   | number |          50          |          | The text size of the label.                                                                                                   |
+| value_text_size   | number |          80          |          | The text size of the entity's state.                                                                                          |
+| entity            | string |                      |    x     | State of the entity will be displayed                                                                                         |
+| input_unit        | string |                      |          | Input unit, not automatically determined. See for options [Unit conversion](#Corner-Info-unit-conversion)                     |
+| output_unit       | string |                      |          | Output unit                                                                                                                   |
+| precision         | string |                      |          | Overwrites (if available) the precision of the entity. For rounding the value, for example after converting to an other unit. |
+| direction_letters | string |        NESWX         |          | The cardinal direction letters use for winddirection conversion.                                                              |
+
+### Corner Info unit conversion
+
+Supported unit types for windspeed sensors:
+
+| Config | Description        |
+|--------|--------------------|
+| bft    | Beaufort           |
+| mps    | Meter per second   |
+| kph    | Kilometer per hour |
+| mph    | Miles per hour     |
+| fps    | Feet per second    |
+| knots  | Knots              |
+
+Supported unit types for wind directions sensors:
+
+| Config  | Description                                 |
+|---------|---------------------------------------------|
+| degrees | Direction in degreees, number from 0 to 359 |
+| letters | Cardinal direction letters                  |
+
+
+The units degrees and letters can only be used in combination with each other.
+The card does not check the sensor type you are using. So, converting a light switch from degreees to letters will result in errors in the browsers console.
+
 ### Example corner_info yaml
 ```yaml
 corner_info:
   top_left:
     label: Current gust speed
-    unit: ' kph'
-    entity: sensor.wind_gust
+    unit: ' m/s'
+    entity: sensor.gorredijk_wind_gust
     label_text_size: 40
     value_text_size: 30
+    input_unit: kph
+    output_unit: mps
+    precision: 2
   top_right:
     label: Wind direction
     unit: °
     color: red
-    entity: sensor.wind_direction
+    entity: sensor.gorredijk_wind_direction_azimuth
+    input_unit: degrees
+    output_unit: letters
+    direction_letters: NOZWX
   bottom_left:
     label: Compass
     unit: °
     entity: input_number.compass
 ```
-
-###  Object top_left, top_right, bottom_left and bottom_right
-
-| Name            |  Type  |       Default        | Required | Description                                                                                |
-|-----------------|:------:|:--------------------:|:--------:|--------------------------------------------------------------------------------------------|
-| label           | string |                      |          | Label                                                                                      |
-| unit            | string |                      |          | Unit, displayed after the state, without a space. If you need space, add it to the config. |
-| color           | string | --primary-text-color |          | Color of the text.                                                                         |
-| label_text_size | number |          50          |          | The text size of the label.                                                                |
-| value_text_size | number |          80          |          | The text size of the entity's state.                                                       |
-| entity          | string |                      |    x     | State of the entity will be displayed                                                      |
-
 
 ### Ojbect actions
 
@@ -323,7 +358,7 @@ actions:
 
 ### Matching strategies
 
-The matching strategies can result in a different graph, depending on your sensor. How many state updates they get.
+The matching strategies can result in a different graph, depending on your sensors. How many state updates they get.
 
 #### Direction first
 
@@ -364,8 +399,7 @@ With that data the wind rose percentages are calculated.
 I think this strategy results in the best graph, but it possibly takes to much CPU power to calculate on some devices.
 
 ### Object colors
-For some value the theme variable --primary-text-color is used. This is needed if HA switches theme
-light/dark mode.
+For some values the theme variable --primary-text-color is used. This is needed if HA switches theme and light/dark mode.
 CSS color values are allowed.
 
 | Name                         |  Type  |       Default        | Required | Description                                                                            |
@@ -457,6 +491,8 @@ windspeed_entities:
         color: red
 ```
 
+## Some configuration examples
+
 ### Minimal configuration
 
 ```yaml
@@ -513,15 +549,19 @@ compass_direction:
 corner_info:
   top_left:
     label: Current gust speed
-    unit: " kph"
+    unit: " knots"
     entity: sensor.wind_gust
     label_text_size: 50
     value_text_size: 50
+    inputUnit: kph
+    outputUnit: knpts
   top_right:
     label: Wind direction
     unit: °
     color: red
     entity: sensor.wind_direction_azimuth
+    inputUnit: degrees
+    outputUnit: letters
   bottom_left:
     label: Compass
     unit: °

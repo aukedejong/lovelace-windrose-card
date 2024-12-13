@@ -110,7 +110,7 @@ export class WindRoseCard extends LitElement {
         super.render();
         this.log.debug('card render()');
         return html`
-            <ha-card header="${this.cardConfig?.title}">
+            <ha-card header="${this.cardConfig?.title}" >
                 <div class="card-content" id="svg-container">
                 </div>
             </ha-card>

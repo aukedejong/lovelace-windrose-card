@@ -17,7 +17,7 @@ export class WindDirectionConverter {
             return undefined;
 
         } else if (Number.isNaN(Number(direction))) {
-            degrees = this.windDirectionLettersConverter.getDirection(direction as string);
+            degrees = this.windDirectionLettersConverter.convertToDegrees(direction as string);
             if (isNaN(degrees as any)) {
                 Log.info("Could not convert direction " + direction + " to degrees.");
                 return undefined;

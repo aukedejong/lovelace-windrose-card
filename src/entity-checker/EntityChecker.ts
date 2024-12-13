@@ -28,7 +28,9 @@ export class EntityChecker {
     private checkCornerInfo(cornerInfo: CornerInfo, hass: HomeAssistant) {
         if (cornerInfo.show && cornerInfo.entity) {
             this.checkEntity(cornerInfo.entity, hass);
-            cornerInfo.precision = hass.entities[cornerInfo.entity]?.display_precision;
+            if (cornerInfo.precision === undefined) {
+                cornerInfo.precision = hass.entities[cornerInfo.entity]?.display_precision;
+            }
         }
     }
 

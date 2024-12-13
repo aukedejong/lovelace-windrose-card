@@ -57,10 +57,10 @@ export class WindSpeedConverter {
     readonly outputSpeedUnit: SpeedUnit;
 
     constructor(private readonly outputUnit: string,
-                private readonly rangeBeaufort?: boolean,
-                private readonly rangeStep?: number,
-                private readonly rangeMax?: number,
-                private readonly speedRanges?: SpeedRange[]) {
+                readonly rangeBeaufort?: boolean,
+                readonly rangeStep?: number,
+                readonly rangeMax?: number,
+                readonly speedRanges?: SpeedRange[]) {
 
         this.outputSpeedUnit = this.getSpeedUnit(this.outputUnit);
 

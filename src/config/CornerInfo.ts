@@ -7,4 +7,7 @@ export class CornerInfo {
     unit: string | undefined;
     label: string | undefined;
     precision: number | undefined;
+    inputUnit: string | undefined;
+    outputUnit: string | undefined;
+    directionLetters: string | undefined;
 }
