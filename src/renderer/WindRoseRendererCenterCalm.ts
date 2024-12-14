@@ -1,4 +1,3 @@
-import {WindRoseConfig} from "../config/WindRoseConfig";
 import {DrawUtil} from "../util/DrawUtil";
 import {SpeedRange} from "../speed-range/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
@@ -12,14 +11,19 @@ import {Coordinate} from "./Coordinate";
 import {ColorUtil} from "../util/ColorUtil";
 import {DegreesCalculator} from "./DegreesCalculator";
 import SVG, {Svg} from "@svgdotjs/svg.js";
+import {CardConfigWrapper} from "../config/CardConfigWrapper";
+import {CardColors} from "../config/CardColors";
 
 export class WindRoseRendererCenterCalm {
-    private readonly config: WindRoseConfig;
+    private readonly cardColors: CardColors;
     private readonly speedRanges: SpeedRange[];
     private readonly svg: Svg;
 
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     private readonly degreesCalculator: DegreesCalculator;
+    private readonly leaveArc: number;
+    private readonly centerRadius: number;
+    private readonly cardinalDirectionLetters: string[];
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
     private readonly roseCenter: Coordinate;
@@ -29,18 +33,21 @@ export class WindRoseRendererCenterCalm {
     private southText!: SVG.Text;
     private westText!: SVG.Text;
 
-    constructor(config: WindRoseConfig,
+    constructor(config: CardConfigWrapper,
                 dimensionConfig: DimensionConfig,
                 speedRanges: SpeedRange[],
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
-        this.config = config;
+        this.cardColors = config.cardColor;
+        this.cardinalDirectionLetters = config.cardinalDirectionLetters;
+        this.centerRadius = 60;
         this.speedRanges = speedRanges;
         this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
         this.degreesCalculator = degreesCalculator;
         this.roseCenter = this.dimensionCalculator.roseCenter();
+        this.leaveArc = (360 / config.windDirectionCount) - 8;
     }
 
     drawWindRose(windRoseData: WindRoseData): void {
@@ -115,11 +122,11 @@ export class WindRoseRendererCenterCalm {
                 }
             }
         }
-        const maxDirectionRadius = (directionPercentage * (this.dimensionCalculator.cfg.roseRadius - this.config.centerRadius)) / this.windRoseData.maxCirclePercentage;
+        const maxDirectionRadius = (directionPercentage * (this.dimensionCalculator.cfg.roseRadius - this.centerRadius)) / this.windRoseData.maxCirclePercentage;
         for (let i = this.speedRanges.length - 1; i >= 0; i--) {
             const sppedPart = this.drawSpeedPart(this.svg,
                 degrees - 90,
-                (maxDirectionRadius * (percentages[i] / 100)) + this.config.centerRadius,
+                (maxDirectionRadius * (percentages[i] / 100)) + this.centerRadius,
                 this.speedRanges[i].color);
             windDirection.add(sppedPart);
         }
@@ -128,8 +135,8 @@ export class WindRoseRendererCenterCalm {
 
     private drawSpeedPart(svg: Svg, degrees: number, radius: number, color: string): SVG.Path {
 
-        var radians1 = DrawUtil.toRadians(degrees - (this.config.leaveArc / 2));
-        var radians2 = DrawUtil.toRadians(degrees + (this.config.leaveArc / 2));
+        var radians1 = DrawUtil.toRadians(degrees - (this.leaveArc / 2));
+        var radians2 = DrawUtil.toRadians(degrees + (this.leaveArc / 2));
         var center = this.dimensionCalculator.roseCenter();
         var x1 = center.x + Math.round(Math.cos(radians1) * radius);
         var y1 = center.y + Math.round(Math.sin(radians1) * radius);
@@ -137,7 +144,7 @@ export class WindRoseRendererCenterCalm {
         var y2 = center.y + Math.round(Math.sin(radians2) * radius);
 
         return svg.path(`M ${center.x} ${center.y} L ${x1} ${y1} A${radius} ${radius} 0 0 1 ${x2} ${y2} Z`)
-            .attr({'fill': color, stroke: this.config.roseLinesColor});
+            .attr({'fill': color, stroke: this.cardColors.roseLines});
     }
 
     private drawBackground(): SVG.G {
@@ -148,14 +155,14 @@ export class WindRoseRendererCenterCalm {
 
         // Circles
         const circleCount = this.windRoseData.circleCount;
-        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.config.centerRadius) / circleCount;
-        let circleRadius = this.config.centerRadius + radiusStep;
+        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.centerRadius) / circleCount;
+        let circleRadius = this.centerRadius + radiusStep;
         for (let i = 1; i <= circleCount; i++) {
             roseLinesGroup.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(circleRadius)));
             circleRadius += radiusStep;
         }
         roseLinesGroup.attr({
-            stroke: this.config.roseLinesColor,
+            stroke: this.cardColors.roseLines,
             strokeWidth: 1,
             fill: "none",
         });
@@ -167,28 +174,28 @@ export class WindRoseRendererCenterCalm {
         const roseRenderDegrees = this.degreesCalculator.getRoseRenderDegrees();
 
         this.northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
-            this.config.cardinalDirectionLetters[0],
+            this.cardinalDirectionLetters[0],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central"
         );
         this.eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
-            this.config.cardinalDirectionLetters[1],
+            this.cardinalDirectionLetters[1],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central");
         this.southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
-            this.config.cardinalDirectionLetters[2],
+            this.cardinalDirectionLetters[2],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central");
         this.westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
-            this.config.cardinalDirectionLetters[3],
+            this.cardinalDirectionLetters[3],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central");
 
@@ -198,8 +205,8 @@ export class WindRoseRendererCenterCalm {
     private drawCircleLegend(): SVG.G {
         const circleLegendGroup = this.svg.group();
         const center = this.dimensionCalculator.roseCenter();
-        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.config.centerRadius) / this.windRoseData.circleCount;
-        const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.config.centerRadius;
+        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.centerRadius) / this.windRoseData.circleCount;
+        const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.centerRadius;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
 
         for (let i = 1; i <= this.windRoseData.circleCount; i++) {
@@ -207,7 +214,7 @@ export class WindRoseRendererCenterCalm {
             const yPos = centerXY + (xy * i) + center.y;
             const text = this.svgUtil.drawText(new Coordinate(xPos, yPos),
                 (this.windRoseData.percentagePerCircle * i) + "%",
-                TextAttributes.roseLegendAttribute(this.config.rosePercentagesColor));
+                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages));
             circleLegendGroup.add(text);
         }
         return circleLegendGroup;
@@ -216,13 +223,13 @@ export class WindRoseRendererCenterCalm {
     private drawCenterZeroSpeed(): void {
         const center = this.dimensionCalculator.roseCenter();
         const centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
-            this.config.centerRadius));
+            this.centerRadius));
         centerCircle.attr({
             fill: this.speedRanges[0].color
         });
 
-        let textColor = this.config.roseCenterPercentageColor;
-        if (this.config.roseCenterPercentageColor === 'auto') {
+        let textColor = this.cardColors.roseCenterPercentage;
+        if (textColor === 'auto') {
              textColor = ColorUtil.getTextColorBasedOnBackground(this.speedRanges[0].color);
         }
         if (!isNaN(this.windRoseData.speedRangePercentages[0])) {

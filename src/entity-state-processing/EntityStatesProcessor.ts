@@ -1,6 +1,5 @@
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {WindDirectionConverter} from "../converter/WindDirectionConverter";
-import {WindRoseConfigFactory} from "../config/WindRoseConfigFactory";
 import {Log2} from "../util/Log2";
 import {Log} from "../util/Log";
 import {EntityState} from "./EntityState";
@@ -25,7 +24,7 @@ export class EntityStatesProcessor {
 
     init(cardConfig: CardConfigWrapper) {
         this.cardConfig = cardConfig;
-        this.windDirectionConverter = new WindDirectionConverter(new WindRoseConfigFactory(cardConfig).createWindRoseConfig());
+        this.windDirectionConverter = new WindDirectionConverter(cardConfig.windDirectionEntity);
 
         this.windDirectionState = new EntityState(this.cardConfig.currentDirection.showArrow, this.cardConfig.windDirectionEntity.entity);
         this.compassDirectionState = new EntityState(this.cardConfig.compassConfig.autoRotate, this.cardConfig.compassConfig.entity);

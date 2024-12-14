@@ -1,4 +1,3 @@
-import {WindRoseConfig} from "../config/WindRoseConfig";
 import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {SvgUtil} from "./SvgUtil";
 import {DimensionConfig} from "./DimensionConfig";
@@ -6,10 +5,11 @@ import {Coordinate} from "./Coordinate";
 import {Log} from "../util/Log";
 import {CircleCoordinate} from "./CircleCoordinate";
 import SVG, {Svg} from "@svgdotjs/svg.js";
+import {CardConfigWrapper} from "../config/CardConfigWrapper";
 
 export class CurrentDirectionRenderer {
 
-    private config: WindRoseConfig;
+    private config: CardConfigWrapper;
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     private readonly cfg!: DimensionConfig;
     private svgUtil!: SvgUtil;
@@ -19,7 +19,7 @@ export class CurrentDirectionRenderer {
 
     private readonly roseCenter: Coordinate;
 
-    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Svg) {
+    constructor(config: CardConfigWrapper, dimensionConfig: DimensionConfig, svg: Svg) {
         this.config = config;
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
         this.svgUtil = new SvgUtil(svg);
@@ -53,12 +53,12 @@ export class CurrentDirectionRenderer {
 
     private drawArrow() {
         const x = this.roseCenter.x;
-        const y = this.roseCenter.y - this.cfg.roseRadius + (this.config.currentDirectionArrowSize! / 2);
+        const y = this.roseCenter.y - this.cfg.roseRadius + (this.config.currentDirection.arrowSize! / 2);
 
-        this.arrowElement = this.svgUtil.drawArrow(x, y, this.config.currentDirectionArrowSize!);
+        this.arrowElement = this.svgUtil.drawArrow(x, y, this.config.currentDirection.arrowSize!);
         this.arrowElement.attr({
-            stroke: this.config.roseCurrentDirectionArrowColor,
-            fill: this.config.roseCurrentDirectionArrowColor
+            stroke: this.config.cardColor.roseCurrentDirectionArrow,
+            fill: this.config.cardColor.roseCurrentDirectionArrow
         });
     }
 
@@ -66,19 +66,19 @@ export class CurrentDirectionRenderer {
 
         if (this.config.centerCalmPercentage) {
 
-            this.centerElement = this.svgUtil.drawCircle(new CircleCoordinate(this.roseCenter, this.config.centerRadius));
+            this.centerElement = this.svgUtil.drawCircle(new CircleCoordinate(this.roseCenter, this.config.currentDirection.centerCircleSize!));
             this.centerElement.attr({
-                stroke: this.config.roseCurrentDirectionArrowColor,
+                stroke: this.config.cardColor.roseCurrentDirectionArrow,
                 strokeWidth: 4,
                 fill: "none"
             });
 
         } else {
 
-            this.centerElement = this.svgUtil.drawCircle(new CircleCoordinate(this.roseCenter, this.config.currentDirectionCenterCircleSize!));
+            this.centerElement = this.svgUtil.drawCircle(new CircleCoordinate(this.roseCenter, this.config.currentDirection.centerCircleSize!));
             this.centerElement.attr({
-                stroke: this.config.roseCurrentDirectionArrowColor,
-                fill: this.config.roseCurrentDirectionArrowColor
+                stroke: this.config.cardColor.roseCurrentDirectionArrow,
+                fill: this.config.cardColor.roseCurrentDirectionArrow
             });
         }
     }

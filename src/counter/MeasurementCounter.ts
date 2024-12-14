@@ -1,9 +1,9 @@
-import {WindRoseConfig} from "../config/WindRoseConfig";
 import {WindSpeedConverter} from "../converter/WindSpeedConverter";
 import {WindCounts} from "./WindCounts";
 import {Log} from "../util/Log";
 import {WindDirection} from "./WindDirection";
 import {WindDirectionConverter} from "../converter/WindDirectionConverter";
+import {CardConfigWrapper} from "../config/CardConfigWrapper";
 
 export class MeasurementCounter {
 
@@ -11,17 +11,17 @@ export class MeasurementCounter {
     private readonly windDirectionConverter: WindDirectionConverter;
 
     private windDirections: WindDirection[] = [];
-    private config: WindRoseConfig;
+    private config: CardConfigWrapper;
 
     private windData = new WindCounts();
 
     private speedRangeFunction: (speed: number) => number;
     private speedConverterFunction!: (speed: number) => number;
 
-    constructor(config: WindRoseConfig, windSpeedConverter: WindSpeedConverter) {
+    constructor(config: CardConfigWrapper, windSpeedConverter: WindSpeedConverter) {
         this.config = config;
         this.windSpeedConverter = windSpeedConverter;
-        this.windDirectionConverter = new WindDirectionConverter(config);
+        this.windDirectionConverter = new WindDirectionConverter(config.windDirectionEntity);
         this.speedRangeFunction = this.windSpeedConverter.getRangeFunction();
         const leaveDegrees = 360 / config.windDirectionCount;
         for (let i = 0; i < config.windDirectionCount; i++) {

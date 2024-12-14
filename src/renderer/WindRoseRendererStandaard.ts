@@ -1,4 +1,3 @@
-import {WindRoseConfig} from "../config/WindRoseConfig";
 import {DrawUtil} from "../util/DrawUtil";
 import {SpeedRange} from "../speed-range/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
@@ -10,13 +9,17 @@ import {Coordinate} from "./Coordinate";
 import {DimensionConfig} from "./DimensionConfig";
 import {DegreesCalculator} from "./DegreesCalculator";
 import SVG, {PathArray, Svg} from "@svgdotjs/svg.js";
+import {CardConfigWrapper} from "../config/CardConfigWrapper";
+import {CardColors} from "../config/CardColors";
 
 export class WindRoseRendererStandaard {
-    private readonly config: WindRoseConfig;
+    private readonly cardColors: CardColors;
     private readonly speedRanges: SpeedRange[];
     private readonly svg: Svg;
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     private readonly degreesCalculator: DegreesCalculator;
+    private readonly leaveArc: number;
+    private readonly cardinalDirectionLetters: string[];
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
     private readonly roseCenter: Coordinate;
@@ -26,18 +29,20 @@ export class WindRoseRendererStandaard {
     private southText!: SVG.Text;
     private westText!: SVG.Text;
 
-    constructor(config: WindRoseConfig,
+    constructor(config: CardConfigWrapper,
                 dimensionConfig: DimensionConfig,
                 speedRanges: SpeedRange[],
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
-        this.config = config;
+        this.cardColors = config.cardColor;
+        this.cardinalDirectionLetters = config.cardinalDirectionLetters;
         this.speedRanges = speedRanges;
         this.svg = svg;
         this.degreesCalculator = degreesCalculator;
         this.svgUtil = new SvgUtil(svg);
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
         this.roseCenter = this.dimensionCalculator.roseCenter();
+        this.leaveArc = (360 / config.windDirectionCount) - 8;
     }
 
     drawWindRose(windRoseData: WindRoseData): void {
@@ -127,11 +132,11 @@ export class WindRoseRendererStandaard {
     }
 
     private drawSpeedPart(svg: Svg, degrees: number, radius: number, color: string): SVG.Path {
-        Log.trace("Degrees 1" + (degrees - (this.config.leaveArc / 2)));
-        Log.trace("Degrees 2" + (degrees + (this.config.leaveArc / 2)));
+        Log.trace("Degrees 1" + (degrees - (this.leaveArc / 2)));
+        Log.trace("Degrees 2" + (degrees + (this.leaveArc / 2)));
         Log.trace("Color: " + color);
-        var radians1 = DrawUtil.toRadians(degrees - (this.config.leaveArc / 2));
-        var radians2 = DrawUtil.toRadians(degrees + (this.config.leaveArc / 2));
+        var radians1 = DrawUtil.toRadians(degrees - (this.leaveArc / 2));
+        var radians2 = DrawUtil.toRadians(degrees + (this.leaveArc / 2));
         var center = this.dimensionCalculator.roseCenter();
         var x1 = center.x + Math.round(Math.cos(radians1) * radius);
         var y1 = center.y + Math.round(Math.sin(radians1) * radius);
@@ -145,7 +150,7 @@ export class WindRoseRendererStandaard {
             ['A', radius, radius, 0, 0, 1, x2, y2],
             ['Z']
         ]);
-        return svg.path(path).attr({'fill': color, stroke: this.config.roseLinesColor});
+        return svg.path(path).attr({'fill': color, stroke: this.cardColors.roseLines});
     }
 
     private drawBackgroundLines(): SVG.G {
@@ -161,7 +166,7 @@ export class WindRoseRendererStandaard {
             roseLinesGroup.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(radiusStep * i)));
         }
         roseLinesGroup.attr({
-            stroke: this.config.roseLinesColor,
+            stroke: this.cardColors.roseLines,
             strokeWidth: 1,
             fill: "none",
         });
@@ -173,28 +178,28 @@ export class WindRoseRendererStandaard {
         const roseRenderDegrees = this.degreesCalculator.getRoseRenderDegrees();
 
         this.northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
-            this.config.cardinalDirectionLetters[0],
+            this.cardinalDirectionLetters[0],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central"
             );
         this.eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
-            this.config.cardinalDirectionLetters[1],
+            this.cardinalDirectionLetters[1],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central");
         this.southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
-            this.config.cardinalDirectionLetters[2],
+            this.cardinalDirectionLetters[2],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central");
         this.westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
-            this.config.cardinalDirectionLetters[3],
+            this.cardinalDirectionLetters[3],
             -roseRenderDegrees,
-            this.config.roseDirectionLettersColor,
+            this.cardColors.roseDirectionLetters,
             "middle",
             "central");
         return this.svg.group().add(this.northText).add(this.eastText).add(this.southText).add(this.westText);
@@ -210,7 +215,7 @@ export class WindRoseRendererStandaard {
             const coordinate = new Coordinate(center.x + (xy * i), center.y + (xy * i));
             const text = this.svgUtil.drawText(coordinate,
                 (this.windRoseData.percentagePerCircle * i) + "%",
-                TextAttributes.roseLegendAttribute(this.config.rosePercentagesColor));
+                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages));
             circleLegendGroup.add(text);
         }
         return circleLegendGroup;

@@ -1,14 +1,14 @@
 import {WindDirectionLettersConverter} from "./WindDirectionLettersConverter";
 import {Log} from "../util/Log";
-import {WindRoseConfig} from "../config/WindRoseConfig";
+import {WindDirectionEntity} from "../config/WindDirectionEntity";
 
 export class WindDirectionConverter {
 
     private windDirectionLettersConverter: WindDirectionLettersConverter;
 
-    constructor(private readonly config: WindRoseConfig) {
+    constructor(private readonly windDirectionConfig: WindDirectionEntity) {
 
-        this.windDirectionLettersConverter = new WindDirectionLettersConverter(config.windDirectionLetters);
+        this.windDirectionLettersConverter = new WindDirectionLettersConverter(windDirectionConfig.directionLetters);
     }
 
     public convertDirection(direction: number | string | undefined): number | undefined {
@@ -33,8 +33,8 @@ export class WindDirectionConverter {
 
     private compensateDirection(degrees: number) {
         let compensatedDegrees = degrees;
-        if (this.config.directionCompensation !== 0) {
-            compensatedDegrees = +compensatedDegrees + this.config.directionCompensation;
+        if (this.windDirectionConfig.directionCompensation !== 0) {
+            compensatedDegrees = +compensatedDegrees + this.windDirectionConfig.directionCompensation;
             if (compensatedDegrees < 0) {
                 compensatedDegrees = 360 + compensatedDegrees;
             } else if (compensatedDegrees >= 360) {

@@ -1,4 +1,3 @@
-import {WindRoseConfig} from "../config/WindRoseConfig";
 import {DimensionConfig} from "./DimensionConfig";
 import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {SvgUtil} from "./SvgUtil";
@@ -10,6 +9,7 @@ import SVG, {Svg} from "@svgdotjs/svg.js";
 import {round} from "custom-card-helpers";
 import {WindSpeedConvertFunctionFactory} from "../converter/WindSpeedConvertFunctionFactory";
 import {WindDirectionLettersConverter} from "../converter/WindDirectionLettersConverter";
+import {CornersInfo} from "../config/CornersInfo";
 
 export class InfoCornersRenderer {
 
@@ -36,7 +36,7 @@ export class InfoCornersRenderer {
     private leftBottomConverter: (input: any) => any;
     private rightBottomConverter: (input: any) => any;
 
-    constructor(config: WindRoseConfig, dimensionConfig: DimensionConfig, svg: Svg) {
+    constructor(cornersInfo: CornersInfo, dimensionConfig: DimensionConfig, svg: Svg) {
 
         this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
         this.svgUtil = new SvgUtil(svg);
@@ -46,10 +46,10 @@ export class InfoCornersRenderer {
         this.leftBottomCoor = this.dimensionCalculator.infoCornetLeftBottom();
         this.rightBottomCoor = this.dimensionCalculator.infoCornetRightBottom();
 
-        this.leftTopConfig = config.cornersInfo.topLeftInfo;
-        this.rightTopConfig = config.cornersInfo.topRightInfo;
-        this.leftBottomConfig = config.cornersInfo.bottomLeftInfo;
-        this.rightBottomConfig = config.cornersInfo.bottomRightInfo;
+        this.leftTopConfig = cornersInfo.topLeftInfo;
+        this.rightTopConfig = cornersInfo.topRightInfo;
+        this.leftBottomConfig = cornersInfo.bottomLeftInfo;
+        this.rightBottomConfig = cornersInfo.bottomRightInfo;
 
         const windConverterFactory = new WindSpeedConvertFunctionFactory();
 
