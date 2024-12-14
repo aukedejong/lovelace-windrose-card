@@ -1,5 +1,5 @@
 import {WindBarConfig} from "../config/WindBarConfig";
-import {SpeedRange} from "../converter/SpeedRange";
+import {SpeedRange} from "../speed-range/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
 import {Log} from "../util/Log";
 import {SpeedUnit} from "../converter/SpeedUnit";

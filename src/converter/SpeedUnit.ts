@@ -1,7 +1,9 @@
-import {SpeedRange} from "./SpeedRange";
+import {SpeedRange} from "../speed-range/SpeedRange";
 
 export class SpeedUnit {
+
     public speedRanges: SpeedRange[] = [];
+
     constructor(
         public readonly name: string,
         public readonly configs: string[],

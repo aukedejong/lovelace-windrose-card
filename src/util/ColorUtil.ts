@@ -1,6 +1,6 @@
 export class ColorUtil {
 
-    getColorArray(count: number) : string[] {
+    static getColorArray(count: number) : string[] {
         const startHue = 240;
         const endHue = 0;
         const saturation = 100;

@@ -1,4 +1,4 @@
-import {SpeedRange} from "../converter/SpeedRange";
+import {SpeedRange} from "../speed-range/SpeedRange";
 import {CardConfigWindSpeedEntity} from "../card/CardConfigWindSpeedEntity";
 import {GlobalConfig} from "./GlobalConfig";
 import {CardConfigSpeedRange} from "../card/CardConfigSpeedRange";

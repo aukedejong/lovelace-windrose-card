@@ -1,6 +1,6 @@
 import {WindRoseConfig} from "../config/WindRoseConfig";
 import {DrawUtil} from "../util/DrawUtil";
-import {SpeedRange} from "../converter/SpeedRange";
+import {SpeedRange} from "../speed-range/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
 import {Log} from "../util/Log";
 import {TextAttributes} from "./TextAttributes";
