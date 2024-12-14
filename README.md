@@ -604,6 +604,17 @@ cardinal_direction_letters: N,E,S,W
 matching_strategy: full-time
 background_image: /hacsfiles/lovelace-windrose-card/bg.png
 center_calm_percentage: true
+colors:
+  rose_lines: rgb(0,255,0)
+  rose_direction_letters: yellow
+  rose_center_percentage: red
+  rose_percentages: blue
+  rose_current_direction_arrow: purple
+  bar_border: hsl(200, 100%, 60%)
+  bar_unit_name: purple
+  bar_name: yellow
+  bar_unit_values: blue
+  bar_percentages: auto
 ```
 
 ## Getting errors?

@@ -99,9 +99,8 @@ export class WindRoseDirigent {
 
         this.windBarRenderers = [];
         if (!cardConfig.hideWindspeedBar) {
-            const barConfigs = this.configFactory.createWindBarConfigs();
             for (let i = 0; i < cardConfig.windBarCount(); i++) {
-                this.windBarRenderers.push(new WindBarRenderer(barConfigs[i], this.dimensionConfig, this.windSpeedConverters[i].getOutputSpeedUnit(), i, this.svg));
+                this.windBarRenderers.push(new WindBarRenderer(this.cardConfig, this.dimensionConfig, this.windSpeedConverters[i].getOutputSpeedUnit(), i, this.svg));
             }
         }
 
