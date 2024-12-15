@@ -4,10 +4,12 @@ import {Log} from "../util/Log";
 import {WindDirection} from "./WindDirection";
 import {WindDirectionConverter} from "../converter/WindDirectionConverter";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
+import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 
 export class MeasurementCounter {
 
     private readonly windSpeedConverter: WindSpeedConverter;
+    private readonly speedRangeService: SpeedRangeService;
     private readonly windDirectionConverter: WindDirectionConverter;
 
     private windDirections: WindDirection[] = [];
@@ -15,14 +17,14 @@ export class MeasurementCounter {
 
     private windData = new WindCounts();
 
-    private speedRangeFunction: (speed: number) => number;
     private speedConverterFunction!: (speed: number) => number;
 
-    constructor(config: CardConfigWrapper, windSpeedConverter: WindSpeedConverter) {
+    constructor(config: CardConfigWrapper, windSpeedConverter: WindSpeedConverter, speedRangeService: SpeedRangeService) {
         this.config = config;
         this.windSpeedConverter = windSpeedConverter;
+        this.speedRangeService = speedRangeService;
         this.windDirectionConverter = new WindDirectionConverter(config.windDirectionEntity);
-        this.speedRangeFunction = this.windSpeedConverter.getRangeFunction();
+
         const leaveDegrees = 360 / config.windDirectionCount;
         for (let i = 0; i < config.windDirectionCount; i++) {
             const degrees = (i * leaveDegrees);
@@ -34,8 +36,8 @@ export class MeasurementCounter {
     }
 
     init(inputSpeedUnit: string) {
-        this.windData.init(this.windSpeedConverter.getSpeedRanges().length, this.config.windDirectionCount);
-        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverter(inputSpeedUnit);
+        this.windData.init(this.speedRangeService.getRangeCount(), this.config.windDirectionCount);
+        this.speedConverterFunction = this.windSpeedConverter.getSpeedConverterFunc(inputSpeedUnit);
     }
 
     getMeasurementCounts(): WindCounts {
@@ -45,7 +47,7 @@ export class MeasurementCounter {
 
     addWindMeasurements(direction: number | string, speed: number, seconds: number): void {
         const convertedSpeed = this.speedConverterFunction(speed);
-        const speedRangeIndex = this.speedRangeFunction(convertedSpeed)
+        const speedRangeIndex = this.speedRangeService.determineSpeedRangeIndex(convertedSpeed);
 
         const convertedDirection = this.windDirectionConverter.convertDirection(direction);
         if (convertedDirection === undefined) {

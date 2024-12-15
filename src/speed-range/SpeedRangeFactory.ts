@@ -2,23 +2,21 @@ import {SpeedRange} from "./SpeedRange";
 import {ColorUtil} from "../util/ColorUtil";
 import {SpeedUnit} from "../converter/SpeedUnit";
 import {SpeedUnits} from "../converter/SpeedUnits";
+import {WindSpeedEntity} from "../config/WindSpeedEntity";
 
 export class SpeedRangeFactory {
 
     public static generateSpeedRanges(outputUnit: SpeedUnit,
-                                      rangeBeaufort?: boolean,
-                                      rangeStep?: number,
-                                      rangeMax?: number,
-                                      speedRanges?: SpeedRange[]) {
+                                      windSpeedEntityConfig: WindSpeedEntity) {
 
-        if (rangeBeaufort === true) {
+        if (windSpeedEntityConfig.speedRangeBeaufort) {
             return this.generateBeaufortSpeedRanges(outputUnit);
 
-        } else if (speedRanges && speedRanges.length > 0) {
-            return speedRanges;
+        } else if (windSpeedEntityConfig.speedRanges && windSpeedEntityConfig.speedRanges.length > 0) {
+            return windSpeedEntityConfig.speedRanges;
 
-        } else if (rangeStep && rangeMax) {
-            return this.generate(rangeStep, rangeMax);
+        } else if (windSpeedEntityConfig.speedRangeStep && windSpeedEntityConfig.speedRangeMax) {
+            return this.generate(windSpeedEntityConfig.speedRangeStep, windSpeedEntityConfig.speedRangeMax);
 
         } else {
             return this.generate(outputUnit.speedRangeStep!, outputUnit.speedRangeMax!);

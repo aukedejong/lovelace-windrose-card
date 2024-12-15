@@ -18,11 +18,13 @@ import {InfoCornersRenderer} from "./InfoCornersRenderer";
 import {Svg} from "@svgdotjs/svg.js";
 import {TouchFacesRenderer} from "./TouchFacesRenderer";
 import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
+import {SpeedUnit} from "../converter/SpeedUnit";
+import {SpeedUnits} from "../converter/SpeedUnits";
+import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 
 export class WindRoseDirigent {
     //Util
     private readonly log = new Log2("WindRoseDirigent");
-    private windSpeedConverters: WindSpeedConverter[] = [];
 
     //Config
     private cardConfig!: CardConfigWrapper;
@@ -30,8 +32,12 @@ export class WindRoseDirigent {
     //Measurements
     private measurementProvider!: HomeAssistantMeasurementProvider;
     private entityStatesProcessor!: EntityStatesProcessor;
-    private measurementCounters: MeasurementCounter[] = [];
     private percentageCalculator!: PercentageCalculator;
+
+    //For every windspeed entity
+    private measurementCounters: MeasurementCounter[] = [];
+    private outputSpeedUnits: SpeedUnit[] = [];
+    private speedRangeServices: SpeedRangeService[] = [];
 
     //Rendering
     private degreesCalculator!: DegreesCalculator;
@@ -67,11 +73,13 @@ export class WindRoseDirigent {
         this.entityStatesProcessor = entityStatesProcessor;
 
         for (const windSpeedEntity of this.cardConfig.windspeedEntities) {
-            const windSpeedConverter = new WindSpeedConverter(windSpeedEntity.outputSpeedUnit,
-                windSpeedEntity.speedRangeBeaufort,  windSpeedEntity.speedRangeStep, windSpeedEntity.speedRangeMax,
-                windSpeedEntity.speedRanges)
-            this.windSpeedConverters.push(windSpeedConverter);
-            this.measurementCounters.push(new MeasurementCounter(cardConfig, windSpeedConverter));
+            const outputSpeedUnit = SpeedUnits.getSpeedUnit(windSpeedEntity.outputSpeedUnit);
+            const speedRangeService = new SpeedRangeService(outputSpeedUnit, windSpeedEntity);
+            this.outputSpeedUnits.push(outputSpeedUnit);
+            this.speedRangeServices.push(speedRangeService);
+
+            const windSpeedConverter = new WindSpeedConverter(outputSpeedUnit);
+            this.measurementCounters.push(new MeasurementCounter(cardConfig, windSpeedConverter, speedRangeService));
         }
 
         this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation, cardConfig.cardinalDirectionLetters, this.svg);
@@ -81,10 +89,10 @@ export class WindRoseDirigent {
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
-            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionConfig, this.windSpeedConverters[0].getSpeedRanges(), this.svg, this.degreesCalculator);
+            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionConfig, this.speedRangeServices[0].getSpeedRanges(), this.svg, this.degreesCalculator);
         } else {
             this.percentageCalculator = new PercentageCalculator();
-            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionConfig, this.windSpeedConverters[0].getSpeedRanges(), this.svg, this.degreesCalculator);
+            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionConfig, this.speedRangeServices[0].getSpeedRanges(), this.svg, this.degreesCalculator);
         }
         if (this.cardConfig.currentDirection.showArrow) {
             this.currentDirectionRenderer = new CurrentDirectionRenderer(cardConfig, this.dimensionConfig, this.svg);
@@ -96,7 +104,7 @@ export class WindRoseDirigent {
         this.windBarRenderers = [];
         if (!cardConfig.hideWindspeedBar) {
             for (let i = 0; i < cardConfig.windBarCount(); i++) {
-                this.windBarRenderers.push(new WindBarRenderer(this.cardConfig, this.dimensionConfig, this.windSpeedConverters[i].getOutputSpeedUnit(), i, this.svg));
+                this.windBarRenderers.push(new WindBarRenderer(this.cardConfig, this.dimensionConfig, this.outputSpeedUnits[i], this.speedRangeServices[i], i, this.svg));
             }
         }
 

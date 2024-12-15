@@ -13,6 +13,7 @@ import {Svg} from "@svgdotjs/svg.js";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {WindSpeedEntity} from "../config/WindSpeedEntity";
 import {CardColors} from "../config/CardColors";
+import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 
 export class WindBarRenderer {
 
@@ -30,6 +31,7 @@ export class WindBarRenderer {
     constructor(config: CardConfigWrapper,
                 dimensionConfig: DimensionConfig,
                 outputSpeedUnit: SpeedUnit,
+                speedRangeService: SpeedRangeService,
                 positionIndex: number,
                 svg: Svg) {
 
@@ -45,7 +47,7 @@ export class WindBarRenderer {
         } else {
             this.outputSpeedUnitLabel = outputSpeedUnit.name;
         }
-        this.speedRanges = outputSpeedUnit.speedRanges;
+        this.speedRanges = speedRangeService.getSpeedRanges();
         this.positionIndex = positionIndex;
         this.svgUtil = new SvgUtil(this.svg);
         this.dimensionCalculator = new WindBarDimensionCalculator(dimensionConfig);
