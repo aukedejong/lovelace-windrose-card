@@ -170,6 +170,30 @@ When your windspeed entity uses an unit of measurement not mentioned in the tabl
 | from_value | number |         |    x     | Start speed of a speed range |
 | color      | string |         |    x     | Color CSS value              |
 
+<details>
+<summary>It can be convenient to generate speed_ranges using Python. Credits to @reidprichard</summary>
+
+Just enter in the name of any colormap from [this page](https://matplotlib.org/stable/gallery/color/colormap_reference.html),
+along with your desired upper and lower bounds and the increment from one range to the next.
+
+```python3
+from matplotlib import colormaps
+MIN_SPEED = 0
+MAX_SPEED = 50
+SPEED_INCREMENT = 10
+COLORMAP_NAME = "YlGnBu" # See https://matplotlib.org/stable/gallery/color/colormap_reference.html
+cmap = colormaps[COLORMAP_NAME]
+count = (MAX_SPEED-MIN_SPEED)//SPEED_INCREMENT+1
+print("speed_ranges:")
+for i in range(count):
+    f = i/(count-1)
+    color_rgba = cmap(f)
+    color_scaled = f"rgb({','.join([str(int(n*255)) for n in color_rgba[:3]])})"
+    speed = MIN_SPEED + (MAX_SPEED - MIN_SPEED)*f
+    print(f'  - from_value: {speed:.1f}\n    color: {color_scaled}')
+```
+</details>
+
 
 ### Cardinal direction letters
 
@@ -538,6 +562,17 @@ windspeed_entities:
     windspeed_bar_full: false
     output_speed_unit: mps
     speed_range_beaufort: false
+    speed_ranges:
+      - from_value: 0
+        color: rgb(0,255,0)
+      - from_value: 2
+        color: yellow
+      - from_value: 5
+        color: hsl(200, 100%, 60%)
+      - from_value: 10
+        color: orange
+      - from_value: 15
+        color: red
 windrose_draw_north_offset: 10
 current_direction:
   show_arrow: true
