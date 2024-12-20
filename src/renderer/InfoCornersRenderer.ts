@@ -77,21 +77,25 @@ export class InfoCornersRenderer {
             const leftTop = this.svgUtil.drawText(this.dimensionCalculator.infoCornerLabelLeftTop(), this.leftTopConfig.label,
                 TextAttributes.infoCornerLabelAttribute(this.leftTopConfig.color, this.leftTopConfig.labelTextSize));
             leftTop.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
+            leftTop.addClass("corner-label-left-top");
         }
         if (this.rightTopConfig.label) {
             const rightTop = this.svgUtil.drawText(this.dimensionCalculator.infoCornerLabelRightTop(), this.rightTopConfig.label,
                 TextAttributes.infoCornerLabelAttribute(this.rightTopConfig.color, this.rightTopConfig.labelTextSize));
             rightTop.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
+            rightTop.addClass("corner-label-right-top");
         }
         if (this.leftBottomConfig.label) {
             const leftBottom = this.svgUtil.drawText(this.dimensionCalculator.infoCornetLabelLeftBottom(), this.leftBottomConfig.label,
                 TextAttributes.infoCornerLabelAttribute(this.leftBottomConfig.color, this.leftBottomConfig.labelTextSize));
             leftBottom.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
+            leftBottom.addClass("corner-label-left-bottom");
         }
         if (this.rightBottomConfig.label) {
             const rightBottom = this.svgUtil.drawText(this.dimensionCalculator.infoCornetLabelRightBottom(), this.rightBottomConfig.label,
                 TextAttributes.infoCornerLabelAttribute(this.rightBottomConfig.color, this.rightBottomConfig.labelTextSize));
             rightBottom.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
+            rightBottom.addClass("corner-label-right-bottom");
         }
     }
 
@@ -101,6 +105,7 @@ export class InfoCornersRenderer {
                 this.getText(entityStates[0], this.leftTopConfig, this.leftTopConverter),
                 TextAttributes.infoCornerAttribute(this.leftTopConfig.color, this.leftTopConfig.valueTextSize));
             this.leftTopValue.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
+            this.leftTopValue.addClass("corner-value-left-top");
             this.leftTopValue.back();
         }
         if (entityStates[1].active) {
@@ -108,6 +113,7 @@ export class InfoCornersRenderer {
                 this.getText(entityStates[1], this.rightTopConfig, this.rightTopConverter),
                 TextAttributes.infoCornerAttribute(this.rightTopConfig.color, this.rightTopConfig.valueTextSize));
             this.rightTopValue.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
+            this.rightTopValue.addClass("corner-value-right-top");
             this.rightTopValue.back();
         }
         if (entityStates[2].active) {
@@ -115,6 +121,7 @@ export class InfoCornersRenderer {
                 this.getText(entityStates[2], this.leftBottomConfig, this.leftBottomConverter),
                 TextAttributes.infoCornerAttribute(this.leftBottomConfig.color, this.leftBottomConfig.valueTextSize));
             this.leftBottomValue.attr({"text-anchor": "left", "dominant-baseline": "auto"});
+            this.leftBottomValue.addClass("corner-value-left-bottom");
             this.leftBottomValue.back();
         }
         if (entityStates[3].active) {
@@ -122,6 +129,7 @@ export class InfoCornersRenderer {
                 this.getText(entityStates[3], this.rightBottomConfig, this.rightBottomConverter),
                 TextAttributes.infoCornerAttribute(this.rightBottomConfig.color, this.rightBottomConfig.valueTextSize));
             this.rightBottomValue.attr({"text-anchor": "end", "dominant-baseline": "auto"});
+            this.rightBottomValue.addClass("corner-value-right-bottom");
             this.rightBottomValue.back();
         }
     }
