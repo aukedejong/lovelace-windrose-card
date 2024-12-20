@@ -3,6 +3,7 @@ import {CardConfigWindSpeedEntity} from "../card/CardConfigWindSpeedEntity";
 import {GlobalConfig} from "./GlobalConfig";
 import {CardConfigSpeedRange} from "../card/CardConfigSpeedRange";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
+import {DynamicSpeedRange} from "./DynamicSpeedRange";
 
 export class WindSpeedEntity {
 
@@ -18,7 +19,8 @@ export class WindSpeedEntity {
         public readonly speedRangeBeaufort: boolean,
         public readonly speedRangeStep: number | undefined,
         public readonly speedRangeMax: number | undefined,
-        public readonly speedRanges: SpeedRange[] = []
+        public readonly speedRanges: SpeedRange[] = [],
+        public readonly dynamicSpeedRanges: DynamicSpeedRange[] = []
     ) {}
 
     static fromConfig(entityConfig: CardConfigWindSpeedEntity,
@@ -71,10 +73,12 @@ export class WindSpeedEntity {
         } else {
             speedRanges = this.checkSpeedRanges(parentEntityConfig.speed_ranges);
         }
+        const dynamicSpeedRanges = this.checkDynamicSpeedRanges(entityConfig.dynamic_speed_ranges);
         this.checkSpeedRangeCombi(outputSpeedUnit, speedRangeStep, speedRangeMax);
 
         return new WindSpeedEntity(entity, name, useStatistics, renderRelativeScale, windspeedBarFull, inputSpeedUnit,
-            outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort, speedRangeStep, speedRangeMax, speedRanges);
+            outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort, speedRangeStep, speedRangeMax, speedRanges,
+            dynamicSpeedRanges);
     }
 
     private static checkInputSpeedUnit(inputSpeedUnit: string): string {
@@ -167,6 +171,24 @@ export class WindSpeedEntity {
         if ((speedRangeStep && !speedRangeMax) || (!speedRangeStep && speedRangeMax)) {
             throw new Error("WindRoseCard: speed_range_step and speed_range_max should both be set.")
         }
+    }
+
+    private static checkDynamicSpeedRanges(dynamicSpeedRanges: DynamicSpeedRange[]): DynamicSpeedRange[] {
+        if (dynamicSpeedRanges === undefined || dynamicSpeedRanges.length === 0) {
+            return [];
+        }
+        for (const dynamicRangeConfig of dynamicSpeedRanges) {
+            if (dynamicRangeConfig.average_below <= 0) {
+                throw new Error("Dynamic speed ranges average_below should be a number higheer then 0.");
+            }
+            if (dynamicRangeConfig.step <= 0 || dynamicRangeConfig.step === undefined) {
+                throw new Error("Dynamic speed ranges step should be a number higheer then 0.");
+            }
+            if (dynamicRangeConfig.max <= 0 || dynamicRangeConfig.max === undefined) {
+                throw new Error("Dynamic speed ranges max should be a number higheer then 0.");
+            }
+        }
+        return [...dynamicSpeedRanges].sort((a, b) => b.average_below - a.average_below);
     }
 
 }

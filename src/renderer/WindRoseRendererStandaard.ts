@@ -11,13 +11,15 @@ import {DegreesCalculator} from "./DegreesCalculator";
 import SVG, {PathArray, Svg} from "@svgdotjs/svg.js";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardColors} from "../config/CardColors";
+import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 
 export class WindRoseRendererStandaard {
     private readonly cardColors: CardColors;
-    private readonly speedRanges: SpeedRange[];
+    private speedRanges: SpeedRange[] = [];
     private readonly svg: Svg;
     private readonly dimensionCalculator: WindRoseDimensionCalculator;
     private readonly degreesCalculator: DegreesCalculator;
+    private readonly speedRangeService: SpeedRangeService;
     private readonly leaveArc: number;
     private readonly cardinalDirectionLetters: string[];
     svgUtil!: SvgUtil;
@@ -31,12 +33,12 @@ export class WindRoseRendererStandaard {
 
     constructor(config: CardConfigWrapper,
                 dimensionConfig: DimensionConfig,
-                speedRanges: SpeedRange[],
+                speedRangeService: SpeedRangeService,
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
         this.cardinalDirectionLetters = config.cardinalDirectionLetters;
-        this.speedRanges = speedRanges;
+        this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.degreesCalculator = degreesCalculator;
         this.svgUtil = new SvgUtil(svg);
@@ -55,6 +57,7 @@ export class WindRoseRendererStandaard {
         this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
 
         this.windRoseData = windRoseData;
+        this.speedRanges = this.speedRangeService.getSpeedRanges();
 
         const backgroundLines = this.drawBackgroundLines();
         const windDirectionText = this.drawWindDirectionText();

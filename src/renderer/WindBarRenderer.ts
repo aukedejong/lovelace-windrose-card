@@ -20,11 +20,12 @@ export class WindBarRenderer {
     private readonly config: CardConfigWrapper;
     private readonly cardColors: CardColors;
     private readonly windSpeedEntityConfig: WindSpeedEntity;
+    private readonly speedRangeService: SpeedRangeService;
 
     private readonly svg: Svg;
     private readonly svgUtil!: SvgUtil;
     private readonly outputSpeedUnitLabel: string;
-    private readonly speedRanges: SpeedRange[];
+    private speedRanges: SpeedRange[] = [];
     private readonly dimensionCalculator: WindBarDimensionCalculator;
     private readonly positionIndex: number;
 
@@ -47,7 +48,7 @@ export class WindBarRenderer {
         } else {
             this.outputSpeedUnitLabel = outputSpeedUnit.name;
         }
-        this.speedRanges = speedRangeService.getSpeedRanges();
+        this.speedRangeService = speedRangeService;
         this.positionIndex = positionIndex;
         this.svgUtil = new SvgUtil(this.svg);
         this.dimensionCalculator = new WindBarDimensionCalculator(dimensionConfig);
@@ -59,6 +60,7 @@ export class WindBarRenderer {
             return;
         }
         Log.trace('drawWindBar(): ', windBarData);
+        this.speedRanges = this.speedRangeService.getSpeedRanges();
 
         if (this.config.windspeedBarLocation === 'bottom') {
             this.drawBarLegendBottom(windBarData.speedRangePercentages);

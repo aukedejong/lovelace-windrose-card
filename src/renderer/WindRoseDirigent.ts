@@ -89,10 +89,10 @@ export class WindRoseDirigent {
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
-            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionConfig, this.speedRangeServices[0].getSpeedRanges(), this.svg, this.degreesCalculator);
+            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionConfig, this.speedRangeServices[0], this.svg, this.degreesCalculator);
         } else {
             this.percentageCalculator = new PercentageCalculator();
-            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionConfig, this.speedRangeServices[0].getSpeedRanges(), this.svg, this.degreesCalculator);
+            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionConfig, this.speedRangeServices[0], this.svg, this.degreesCalculator);
         }
         if (this.cardConfig.currentDirection.showArrow) {
             this.currentDirectionRenderer = new CurrentDirectionRenderer(cardConfig, this.dimensionConfig, this.svg);
@@ -118,7 +118,7 @@ export class WindRoseDirigent {
                 this.windRoseData = [];
                 this.log.debug('Matched measurements:', matchedGroups);
                 for (let i = 0; i < matchedGroups.length; i++) {
-                    this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit);
+                    this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit, matchedGroups[i].getAverageSpeed());
                     for (const measurement of matchedGroups[i].getMeasurements()) {
                         this.measurementCounters[i].addWindMeasurements(measurement.direction, measurement.speed, measurement.seconds);
                     }

@@ -7,7 +7,7 @@ import {WindSpeedEntity} from "../config/WindSpeedEntity";
 export class SpeedRangeFactory {
 
     public static generateSpeedRanges(outputUnit: SpeedUnit,
-                                      windSpeedEntityConfig: WindSpeedEntity) {
+                                      windSpeedEntityConfig: WindSpeedEntity): SpeedRange[] {
 
         if (windSpeedEntityConfig.speedRangeBeaufort) {
             return this.generateBeaufortSpeedRanges(outputUnit);
@@ -16,14 +16,14 @@ export class SpeedRangeFactory {
             return windSpeedEntityConfig.speedRanges;
 
         } else if (windSpeedEntityConfig.speedRangeStep && windSpeedEntityConfig.speedRangeMax) {
-            return this.generate(windSpeedEntityConfig.speedRangeStep, windSpeedEntityConfig.speedRangeMax);
+            return this.generateStepMax(windSpeedEntityConfig.speedRangeStep, windSpeedEntityConfig.speedRangeMax);
 
         } else {
-            return this.generate(outputUnit.speedRangeStep!, outputUnit.speedRangeMax!);
+            return this.generateStepMax(outputUnit.speedRangeStep!, outputUnit.speedRangeMax!);
         }
     }
 
-    private static generate(step: number, max: number): SpeedRange[] {
+    public static generateStepMax(step: number, max: number): SpeedRange[] {
         const colors = ColorUtil.getColorArray(Math.floor(max / step) + 1);
         const speedRanges = [] as SpeedRange[];
         let currentSpeed = 0;

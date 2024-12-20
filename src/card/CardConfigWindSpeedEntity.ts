@@ -1,4 +1,5 @@
 import {CardConfigSpeedRange} from "./CardConfigSpeedRange";
+import {CardConfigDynamicSpeedRange} from "./CardConfigDynamicSpeedRange";
 
 export interface CardConfigWindSpeedEntity {
     entity: string;
@@ -14,4 +15,5 @@ export interface CardConfigWindSpeedEntity {
     speed_range_step: number;
     speed_range_max: number;
     speed_ranges: CardConfigSpeedRange[];
+    dynamic_speed_ranges: CardConfigDynamicSpeedRange[];
 }
