@@ -39,27 +39,27 @@ export class TouchFacesRenderer {
         const center = this.roseDimensionCalculator.roseCenter();
         if (this.actionsConfig.top_left) {
             const topLeftCorner = this.svgUtil.drawTriangle(0, 0, center.x, 0, 0, center.y);
-            topLeftCorner.attr({ fill: "transparent" });
+            topLeftCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.top_left, topLeftCorner);
         }
         if (this.actionsConfig.top_right) {
             const topRightCorner = this.svgUtil.drawTriangle(center.x, 0, center.x * 2, 0, center.x * 2, center.y);
-            topRightCorner.attr({ fill: "transparent" });
+            topRightCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.top_right, topRightCorner);
         }
         if (this.actionsConfig.bottom_left) {
             const bottomLeftCorner = this.svgUtil.drawTriangle(0, center.y, center.x, center.y * 2, 0, center.y * 2);
-            bottomLeftCorner.attr({ fill: "transparent" });
+            bottomLeftCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.bottom_left, bottomLeftCorner);
         }
         if (this.actionsConfig.bottom_right) {
             const bottomRightCorner = this.svgUtil.drawTriangle(center.x, center.y * 2, center.x * 2, center.y * 2, center.x * 2, center.y);
-            bottomRightCorner.attr({ fill: "transparent" });
+            bottomRightCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.bottom_right, bottomRightCorner);
         }
         if (this.actionsConfig.windrose) {
             const windrose = this.svgUtil.drawCircle(new CircleCoordinate(center, radius));
-            windrose.attr({ fill: "transparent" });
+            windrose.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.windrose, windrose);
         }
 
@@ -67,7 +67,7 @@ export class TouchFacesRenderer {
             if (this.cardConfig.windspeedBarLocation === 'bottom') {
                 const barRect = this.barDimensionCalculator.touchFaceBarBottom(0);
                 const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent"});
+                rect.attr({ fill: "transparent", cursor: "pointer"});
                 this.addEventHandler(this.actionsConfig.speed_bar_1, rect);
 
             } else if (this.cardConfig.windspeedBarLocation === 'right') {
@@ -81,13 +81,13 @@ export class TouchFacesRenderer {
             if (this.cardConfig.windspeedBarLocation === 'bottom') {
                 const barRect = this.barDimensionCalculator.touchFaceBarBottom(1);
                 const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent"});
+                rect.attr({ fill: "transparent", cursor: "pointer"});
                 this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
 
             } else if (this.cardConfig.windspeedBarLocation === 'right') {
                 const barRect = this.barDimensionCalculator.touchFaceBarRight(1);
                 const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent"});
+                rect.attr({ fill: "transparent", cursor: "pointer"});
                 this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
             }
         }
