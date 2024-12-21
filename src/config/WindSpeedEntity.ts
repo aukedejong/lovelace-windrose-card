@@ -177,18 +177,22 @@ export class WindSpeedEntity {
         if (dynamicSpeedRanges === undefined || dynamicSpeedRanges.length === 0) {
             return [];
         }
-        for (const dynamicRangeConfig of dynamicSpeedRanges) {
-            if (dynamicRangeConfig.average_below <= 0) {
-                throw new Error("Dynamic speed ranges average_below should be a number higheer then 0.");
+        const sorted = [...dynamicSpeedRanges].sort((a, b) => a.average_above - b.average_above);
+        if (sorted[0].average_above !== 0) {
+            throw new Error("First dynamic speed config average_above should be 0.");
+        }
+        for (const dynamicRangeConfig of sorted) {
+            if (dynamicRangeConfig.average_above < 0) {
+                throw new Error("Dynamic speed ranges average_above should be a number higher then 0.");
             }
             if (dynamicRangeConfig.step <= 0 || dynamicRangeConfig.step === undefined) {
-                throw new Error("Dynamic speed ranges step should be a number higheer then 0.");
+                throw new Error("Dynamic speed ranges step should be a number higher then 0.");
             }
             if (dynamicRangeConfig.max <= 0 || dynamicRangeConfig.max === undefined) {
-                throw new Error("Dynamic speed ranges max should be a number higheer then 0.");
+                throw new Error("Dynamic speed ranges max should be a number higher then 0.");
             }
         }
-        return [...dynamicSpeedRanges].sort((a, b) => b.average_below - a.average_below);
+        return sorted;
     }
 
 }

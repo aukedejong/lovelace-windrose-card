@@ -20,24 +20,20 @@ export class SpeedRangeService {
     }
 
     generateRanges(averageSpeed: number): void {
-        let lastOne: DynamicSpeedRange | undefined;
-        Log.debug("Generate speed ranges: ", this.dynamicSpeedRangeConfig);
+        Log.info(`Generate speed ranges, average: ${averageSpeed}, config: `, this.dynamicSpeedRangeConfig);
         if (this.dynamicSpeedRangeConfig.length > 0) {
-            for (const config of this.dynamicSpeedRangeConfig) {
-                if (averageSpeed < config.average_below) {
+            for (let i = this.dynamicSpeedRangeConfig.length - 1; i >= 0; i--) {
+                const config = this.dynamicSpeedRangeConfig[i];
+                if (averageSpeed > config.average_above) {
                     this.speedRanges = SpeedRangeFactory.generateStepMax(config.step, config.max);
                     break;
                 }
-                lastOne = config;
             }
-            if (this.speedRanges.length === 0 && lastOne) {
-                this.speedRanges = SpeedRangeFactory.generateStepMax(lastOne.step, lastOne.max);
-            }
-            Log.debug("Dynamic speed ranges determined: ", this.speedRanges);
+            Log.info("Dynamic speed ranges determined: ", this.speedRanges);
         } else {
             if (this.speedRanges.length === 0) {
                 this.speedRanges = SpeedRangeFactory.generateSpeedRanges(this.outputSpeedUnit, this.windSpeedEntity);
-                Log.debug("Speed ranges determined: ", this.speedRanges);
+                Log.info("Speed ranges determined: ", this.speedRanges);
             }
         }
     }

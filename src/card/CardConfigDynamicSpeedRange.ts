@@ -1,5 +1,5 @@
 export interface CardConfigDynamicSpeedRange {
-    average_below: number;
+    average_above: number;
     step: number;
     max: number;
 }

@@ -3,6 +3,7 @@ import {ColorUtil} from "../util/ColorUtil";
 import {SpeedUnit} from "../converter/SpeedUnit";
 import {SpeedUnits} from "../converter/SpeedUnits";
 import {WindSpeedEntity} from "../config/WindSpeedEntity";
+import {Log} from "../util/Log";
 
 export class SpeedRangeFactory {
 
@@ -24,6 +25,7 @@ export class SpeedRangeFactory {
     }
 
     public static generateStepMax(step: number, max: number): SpeedRange[] {
+        Log.info(`Generate step/max speedranges, step: ${step}, max: ${max}`);
         const colors = ColorUtil.getColorArray(Math.floor(max / step) + 1);
         const speedRanges = [] as SpeedRange[];
         let currentSpeed = 0;
@@ -39,6 +41,7 @@ export class SpeedRangeFactory {
 
 
     private static generateBeaufortSpeedRanges(beaufortType: SpeedUnit | undefined): SpeedRange[] {
+        Log.info(`Generate Beaufort speedranges for unit ${beaufortType?.name}`);
         const colors = ColorUtil.getColorArray(13);
         if (beaufortType === undefined || beaufortType === SpeedUnits.mps) {
             return [

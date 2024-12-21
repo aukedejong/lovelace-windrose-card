@@ -36,9 +36,9 @@ export class MeasurementCounter {
     }
 
     init(inputSpeedUnit: string, averageSpeed: number) {
-        this.speedRangeService.generateRanges(averageSpeed);
-        this.windData.init(this.speedRangeService.getRangeCount(), this.config.windDirectionCount);
         this.speedConverterFunction = this.windSpeedConverter.getSpeedConverterFunc(inputSpeedUnit);
+        this.speedRangeService.generateRanges(this.speedConverterFunction(averageSpeed));
+        this.windData.init(this.speedRangeService.getRangeCount(), this.config.windDirectionCount);
     }
 
     getMeasurementCounts(): WindCounts {

@@ -52,8 +52,8 @@ export class EntityStatesProcessor {
                 this.procesState(hass, state);
             });
 
-            this.log.debug("Updated wind values: "  + this.windDirectionState.updated + "  " + this.windDirectionState.state);
-            this.log.debug("Updated compass values: "  + this.compassDirectionState.updated + "  " + this.compassDirectionState.state);
+            this.log.trace("Updated wind values: "  + this.windDirectionState.updated + "  " + this.windDirectionState.state);
+            this.log.trace("Updated compass values: "  + this.compassDirectionState.updated + "  " + this.compassDirectionState.state);
         }
     }
 
@@ -81,7 +81,7 @@ export class EntityStatesProcessor {
             return undefined;
         }
         const converted = this.windDirectionConverter.convertDirection(this.windDirectionState.state);
-        this.log.debug("Wind state: " + this.windDirectionState.state + " Converted: " + converted);
+        this.log.trace("Wind state: " + this.windDirectionState.state + " Converted: " + converted);
         if (converted === undefined) {
             return undefined;
         }

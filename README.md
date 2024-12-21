@@ -198,8 +198,8 @@ for i in range(count):
 
 | Name          |  Type   | Default | Required | Description                                                          |
 |---------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------|
-| average_below | number  |         |    x     | Average wind speed below this value.                                 |
-| step          | number  |         |    x     | Range steps to be used if average speed is below configurated value. |
+| average_above | number  |         |    x     | Average wind speed above this value. Option with 0 is required.      |
+| step          | number  |         |    x     | Range steps to be used if average speed is above configurated value. |
 | max           | number  |         |    x     | Max speed, used to calculate how many steps are used.                |
 
 ```yaml
@@ -208,13 +208,13 @@ windspeed_entities:
     name: Speed
     speed_range_beaufort: false
     dynamic_speed_ranges:
-      - average_below: 5
+      - average_above: 0
         step: 2
         max: 10
-      - average_below: 10
+      - average_above: 10
         step: 4
         max: 20
-      - average_below: 15
+      - average_above: 15
         step: 8
         max: 30
 ```

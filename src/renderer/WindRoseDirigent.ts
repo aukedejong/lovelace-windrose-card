@@ -152,7 +152,7 @@ export class WindRoseDirigent {
             this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
             this.touchFacesRenderer.renderTouchFaces();
         } else {
-            this.log.error("render(): Could not render, init or measurements not ready " + this.initReady + " - "  + this.measurementsReady);
+            this.log.debug("render(): Could not render, init or measurements not ready yet " + this.initReady + " - "  + this.measurementsReady);
         }
     }
 
