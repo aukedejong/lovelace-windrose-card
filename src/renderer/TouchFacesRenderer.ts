@@ -67,13 +67,13 @@ export class TouchFacesRenderer {
             if (this.cardConfig.windspeedBarLocation === 'bottom') {
                 const barRect = this.barDimensionCalculator.touchFaceBarBottom(0);
                 const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent", cursor: "pointer"});
+                rect.attr({ fill: "transparent", cursor: "pointer" });
                 this.addEventHandler(this.actionsConfig.speed_bar_1, rect);
 
             } else if (this.cardConfig.windspeedBarLocation === 'right') {
                 const barRect = this.barDimensionCalculator.touchFaceBarRight(0);
                 const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent"});
+                rect.attr({ fill: "transparent", cursor: "pointer" });
                 this.addEventHandler(this.actionsConfig.speed_bar_1, rect);
             }
         }
@@ -81,13 +81,13 @@ export class TouchFacesRenderer {
             if (this.cardConfig.windspeedBarLocation === 'bottom') {
                 const barRect = this.barDimensionCalculator.touchFaceBarBottom(1);
                 const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent", cursor: "pointer"});
+                rect.attr({ fill: "transparent", cursor: "pointer" });
                 this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
 
             } else if (this.cardConfig.windspeedBarLocation === 'right') {
                 const barRect = this.barDimensionCalculator.touchFaceBarRight(1);
                 const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent", cursor: "pointer"});
+                rect.attr({ fill: "transparent", cursor: "pointer" });
                 this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
             }
         }
