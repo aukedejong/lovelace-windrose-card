@@ -15,7 +15,7 @@ import {DegreesCalculator} from "./DegreesCalculator";
 import {Log2} from "../util/Log2";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {InfoCornersRenderer} from "./InfoCornersRenderer";
-import {Svg} from "@svgdotjs/svg.js";
+import {Element, Svg} from "@svgdotjs/svg.js";
 import {TouchFacesRenderer} from "./TouchFacesRenderer";
 import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
 import {SpeedUnit} from "../converter/SpeedUnit";
@@ -52,6 +52,7 @@ export class WindRoseDirigent {
     private windRoseData: WindRoseData[] = [];
 
     private readonly svg: Svg;
+    private backgroundElement: Element | undefined;
     private readonly sendEvent: (event: CustomEvent) => void;
     private initReady = false;
     private measurementsReady = false;
@@ -138,11 +139,6 @@ export class WindRoseDirigent {
         this.svg.clear();
         if (this.initReady && this.measurementsReady) {
             this.log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
-            if (this.cardConfig.backgroundImage !== undefined) {
-                this.svg.image(this.cardConfig.backgroundImage)
-                    .size(1000, 1000)
-                    .move(this.dimensionConfig.marginLeft, this.dimensionConfig.marginTop);
-            }
             this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
@@ -151,6 +147,12 @@ export class WindRoseDirigent {
             this.infoCornersRendeerer?.drawCornerLabel();
             this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
             this.touchFacesRenderer.renderTouchFaces();
+            if (this.cardConfig.backgroundImage !== undefined) {
+                this.backgroundElement = this.svg.image(this.cardConfig.backgroundImage)
+                    .size(1000, 1000)
+                    .move(this.dimensionConfig.marginLeft, this.dimensionConfig.marginTop)
+                    .back();
+            }
         } else {
             this.log.debug("render(): Could not render, init or measurements not ready yet " + this.initReady + " - "  + this.measurementsReady);
         }
@@ -169,5 +171,6 @@ export class WindRoseDirigent {
         if (this.entityStatesProcessor.hasCornerInfoUpdates()) {
             this.infoCornersRendeerer.updateCornerValues(this.entityStatesProcessor.getCornerInfoStates());
         }
+        this.backgroundElement?.back();
     }
 }
