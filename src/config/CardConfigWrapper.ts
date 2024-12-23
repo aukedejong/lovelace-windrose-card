@@ -90,7 +90,7 @@ export class CardConfigWrapper {
         this.refreshInterval = this.checkRefreshInterval();
         this.windDirectionEntity = this.checkWindDirectionEntity();
         this.windspeedEntities = this.checkWindspeedEntities();
-        this.windRoseDrawNorthOffset = this.checkwindRoseDrawNorthOffset();
+        this.windRoseDrawNorthOffset = this.checkWindRoseDrawNorthOffset();
         this.currentDirection = this.checkCurrentDirection()
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
@@ -235,7 +235,7 @@ export class CardConfigWrapper {
         return undefined;
     }
 
-    private checkwindRoseDrawNorthOffset(): number {
+    private checkWindRoseDrawNorthOffset(): number {
         if (this.cardConfig.windrose_draw_north_offset && isNaN(this.cardConfig.windrose_draw_north_offset)) {
             throw new Error('WindRoseCard: Invalid render direction offset, should be a number in degress between 0 and 360.');
         } else if (this.cardConfig.windrose_draw_north_offset) {

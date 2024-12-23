@@ -65,7 +65,7 @@ export class WindSpeedEntity {
         if (entityConfig.speed_range_max) {
             speedRangeMax = this.checkSpeedRangeMax(entityConfig.speed_range_max);
         } else {
-            this.checkSpeedRangeMax(parentEntityConfig.speed_range_max);
+            speedRangeMax = this.checkSpeedRangeMax(parentEntityConfig.speed_range_max);
         }
         let speedRanges;
         if (entityConfig.speed_ranges) {
@@ -169,7 +169,7 @@ export class WindSpeedEntity {
                 "speed unit Beaufort (bft). Beaufort uses fixed speed ranges.");
         }
         if ((speedRangeStep && !speedRangeMax) || (!speedRangeStep && speedRangeMax)) {
-            throw new Error("WindRoseCard: speed_range_step and speed_range_max should both be set.")
+            throw new Error(`WindRoseCard: speed_range_step and speed_range_max should both be set, step: ${speedRangeStep}, max: ${speedRangeMax}`)
         }
     }
 
