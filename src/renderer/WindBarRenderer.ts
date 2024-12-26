@@ -98,11 +98,7 @@ export class WindBarRenderer {
             rect.attr({ fill: this.speedRanges[i].color, stroke: this.config.cardColor.barBorder});
 
             if (this.windSpeedEntityConfig.speedRangeBeaufort) {
-                if (i == 12) {
-                    this.svgUtil.drawText(new Coordinate(posX + barRect.width + 10, posY), i + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, fontSize, "middle", "left"));
-                } else {
-                    this.svgUtil.drawText(new Coordinate(posX + barRect.width + 10, posY + (length / 2)), i + "", TextAttributes.windBarAttribute(this.cardColors.barUnitValues, fontSize, "middle", "left"));
-                }
+                this.svgUtil.drawText(new Coordinate(posX + barRect.width + 10, posY + (length / 2)), i + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, fontSize, "middle", "left"));
             } else {
                 let baseline = 'middle';
                 if (i === 0) {
@@ -124,6 +120,11 @@ export class WindBarRenderer {
 
             this.svgUtil.drawText(new Coordinate(posX + barRect.width + 10, posY), this.speedRanges[highestRangeMeasured].minSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, fontSize, "hanging", "left"));
         }
+        // if (this.windSpeedEntityConfig.speedRangeBeaufort) {
+        //     posY = barRect.startPoint.y - barRect.height - 15;
+        // } else {
+        //     posY = barRect.startPoint.y - barRect.height - 15;
+        // }
 
         this.svgUtil.drawText(new Coordinate(posX + (barRect.width / 2), barRect.startPoint.y - barRect.height - 15), this.outputSpeedUnitLabel, TextAttributes.windBarAttribute(this.cardColors.barUnitName, fontSize, "auto", "middle"));
     }

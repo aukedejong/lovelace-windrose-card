@@ -259,7 +259,7 @@ export class CardConfigWrapper {
         if (this.cardConfig.cardinal_direction_letters || this.cardConfig.cardinal_direction_letters === '') {
             const length = this.cardConfig.cardinal_direction_letters.length
             if (length > 0 && length < 4) {
-                throw new Error("Cardinal direction letters option should contain 4 letters.");
+                throw new Error("Cardinal direction letters option should contain 4 letters, empty string or 4 comma seperated words.");
             } else if (length === 0) {
                 return ['', '', '', ''];
             } else if (length === 4) {
