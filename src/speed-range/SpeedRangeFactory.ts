@@ -61,8 +61,8 @@ export class SpeedRangeFactory {
             ];
         } else if (beaufortType === SpeedUnits.kph) {
             return [
-                new SpeedRange(0, 0, 2, colors[0]),
-                new SpeedRange(1, 2, 6, colors[1]),
+                new SpeedRange(0, 0, 1, colors[0]),
+                new SpeedRange(1, 1, 6, colors[1]),
                 new SpeedRange(2, 6, 12, colors[2]),
                 new SpeedRange(3, 12, 20, colors[3]),
                 new SpeedRange(4, 20, 29, colors[4]),
