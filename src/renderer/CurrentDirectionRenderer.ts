@@ -43,11 +43,15 @@ export class CurrentDirectionRenderer {
             Log.debug("Cur No direction, show circle", this.arrowElement, this.centerElement);
 
         } else {
-            this.arrowElement!.attr({ visibility: "visible" })
-            this.centerElement!.attr({ visibility: "hidden" })
-            this.arrowElement!.animate(700, 0, 'now')
-                .transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y})
-                .ease('<>');
+            this.arrowElement!.attr({ visibility: "visible" });
+            this.centerElement!.attr({ visibility: "hidden" });
+            if (redraw) { //Only animate when it's an update, not a redraw.
+                this.arrowElement!.transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y});
+            } else {
+                this.arrowElement!.animate(700, 0, 'now')
+                    .transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y})
+                    .ease('<>');
+            }
         }
     }
 
