@@ -43,8 +43,8 @@ export class SvgUtil {
         return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
     }
 
-    public drawWindDirectionText(coord: Coordinate, text: string, rotateDegrees: number, color: string, anchor: string, baseline: string): SVG.Text {
-        var textElement = this.drawText(coord, text,  TextAttributes.windBarAttribute(color, 50, baseline, anchor));
+    public drawWindDirectionText(coord: Coordinate, text: string, rotateDegrees: number, color: string, size: number): SVG.Text {
+        var textElement = this.drawText(coord, text,  TextAttributes.windBarAttribute(color, size, "central", "middle"));
         this.rotate(textElement, rotateDegrees, coord);
         return textElement;
     }

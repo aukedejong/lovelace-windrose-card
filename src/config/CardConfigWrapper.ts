@@ -13,6 +13,7 @@ import {CornersInfo} from "./CornersInfo";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
 import {CardConfigWindSpeedEntity} from "../card/CardConfigWindSpeedEntity";
 import {CardConfigActions} from "../card/CardConfigActions";
+import {DirectionLabels} from "./DirectionLabels";
 
 
 export class CardConfigWrapper {
@@ -25,7 +26,7 @@ export class CardConfigWrapper {
     windspeedBarLocation: string;
     hideWindspeedBar: boolean;
     centerCalmPercentage: boolean;
-    cardinalDirectionLetters: string[];
+    directionLabels: DirectionLabels;
     windDirectionCount: number;
     windRoseDrawNorthOffset: number;
     currentDirection: CurrentDirectionConfig;
@@ -66,6 +67,9 @@ export class CardConfigWrapper {
                     speed_ranges: undefined,
                 }
             ],
+            direction_labels: {
+                cardinal_direction_letters: 'NESW'
+            },
             windrose_draw_north_offset: 0,
             current_direction: {
                 show_arrow: false,
@@ -95,11 +99,11 @@ export class CardConfigWrapper {
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
         this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
-        this.cardinalDirectionLetters = this.checkCardinalDirectionLetters();
+        this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels, cardConfig.cardinal_direction_letters);
         this.windDirectionCount = this.checkWindDirectionCount();
         this.matchingStrategy = this.checkMatchingStrategy();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
-        this.cardColor = this.checkCardColors();
+        this.cardColor = CardColors.fromConfig(cardConfig.colors);
         this.compassConfig = this.checkCompassConfig(cardConfig.compass_direction);
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
         this.backgroundImage = ConfigCheckUtils.checkString(cardConfig.background_image);
@@ -255,21 +259,6 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultWindspeedBarLocation;
     }
 
-    private checkCardinalDirectionLetters(): string[] {
-        if (this.cardConfig.cardinal_direction_letters || this.cardConfig.cardinal_direction_letters === '') {
-            const length = this.cardConfig.cardinal_direction_letters.length
-            if (length > 0 && length < 4) {
-                throw new Error("Cardinal direction letters option should contain 4 letters, empty string or 4 comma seperated words.");
-            } else if (length === 0) {
-                return ['', '', '', ''];
-            } else if (length === 4) {
-                return this.cardConfig.cardinal_direction_letters.split('')
-            }
-            return this.cardConfig.cardinal_direction_letters.split(',');
-        }
-        return GlobalConfig.defaultCardinalDirectionLetters;
-    }
-
     private checkWindDirectionCount(): number {
         if (this.cardConfig.wind_direction_count) {
             if (isNaN(this.cardConfig.wind_direction_count) || this.cardConfig.wind_direction_count < 4 ||
@@ -330,42 +319,4 @@ export class CardConfigWrapper {
         }
         return entities.concat(this.windspeedEntities.filter(config => config.useStatistics).map(config => config.entity));
     }
-
-    private checkCardColors(): CardColors {
-        const cardColors = new CardColors();
-        if (this.cardConfig.colors) {
-            if (this.cardConfig.colors.rose_direction_letters) {
-                cardColors.roseDirectionLetters = this.cardConfig.colors.rose_direction_letters;
-            }
-            if (this.cardConfig.colors.rose_lines) {
-                cardColors.roseLines = this.cardConfig.colors.rose_lines;
-            }
-            if (this.cardConfig.colors.rose_percentages) {
-                cardColors.rosePercentages = this.cardConfig.colors.rose_percentages;
-            }
-            if (this.cardConfig.colors.rose_center_percentage) {
-                cardColors.roseCenterPercentage = this.cardConfig.colors.rose_center_percentage;
-            }
-            if (this.cardConfig.colors.rose_current_direction_arrow) {
-                cardColors.roseCurrentDirectionArrow = this.cardConfig.colors.rose_current_direction_arrow
-            }
-            if (this.cardConfig.colors.bar_border) {
-                cardColors.barBorder = this.cardConfig.colors.bar_border;
-            }
-            if (this.cardConfig.colors.bar_name) {
-                cardColors.barName = this.cardConfig.colors.bar_name;
-            }
-            if (this.cardConfig.colors.bar_percentages) {
-                cardColors.barPercentages = this.cardConfig.colors.bar_percentages;
-            }
-            if (this.cardConfig.colors.bar_unit_name) {
-                cardColors.barUnitName = this.cardConfig.colors.bar_unit_name;
-            }
-            if (this.cardConfig.colors.bar_unit_values) {
-                cardColors.barUnitValues = this.cardConfig.colors.bar_unit_values;
-            }
-        }
-        return cardColors;
-    }
-
 }

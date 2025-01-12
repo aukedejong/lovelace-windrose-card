@@ -6,7 +6,6 @@ import {TextAttributes} from "./TextAttributes";
 import {EntityState} from "../entity-state-processing/EntityState";
 import {CornerInfo} from "../config/CornerInfo";
 import SVG, {Svg} from "@svgdotjs/svg.js";
-import {round} from "custom-card-helpers";
 import {WindSpeedConvertFunctionFactory} from "../converter/WindSpeedConvertFunctionFactory";
 import {WindDirectionLettersConverter} from "../converter/WindDirectionLettersConverter";
 import {CornersInfo} from "../config/CornersInfo";
@@ -148,7 +147,7 @@ export class InfoCornersRenderer {
         }
         let stateValue = converter(entityState.state);
         if (!isNaN(stateValue!) && !isNaN(config.precision!)) {
-            stateValue = '' + round(+stateValue!, config.precision);
+            stateValue = '' + this.round(+stateValue!, config.precision);
         }
         if (config.unit) {
             return stateValue + config.unit;
@@ -156,4 +155,7 @@ export class InfoCornersRenderer {
         return stateValue!;
     }
 
+    private round(value: number, precision = 2): number {
+        return Math.round(value * 10 ** precision) / 10 ** precision;
+    }
 }

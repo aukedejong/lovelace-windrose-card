@@ -1,5 +1,6 @@
 import {SvgUtil} from "./SvgUtil";
 import {Svg} from "@svgdotjs/svg.js";
+import {DirectionLabels} from "../config/DirectionLabels";
 
 export class DimensionConfig {
 
@@ -28,17 +29,11 @@ export class DimensionConfig {
 
     constructor(readonly barCount: number,
                 readonly barLocation: string,
-                readonly cardinalDirectionLetters: string[],
+                readonly directionLabels: DirectionLabels,
                 readonly svg: Svg) {
 
         const svgUtil = new SvgUtil(svg);
-
-        const northLength = this.directionLetterMargin + svgUtil.getTextLength(cardinalDirectionLetters[0], 50);
-        const eastLength = this.directionLetterMargin + svgUtil.getTextLength(cardinalDirectionLetters[1], 50);
-        const southLength = this.directionLetterMargin + svgUtil.getTextLength(cardinalDirectionLetters[2], 50);
-        const westLength = this.directionLetterMargin + svgUtil.getTextLength(cardinalDirectionLetters[3], 50);
-        const maxLength = [northLength, eastLength, southLength, westLength].reduce((prev, current) => (prev > current) ? prev : current);
-
+        const maxLength = this.directionLetterMargin + this.directionLabels.getMaxLabelLength(svgUtil);
         this.marginTop = maxLength;
         this.marginRight = maxLength;
         this.marginLeft = maxLength;

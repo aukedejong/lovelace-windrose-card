@@ -2,6 +2,7 @@ import {LineCoordinates} from "./LineCoordinates";
 import {Coordinate} from "./Coordinate";
 import {CircleCoordinate} from "./CircleCoordinate";
 import {DimensionConfig} from "./DimensionConfig";
+import {DrawUtil} from "../util/DrawUtil";
 
 export class WindRoseDimensionCalculator {
 
@@ -89,6 +90,102 @@ export class WindRoseDimensionCalculator {
 
     west(): Coordinate{
         return new Coordinate((this.cfg.marginLeft / 2), this.cfg.marginTop + this.cfg.roseRadius);
+    }
+
+    northEast(): Coordinate {
+        var rads = DrawUtil.toRadians(45);
+        var center = this.roseCenter();
+        var x = center.x + Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y - Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    northWest(): Coordinate {
+        var rads = DrawUtil.toRadians(45);
+        var center = this.roseCenter();
+        var x = center.x - Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y - Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    southEast(): Coordinate {
+        var rads = DrawUtil.toRadians(45);
+        var center = this.roseCenter();
+        var x = center.x + Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y + Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    southWest(): Coordinate {
+        var rads = DrawUtil.toRadians(45);
+        var center = this.roseCenter();
+        var x = center.x - Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y + Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+    //Sub cardinals east side
+    northNorthEast(): Coordinate {
+        var rads = DrawUtil.toRadians(67.5);
+        var center = this.roseCenter();
+        var x = center.x + Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y - Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    eastNorthEast(): Coordinate {
+        var rads = DrawUtil.toRadians(22.5);
+        var center = this.roseCenter();
+        var x = center.x + Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y - Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    eastSouthEast(): Coordinate {
+        var rads = DrawUtil.toRadians(22.5);
+        var center = this.roseCenter();
+        var x = center.x + Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y + Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    southSouthEast(): Coordinate {
+        var rads = DrawUtil.toRadians(67.5);
+        var center = this.roseCenter();
+        var x = center.x + Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y + Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+    //Sub cardinal west side
+    northNorthWest(): Coordinate {
+        var rads = DrawUtil.toRadians(67.5);
+        var center = this.roseCenter();
+        var x = center.x - Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y - Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    westNorthWest(): Coordinate {
+        var rads = DrawUtil.toRadians(22.5);
+        var center = this.roseCenter();
+        var x = center.x - Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y - Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    westSouthWest(): Coordinate {
+        var rads = DrawUtil.toRadians(22.5);
+        var center = this.roseCenter();
+        var x = center.x - Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y + Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
+    }
+
+    southSouthWest(): Coordinate {
+        var rads = DrawUtil.toRadians(67.5);
+        var center = this.roseCenter();
+        var x = center.x - Math.round(Math.cos(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        var y = center.y + Math.round(Math.sin(rads) * (this.cfg.roseRadius + (this.cfg.marginRight / 2)));
+        return new Coordinate(x, y);
     }
 
     infoCornerLeftTop(): Coordinate {

@@ -15,4 +15,7 @@ export class GlobalConfig {
     static defaultSpeedRangeBeaufort = true;
     static defaultCurrentDirectionArrowSize = 50;
     static defaultCurrentDirectionCircleSize = 30;
+    static defaultCardinalDirectionLabelSize = 50;
+    static defaultIntercardinalDirectionLabelSize = 40;
+    static defaultSubIntercardinalDirectionLabelSize = 30;
 }

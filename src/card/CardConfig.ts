@@ -7,6 +7,7 @@ import {CardConfigCompass} from "./CardConfigCompass";
 import {CardConfigCurrentDirection} from "./CardConfigCurrentDirection";
 import {CardConfigCorners} from "./CardConfigCorners";
 import {CardConfigActions} from "./CardConfigActions";
+import {CardConfigDirectionLabels} from "./CardConfigDirectionLabels";
 
 export interface CardConfig {
     type: string;
@@ -33,7 +34,8 @@ export interface CardConfig {
     windspeed_bar_location: string;
     windspeed_bar_full: boolean;
     hide_windspeed_bar: boolean;
-    cardinal_direction_letters: string;
+    cardinal_direction_letters: string; //Deprecated
+    direction_labels: CardConfigDirectionLabels;
     wind_direction_count: number;
     matching_strategy: string;
     background_image: string;
