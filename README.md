@@ -665,15 +665,15 @@ corner_info:
     entity: sensor.wind_gust
     label_text_size: 50
     value_text_size: 50
-    inputUnit: kph
-    outputUnit: knpts
+    input_unit: kph
+    output_unit: knpts
   top_right:
     label: Wind direction
     unit: °
     color: red
     entity: sensor.wind_direction_azimuth
-    inputUnit: degrees
-    outputUnit: letters
+    input_unit: degrees
+    output_unit: letters
   bottom_left:
     label: Compass
     unit: °
