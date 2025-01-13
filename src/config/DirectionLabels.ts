@@ -139,7 +139,6 @@ export class DirectionLabels {
                 customLabels.nnw = letters[0] + letters[0] + letters[3];
             }
         }
-        console.log("Labels", customLabels);
         return new DirectionLabels(
             showCardinalDirections,
             showIntercardinalDirections,

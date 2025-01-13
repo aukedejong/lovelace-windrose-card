@@ -20,7 +20,7 @@ import {Log2} from "../util/Log2";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.13.0 `,
+    `%c  WINROSE-CARD  %c Version 1.13.1 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );

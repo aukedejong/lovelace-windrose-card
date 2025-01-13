@@ -1,5 +1,3 @@
-import {DirectionSpeed} from "./DirectionSpeed";
-
 export class TimeDirectionSpeed {
 
     public direction: number | string | undefined;
@@ -7,10 +5,6 @@ export class TimeDirectionSpeed {
     public seconds: number | undefined;
 
     constructor(public time: number) {
-    }
-
-    toDirectionSpeed(): DirectionSpeed {
-        return new DirectionSpeed(this.direction!, this.speed!, this.seconds);
     }
 
     static directionFromHistoryData(historyData: HistoryData): TimeDirectionSpeed {

@@ -24,7 +24,7 @@ describe('FullTimeMatcher tests', () => {
         const speed: HistoryData[] = [];
         const merged = fullTimeMatcher.matchHistoryHistory(direction, speed);
 
-        expect(merged).toEqual([]);
+        expect(merged.getMeasurements()).toEqual([]);
     });
 
     test('Merge data, complete match', () => {
@@ -44,7 +44,7 @@ describe('FullTimeMatcher tests', () => {
         ];
         const merged = fullTimeMatcher.matchHistoryHistory(direction, speed);
 
-        expect(merged).toEqual([
+        expect(merged.getMeasurements()).toEqual([
             { "direction": "10", "seconds": 1, "speed": 10 },
             { "direction": "10", "seconds": 1, "speed": 10 },
             { "direction": "10", "seconds": 1, "speed": 10 },
@@ -66,7 +66,7 @@ describe('FullTimeMatcher tests', () => {
             {lu: 4, s: '30'},
         ];
         const merged = fullTimeMatcher.matchHistoryHistory(direction, speed);
-        expect(merged).toEqual([
+        expect(merged.getMeasurements()).toEqual([
             { "direction": undefined, "seconds": 1, "speed": 10 },
             { "direction": "100", "seconds": 2, "speed": 20 },
             { "direction": "200", "seconds": 1, "speed": 30 },
@@ -90,7 +90,7 @@ describe('FullTimeMatcher tests', () => {
         ];
         const merged = fullTimeMatcher.matchHistoryHistory(direction, speed);
 
-        expect(merged).toEqual([
+        expect(merged.getMeasurements()).toEqual([
             { "direction": "10", "seconds": 1, "speed": 10 },
             { "direction": "10", "seconds": 1, "speed": 10 },
             { "direction": "10", "seconds": 1, "speed": 10 },
@@ -114,7 +114,7 @@ describe('FullTimeMatcher tests', () => {
         ];
         const merged = fullTimeMatcher.matchHistoryHistory(direction, speed);
 
-        expect(merged).toEqual([
+        expect(merged.getMeasurements()).toEqual([
             { "direction": "10", "seconds": 1, "speed": 10 },
             { "direction": "10", "seconds": 1, "speed": 10 },
             { "direction": "10", "seconds": 1, "speed": 10 },
@@ -140,7 +140,7 @@ describe('FullTimeMatcher tests', () => {
         ];
         const merged = fullTimeMatcher.matchHistoryHistory(direction, speed);
 
-        expect(merged).toEqual([
+        expect(merged.getMeasurements()).toEqual([
             { "direction": "100", "seconds": 1, "speed": 10 },
             { "direction": "200", "seconds": 1, "speed": 20 },
             { "direction": "200", "seconds": 1, "speed": 30 },

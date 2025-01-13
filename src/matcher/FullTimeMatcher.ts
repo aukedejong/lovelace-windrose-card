@@ -73,50 +73,8 @@ export class FullTimeMatcher implements MeasurementMatcher {
             prevTds.seconds = (Date.now() / 1000) - prevTds.time;
         }
         const matchedMeasurements = new MatchedMeasurements();
-        mergedList.forEach((tds) => matchedMeasurements.add(tds.direction!, tds.speed!, tds.time));
+        mergedList.forEach((tds) => matchedMeasurements.add(tds.direction!, tds.speed!, tds.seconds));
         return matchedMeasurements;
     }
 
-    mergeMeasurements2(directionHistory: HistoryData[], speedHistory: HistoryData[]): TimeDirectionSpeed[] {
-        const merged = [] as TimeDirectionSpeed[];
-        let indexDirection = 0;
-        let indexSpeed = 0;
-        let prevTds: TimeDirectionSpeed | undefined;
-        while (indexDirection < directionHistory.length || indexSpeed < speedHistory.length) {
-            const direction = directionHistory[indexDirection];
-            const speed = speedHistory[indexSpeed];
-            let tds: TimeDirectionSpeed;
-            if (direction.lu === speed.lu) {
-                tds = new TimeDirectionSpeed(direction.lu);
-                tds.direction = direction.s;
-                tds.speed = +speed.s;
-                if (indexDirection < directionHistory.length - 1) indexDirection++;
-                if (indexSpeed < speedHistory.length - 1) indexSpeed++;
-            } else if (direction.lu > speed.lu) { //Speed measurement is earlier.
-                tds = new TimeDirectionSpeed(speed.lu);
-                tds.direction = indexDirection === 0 ? undefined : directionHistory[indexDirection - 1].s;
-                tds.speed = +speed.s;
-                if (indexSpeed < speedHistory.length - 1) {
-                    indexSpeed++;
-                } else {
-                    indexDirection++;
-                }
-            } else {
-                tds = new TimeDirectionSpeed(direction.lu);
-                tds.direction = direction.s;
-                tds.speed = indexSpeed === 0 ? undefined : +speedHistory[indexSpeed - 1].s;
-                if (indexDirection < directionHistory.length - 1) {
-                    indexDirection++;
-                } else {
-                    indexSpeed++;
-                }
-            }
-            merged.push(tds!)
-            if (prevTds) {
-                prevTds.seconds = tds.time - prevTds.time;
-            }
-            prevTds = tds;
-        }
-        return merged;
-    }
 }
