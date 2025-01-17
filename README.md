@@ -247,7 +247,7 @@ direction_labels:
    cardinal_directions_text_size: 60
    intercardinal_directions_text_size: 45
    secondary_intercardinal_directions_text_size: 30
-   customLabels:
+   custom_labels:
       n: A
       e: B
       s: C
