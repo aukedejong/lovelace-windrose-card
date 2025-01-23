@@ -91,10 +91,10 @@ Select "Manage Resources"
 | direction_labels                        |   [object](#Object-direction_labels)    |                              |    -     | Windrose cardinal direction label configuration. Cardinal_direction_letters configuration is moved into this plus added features. Of this property is defined, the above cardinal_direction_letters config is ignored.                                       |
 | wind_direction_count                    |                 string                  |              16              |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                                                                                                                             |
 | windrose_draw_north_offset              |                 number                  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                                                                                                          |
-| compass_direction                       |   [object](#Ojbect-compass_direction)   |                              |    -     | Configuration for using a compass sensor to rotate the windrose to the correct direction, for use on for example a boat.                                                                                                                                     |
+| compass_direction                       |   [object](#Object-compass_direction)   |                              |    -     | Configuration for using a compass sensor to rotate the windrose to the correct direction, for use on for example a boat.                                                                                                                                     |
 | current_direction                       |   [object](#Object-current_direction)   |                              |    -     | Shows the last reported wind direction with a red arrow on the wind rose.                                                                                                                                                                                    |
-| corner_info             (NEW OPTIONS)   |      [object](#Ojbect-corner_info)      |                              |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                                                                               |
-| actions                      (NEW)      |        [object](#Ojbect-actions)        |                              |    -     | Configuration for HA actions, for example to display more-info popups.                                                                                                                                                                                       |
+| corner_info             (NEW OPTIONS)   |      [object](#Object-corner_info)      |                              |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                                                                               |
+| actions                      (NEW)      |        [object](#Object-actions)        |                              |    -     | Configuration for HA actions, for example to display more-info popups.                                                                                                                                                                                       |
 | matching_strategy        (NEW OPTION)   |                 string                  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first`, `time-frame` or `full-time`. More info at [Matching strategies](#Matching-strategies) |
 | background_image                        |                 string                  |                              |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                                                                                                              |
 | colors                                  |        [object](#Object-colors)         |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                                                                                                                    |
@@ -305,7 +305,7 @@ Some sensors can have a value like CALM or VRB, indicating there is no direction
 | center_circle_size | number  |   30    |          | Size of the center circle, only when not using the center_calm_percentage. Then a red circle is displeyed around the center percante. |
 
 
-### Ojbect compass_direction
+### Object compass_direction
 
 This configuration is only needed if you want the windrose to rotate on an compass entity.
 Usefull on for example a boat.
@@ -317,7 +317,7 @@ You can also make a helper number entity to rotate the windrose on manual input.
 | entity      | string  |         |    x     | Compass or other direction entity, needs degrees as unit. |
 
 
-### Ojbect corner_info
+### Object corner_info
 
 Configuration for displaying information in the corners around the windrose.
 
@@ -393,7 +393,7 @@ corner_info:
     entity: input_number.compass
 ```
 
-### Ojbect actions
+### Object actions
 
 The tap and double-tap actions described in the Home Assistant documentation are supported. See link:
 [Home Assistant action documentation](https://www.home-assistant.io/dashboards/actions/)
