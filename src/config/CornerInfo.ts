@@ -1,6 +1,7 @@
 export class CornerInfo {
     show: boolean = false;
     entity: string | undefined;
+    attribute: string | undefined;
     color!: string;
     labelTextSize!: number;
     valueTextSize!: number;

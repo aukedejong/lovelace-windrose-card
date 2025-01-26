@@ -6,17 +6,18 @@ export class EntityChecker {
 
     public checkEntities(cardConfig: CardConfigWrapper, hass: HomeAssistant) {
 
-        this.checkEntity(cardConfig.windDirectionEntity.entity, hass);
+        const windDirectionEntity = cardConfig.windDirectionEntity;
+        this.checkEntity(windDirectionEntity.entity, windDirectionEntity.attribute, windDirectionEntity.useStatistics, hass);
 
         for (const entity of cardConfig.windspeedEntities) {
-            this.checkEntity(entity.entity, hass);
+            this.checkEntity(entity.entity, entity.attribute, entity.useStatistics, hass);
             if (entity.speedUnit === 'auto' && hass.states[entity.entity].attributes.unit_of_measurement !== undefined) {
                 entity.speedUnit = hass.states[entity.entity].attributes.unit_of_measurement as string;
             }
         }
 
         if (cardConfig.compassConfig && cardConfig.compassConfig.autoRotate && cardConfig.compassConfig.entity) {
-            this.checkEntity(cardConfig.compassConfig.entity, hass);
+            this.checkEntity(cardConfig.compassConfig.entity, cardConfig.compassConfig.attribute, false, hass);
         }
 
         this.checkCornerInfo(cardConfig.cornersInfo.topLeftInfo, hass);
@@ -27,16 +28,26 @@ export class EntityChecker {
 
     private checkCornerInfo(cornerInfo: CornerInfo, hass: HomeAssistant) {
         if (cornerInfo.show && cornerInfo.entity) {
-            this.checkEntity(cornerInfo.entity, hass);
+            this.checkEntity(cornerInfo.entity, cornerInfo.attribute, false, hass);
             if (cornerInfo.precision === undefined) {
                 cornerInfo.precision = hass.entities[cornerInfo.entity]?.display_precision;
             }
         }
     }
 
-    private checkEntity(entity: string, hass: HomeAssistant) {
+    private checkEntity(entity: string, attribute: string | undefined, statsSupport: boolean, hass: HomeAssistant) {
         if (hass.states[entity] === undefined) {
             throw new Error(`Entity ${entity} not found.`);
+        }
+        if (statsSupport) {
+            if (hass.states[entity].attributes['state_class'] !== 'measurement') {
+                throw new Error(`Entity ${entity} does not support long term statistics, state_class should be measurement.`);
+            }
+        }
+        if (attribute) {
+            if (hass.states[entity].attributes[attribute] == undefined) {
+                throw new Error(`Attribute ${attribute} not found in entity ${entity}.`);
+            }
         }
     }
 }

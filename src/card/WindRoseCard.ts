@@ -5,11 +5,12 @@ import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardConfig} from "./CardConfig";
 import {Log} from "../util/Log";
 import {WindRoseDirigent} from "../renderer/WindRoseDirigent";
-import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {EntityChecker} from "../entity-checker/EntityChecker";
 import {Svg, SVG} from "@svgdotjs/svg.js";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {Log2} from "../util/Log2";
+import {HAMeasurementProvider} from "../measurement-provider/HAMeasurementProvider";
+import {HAWebservice} from "../measurement-provider/HAWebservice";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -20,7 +21,7 @@ import {Log2} from "../util/Log2";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.13.1 `,
+    `%c  WINROSE-CARD  %c Version 1.14.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -39,7 +40,7 @@ export class WindRoseCard extends LitElement {
 
     windRoseDirigent!: WindRoseDirigent;
     entityStateProcessor!: EntityStatesProcessor;
-    measurementProvider!: HomeAssistantMeasurementProvider;
+    measurementProvider!: HAMeasurementProvider;
     entityChecker!: EntityChecker;
 
     config!: CardConfig;
@@ -48,6 +49,8 @@ export class WindRoseCard extends LitElement {
     updateInterval: NodeJS.Timer | undefined;
     _hass!: HomeAssistant;
     svg: Svg;
+    warningMessage: string = '';
+    errorMessage: string = '';
 
     constructor() {
         super();
@@ -95,13 +98,13 @@ export class WindRoseCard extends LitElement {
         this.log.debug("refreshCardConfig()");
         try {
             this.entityChecker.checkEntities(this.cardConfig, this._hass);
-            this.measurementProvider = new HomeAssistantMeasurementProvider(this.cardConfig);
-            this.measurementProvider.setHass(this._hass);
+            this.measurementProvider = new HAMeasurementProvider(new HAWebservice(this._hass), this.cardConfig);
             this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor);
             this.entityStateProcessor.init(this.cardConfig)
             this.refreshMeasurements();
         } catch(e) {
             Log.error("Error during init: ", e);
+            this.errorMessage = e as string;
             this.svg.remove();
         }
     }
@@ -112,6 +115,9 @@ export class WindRoseCard extends LitElement {
         return html`
             <ha-card header="${this.cardConfig?.title}" >
                 <div class="card-content" id="svg-container">
+                    <div id="info-container"></div>
+                    <div id="warning-container">${this.warningMessage}</div>
+                    <div id="error-container">${this.errorMessage}</div>
                 </div>
             </ha-card>
         `;
@@ -143,6 +149,12 @@ export class WindRoseCard extends LitElement {
         return css`
           :host {
             display: block;
+          }
+          #warning-container {
+              color: yellow;
+          }
+          #error-container {
+              color: red;
           }`
     }
 

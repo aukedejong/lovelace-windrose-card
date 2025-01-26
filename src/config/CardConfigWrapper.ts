@@ -92,7 +92,7 @@ export class CardConfigWrapper {
         this.title = this.cardConfig.title;
         this.dataPeriod = this.checkDataPeriod(cardConfig.hours_to_show, cardConfig.data_period);
         this.refreshInterval = this.checkRefreshInterval();
-        this.windDirectionEntity = this.checkWindDirectionEntity();
+        this.windDirectionEntity = WindDirectionEntity.fromConfig(cardConfig.wind_direction_entity);
         this.windspeedEntities = this.checkWindspeedEntities();
         this.windRoseDrawNorthOffset = this.checkWindRoseDrawNorthOffset();
         this.currentDirection = this.checkCurrentDirection()
@@ -167,21 +167,6 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultRefreshInterval;
     }
 
-    private checkWindDirectionEntity(): WindDirectionEntity {
-        if (this.cardConfig.wind_direction_entity) {
-            const entityConfig = this.cardConfig.wind_direction_entity;
-            if (entityConfig.entity === undefined) {
-                throw new Error("WindRoseCard: No wind_direction_entity.entity configured.");
-            }
-            const entity = entityConfig.entity;
-            const useStatistics = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.use_statistics);
-            const directionCompensation = this.checkDirectionCompensation(entityConfig.direction_compensation);
-            const directionLetters = this.checkDirectionLetters(entityConfig.direction_letters);
-            return new WindDirectionEntity(entity, useStatistics, directionCompensation, directionLetters);
-        }
-        throw new Error("WindRoseCard: No wind_direction_entity configured.");
-    }
-
     private checkCurrentDirection(): CurrentDirectionConfig {
         if (this.cardConfig.current_direction) {
             return new CurrentDirectionConfig(
@@ -216,27 +201,6 @@ export class CardConfigWrapper {
             entities.push(WindSpeedEntity.fromConfig(entityConfig, parentWindSpeedConfig))
         }
         return entities;
-    }
-
-    private checkDirectionCompensation(directionCompensation: number): number {
-        if (directionCompensation && isNaN(directionCompensation)) {
-            throw new Error('WindRoseCard: Invalid direction compensation, should be a number in degress between 0 and 360.');
-        } else if (directionCompensation) {
-            return directionCompensation;
-        }
-        return 0;
-    }
-
-    private checkDirectionLetters(directionLetters: string): string | undefined {
-        if (directionLetters) {
-
-            if (directionLetters && directionLetters.length === 5) {
-                return directionLetters.toUpperCase();
-            } else {
-                throw new Error('WindRoseCard: direction_letters config should be 5 letters.');
-            }
-        }
-        return undefined;
     }
 
     private checkWindRoseDrawNorthOffset(): number {
@@ -291,17 +255,19 @@ export class CardConfigWrapper {
     private checkCompassConfig(compassDirection: CardConfigCompass | undefined): CompassConfig {
         let entity = undefined;
         let autoRotate = false;
+        let attribute = undefined;
         if (compassDirection) {
             autoRotate = ConfigCheckUtils.checkBooleanDefaultFalse(compassDirection.auto_rotate);
             if (autoRotate) {
                 if (compassDirection.entity) {
                     entity = compassDirection.entity;
+                    attribute = compassDirection.attribute;
                 } else {
                     throw new Error('WindRoseCard: compass direction auto rotate set to true, but no entity configured.');
                 }
             }
         }
-       return new CompassConfig(autoRotate, entity);
+       return new CompassConfig(autoRotate, entity, attribute);
     }
 
     createRawEntitiesArray(): string[] {
@@ -318,5 +284,12 @@ export class CardConfigWrapper {
             entities.push(this.windDirectionEntity.entity);
         }
         return entities.concat(this.windspeedEntities.filter(config => config.useStatistics).map(config => config.entity));
+    }
+
+    attributesConfigured(): boolean {
+        if (this.windDirectionEntity.attribute || this.windspeedEntities.some((entity) => entity.attribute)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -73,7 +73,7 @@ Select "Manage Resources"
 | type                                    |                 string                  |                              |    x     | `custom:windrose-card`.                                                                                                                                                                                                                                      |
 | title                                   |                 string                  |                              |    -     | The card title.                                                                                                                                                                                                                                              |
 | wind_direction_entity                   | [object](#Object-wind_direction_entity) |              x               |          | The wind direction entity, having directing in degrees as the state.                                                                                                                                                                                         |
-| windspeed_entities      (NEW OPTIONS)   |  [object](#Object-windspeed_entities)   |                              |    x     | One are more windspeed entities. Only the first is used for the windrose.                                                                                                                                                                                    |
+| windspeed_entities                      |  [object](#Object-windspeed_entities)   |                              |    x     | One are more windspeed entities. Only the first is used for the windrose.                                                                                                                                                                                    |
 | refresh_interval                        |                 number                  |             300              |    -     | Refresh interval in seconds                                                                                                                                                                                                                                  |
 | hours_to_show (DEPRECATED)              |                 number                  |                              |    -     | Deprecated. Still works for now. Use the data period object instead.                                                                                                                                                                                         |
 | data_period                             |      [object](#Object-data_period)      |                              |    x     | Configure what data period to query. See object data_period below. Only one options should be configured.                                                                                                                                                    |
@@ -93,9 +93,9 @@ Select "Manage Resources"
 | windrose_draw_north_offset              |                 number                  |              0               |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation                                                                                                          |
 | compass_direction                       |   [object](#Object-compass_direction)   |                              |    -     | Configuration for using a compass sensor to rotate the windrose to the correct direction, for use on for example a boat.                                                                                                                                     |
 | current_direction                       |   [object](#Object-current_direction)   |                              |    -     | Shows the last reported wind direction with a red arrow on the wind rose.                                                                                                                                                                                    |
-| corner_info             (NEW OPTIONS)   |      [object](#Object-corner_info)      |                              |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                                                                               |
-| actions                      (NEW)      |        [object](#Object-actions)        |                              |    -     | Configuration for HA actions, for example to display more-info popups.                                                                                                                                                                                       |
-| matching_strategy        (NEW OPTION)   |                 string                  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first`, `time-frame` or `full-time`. More info at [Matching strategies](#Matching-strategies) |
+| corner_info                             |      [object](#Object-corner_info)      |                              |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                                                                               |
+| actions                                 |        [object](#Object-actions)        |                              |    -     | Configuration for HA actions, for example to display more-info popups.                                                                                                                                                                                       |
+| matching_strategy                       |                 string                  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first`, `time-frame` or `full-time`. More info at [Matching strategies](#Matching-strategies) |
 | background_image                        |                 string                  |                              |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                                                                                                              |
 | colors                                  |        [object](#Object-colors)         |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                                                                                                                    |
 | log_level                               |                 string                  |             WARN             |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                                                                                                                 |
@@ -111,6 +111,21 @@ Only one of the options should be configured.
 | from_hour_of_day | number |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used. |
 | time_interval    | number |   60    |    -     | Time interval in seconds. Only used by the time-frame matching strategy. More info at [Matching strategies](#Matching-strategies)                                                                |
 
+### Home Assistant data retention
+
+The hours_to_show option does not have a limit yet. When set higher then is available in Home Assistant, the card will not show a message.
+Home Assistant has a default entity state retention of 10 days. This can be changed in the recorder configuration. See [https://www.home-assistant.io/integrations/recorder/#purge_keep_days](https://www.home-assistant.io/integrations/recorder/#purge_keep_days).
+
+#### State data
+When using entity state data, using an hours_to_show of more then 240 hours (10 days, in reality it's a little bit more) will not give the card more measurements.
+
+#### Statistics data
+When using statistics data, currently the card has not more then 10 days data available. This is because the card uses the short-term statistics, 5 minute period data.
+
+More info about Home Assistant statistics data: [https://data.home-assistant.io/docs/statistics/](https://data.home-assistant.io/docs/statistics/).
+
+I'm working on making the long-term statistics available to the card. Long-term statistics is never purged and only contains hourly data.
+
 
 ### Object wind_direction_entity
 
@@ -120,6 +135,7 @@ When the state is numeric, a degree value is assumed. When the state is letters,
 | Name                                                  |  Type   | Default | Required | Description                                                                                                                                                                                                                               |
 |-------------------------------------------------------|:-------:|:-------:|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | entity                                                | string  |         |    x     | Wind direction entity                                                                                                                                                                                                                     |
+| attribute                                             | string  |         |          | If used, not the state but the attributtes value is deplayed.                                                                                                                                                                             |
 | use_statistics                                        | boolean |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                                                      |
 | direction_unit (not used anymore since version 1.8.2) | string  | degrees |    -     | Wind direction unit, options: degrees, letters. Where letters being N, NE upto 32 directions.                                                                                                                                             |
 | direction_compensation                                | number  |    0    |    -     | Compensate the measured direction in degrees.                                                                                                                                                                                             |
@@ -130,21 +146,22 @@ When the state is numeric, a degree value is assumed. When the state is letters,
 
 See [here](#Examples-using-custom-speed-ranges) for some example speed ragne configurations.
 
-| Name                    |                  Type                  |           Default            | Required | Description                                                                                                                                                                                            |
-|-------------------------|:--------------------------------------:|:----------------------------:|:--------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| entity                  |                 string                 |                              |    x     | Wind speed entity.                                                                                                                                                                                     |
-| name                    |                 string                 |                              |    -     | Label, displayed with the windspeed bar.                                                                                                                                                               |
-| use_statistics          |                boolean                 |            false             |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                   |
-| render_relative_scale   |                boolean                 |             true             |    -     | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks.                                                                                   |
-| speed_unit              | [string](#Windspeed-unit-options)      |             auto             |    -     | Windspeed unit of measurement, see Windspeed unit options bellow. When the speed_range_beaufort property is not set or set to true, the bars will show Beaufort ranges.                                |
-| windspeed_bar_full      |                boolean                 |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                   |
-| output_speed_unit       |                 string                 |             mps              |    -     | Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                        |
-| output_speed_unit_label |                 string                 |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                                                               |
-| speed_range_beaufort    |                boolean                 |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false.   |
-| speed_range_step        |                 number                 | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                                                  |
-| speed_range_max         |                 number                 | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                   |
-| speed_ranges            |     [object](#Object-speed_ranges)     | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                                                 |
-| dynamic_speed_ranges    | [object](#Object-dynamic_speed_ranges) |                              |    -     | Speed range step and max config, depending on the average wind speed                                                                                                                                   |
+| Name                    |                  Type                  |           Default            | Required | Description                                                                                                                                                                                          |
+|-------------------------|:--------------------------------------:|:----------------------------:|:--------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entity                  |                 string                 |                              |    x     | Wind speed entity.                                                                                                                                                                                   |
+| attribute               |                 string                 |                              |          | If used, not the state but the attributtes value is deplayed.                                                                                                                                        |
+| name                    |                 string                 |                              |    -     | Label, displayed with the windspeed bar.                                                                                                                                                             |
+| use_statistics          |                boolean                 |            false             |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                 |
+| render_relative_scale   |                boolean                 |             true             |    -     | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks.                                                                                 |
+| speed_unit              | [string](#Windspeed-unit-options)      |             auto             |    -     | Windspeed unit of measurement, see Windspeed unit options bellow. When the speed_range_beaufort property is not set or set to true, the bars will show Beaufort ranges.                              |
+| windspeed_bar_full      |                boolean                 |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                 |
+| output_speed_unit       |                 string                 |             mps              |    -     | Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                      |
+| output_speed_unit_label |                 string                 |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                                                             |
+| speed_range_beaufort    |                boolean                 |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false. |
+| speed_range_step        |                 number                 | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                                                |
+| speed_range_max         |                 number                 | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                 |
+| speed_ranges            |     [object](#Object-speed_ranges)     | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                                               |
+| dynamic_speed_ranges    | [object](#Object-dynamic_speed_ranges) |                              |    -     | Speed range step and max config, depending on the average wind speed                                                                                                                                 |
 
 ### Windspeed unit options:
 
@@ -160,7 +177,7 @@ When your windspeed entity uses an unit of measurement not mentioned in the tabl
 | kph      | kilometer per hour |   x   |   x    | kph, km/h                           |
 | mph      |   miles per hour   |   x   |   x    | mps, m/h                            |
 | fps      |  feet per second   |   x   |   x    | fps, f/s                            |
-| knot     |       knots        |   x   |   x    | knots, knts, kts                    |
+| knot     |       knots        |   x   |   x    | knots, kts, knts, kn, knot          |
 
 
 ### Object speed_ranges
@@ -311,10 +328,11 @@ This configuration is only needed if you want the windrose to rotate on an compa
 Usefull on for example a boat.
 You can also make a helper number entity to rotate the windrose on manual input.
 
-| Name        |  Type   | Default | Required | Description                                               |
-|-------------|:-------:|:-------:|:--------:|-----------------------------------------------------------|
-| auto_rotate | boolean |         |    x     | Use auto rotation, false to turn off.                     |
-| entity      | string  |         |    x     | Compass or other direction entity, needs degrees as unit. |
+| Name        |  Type   | Default | Required | Description                                                   |
+|-------------|:-------:|:-------:|:--------:|---------------------------------------------------------------|
+| auto_rotate | boolean |         |    x     | Use auto rotation, false to turn off.                         |
+| entity      | string  |         |    x     | Compass or other direction entity, needs degrees as unit.     |
+| attribute   | string  |         |          | If used, not the state but the attributtes value is deplayed. |
 
 
 ### Object corner_info
@@ -338,6 +356,7 @@ Configuration for displaying information in the corners around the windrose.
 | label_text_size   | number |          50          |          | The text size of the label.                                                                                                   |
 | value_text_size   | number |          80          |          | The text size of the entity's state.                                                                                          |
 | entity            | string |                      |    x     | State of the entity will be displayed                                                                                         |
+| attribute         | string |                      |          | If used, not the state but the attributtes value is deplayed.                                                                 |
 | input_unit        | string |                      |          | Input unit, not automatically determined. See for options [Unit conversion](#Corner-Info-unit-conversion)                     |
 | output_unit       | string |                      |          | Output unit                                                                                                                   |
 | precision         | string |                      |          | Overwrites (if available) the precision of the entity. For rounding the value, for example after converting to an other unit. |
@@ -423,7 +442,8 @@ Examples:
 actions:
   top_left:
     tap_action:
-      entity: sensor.wind_gust
+      entity: weather.home
+      attribute: wind_speed
       action: more-info
   top_right:
     double_tap_action:

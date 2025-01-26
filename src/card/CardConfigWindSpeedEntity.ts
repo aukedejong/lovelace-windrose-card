@@ -3,6 +3,7 @@ import {CardConfigDynamicSpeedRange} from "./CardConfigDynamicSpeedRange";
 
 export interface CardConfigWindSpeedEntity {
     entity: string;
+    attribute: string;
     name: string;
     use_statistics: boolean;
     render_relative_scale: boolean;

@@ -8,7 +8,6 @@ import {WindRoseData} from "./WindRoseData";
 import {WindRoseRendererCenterCalm} from "./WindRoseRendererCenterCalm";
 import {PercentageCalculatorCenterCalm} from "./PercentageCalculatorCenterCalm";
 import {WindRoseRenderer} from "./WindRoseRenderer";
-import {HomeAssistantMeasurementProvider} from "../measurement-provider/HomeAssistantMeasurementProvider";
 import {DimensionConfig} from "./DimensionConfig";
 import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
 import {DegreesCalculator} from "./DegreesCalculator";
@@ -17,10 +16,12 @@ import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProc
 import {InfoCornersRenderer} from "./InfoCornersRenderer";
 import {Element, Svg} from "@svgdotjs/svg.js";
 import {TouchFacesRenderer} from "./TouchFacesRenderer";
-import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
 import {SpeedUnit} from "../converter/SpeedUnit";
 import {SpeedUnits} from "../converter/SpeedUnits";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
+import {HAMeasurementProvider} from "../measurement-provider/HAMeasurementProvider";
+import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
+import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
 
 export class WindRoseDirigent {
     //Util
@@ -30,7 +31,8 @@ export class WindRoseDirigent {
     private cardConfig!: CardConfigWrapper;
 
     //Measurements
-    private measurementProvider!: HomeAssistantMeasurementProvider;
+    private measurementProvider!: HAMeasurementProvider;
+    private measurementMatcher!: MeasurementMatcher;
     private entityStatesProcessor!: EntityStatesProcessor;
     private percentageCalculator!: PercentageCalculator;
 
@@ -63,7 +65,7 @@ export class WindRoseDirigent {
     }
 
     init(cardConfig: CardConfigWrapper,
-         measurementProvider: HomeAssistantMeasurementProvider,
+         measurementProvider: HAMeasurementProvider,
          entityStatesProcessor: EntityStatesProcessor): void {
 
         this.log.debug("init()");
@@ -71,6 +73,7 @@ export class WindRoseDirigent {
         this.measurementsReady = false;
         this.cardConfig = cardConfig;
         this.measurementProvider = measurementProvider;
+        this.measurementMatcher = new MeasurementMatcher(cardConfig);
         this.entityStatesProcessor = entityStatesProcessor;
 
         for (const windSpeedEntity of this.cardConfig.windspeedEntities) {
@@ -115,9 +118,9 @@ export class WindRoseDirigent {
     refreshData(): Promise<boolean> {
         if (this.initReady) {
             this.log.debug('refreshData()');
-            return this.measurementProvider.getMeasurements().then((matchedGroups: MatchedMeasurements[]) => {
+            return this.measurementProvider.getMeasurements().then((measurementHolder: MeasurementHolder) => {
                 this.windRoseData = [];
-                this.log.debug('Matched measurements:', matchedGroups);
+                const matchedGroups = this.measurementMatcher.match(measurementHolder);
                 for (let i = 0; i < matchedGroups.length; i++) {
                     this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit, matchedGroups[i].getAverageSpeed());
                     for (const measurement of matchedGroups[i].getMeasurements()) {

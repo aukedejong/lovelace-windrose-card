@@ -54,17 +54,21 @@ export class CornersInfo {
     private static checkCornerInfo(cornerInfoConfig: CardConfigCornerInfo | undefined): CornerInfo {
         const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-text-color');
         const info = new CornerInfo();
-        info.entity = cornerInfoConfig?.entity;
-        info.color = cornerInfoConfig?.color === undefined ? defaultColor : cornerInfoConfig.color;
-        info.labelTextSize = ConfigCheckUtils.checkNummerOrDefault(cornerInfoConfig?.label_text_size, 50);
-        info.valueTextSize = ConfigCheckUtils.checkNummerOrDefault(cornerInfoConfig?.value_text_size, 80);
+        if (cornerInfoConfig === undefined || cornerInfoConfig === null) {
+            return info;
+        }
+        info.entity = cornerInfoConfig.entity;
+        info.attribute = cornerInfoConfig.attribute;
+        info.color = cornerInfoConfig.color === undefined ? defaultColor : cornerInfoConfig.color;
+        info.labelTextSize = ConfigCheckUtils.checkNummerOrDefault(cornerInfoConfig.label_text_size, 50);
+        info.valueTextSize = ConfigCheckUtils.checkNummerOrDefault(cornerInfoConfig.value_text_size, 80);
         info.label = cornerInfoConfig?.label;
-        info.inputUnit = this.checkUnit(cornerInfoConfig?.input_unit);
-        info.outputUnit = this.checkUnit(cornerInfoConfig?.output_unit);
+        info.inputUnit = this.checkUnit(cornerInfoConfig.input_unit);
+        info.outputUnit = this.checkUnit(cornerInfoConfig.output_unit);
         this.checkUnitCombinations(info.inputUnit, info.outputUnit);
-        info.unit = cornerInfoConfig?.unit;
-        info.precision = ConfigCheckUtils.checkNumberOrUndefined('precision', cornerInfoConfig?.precision);
-        info.directionLetters = cornerInfoConfig?.direction_letters;
+        info.unit = cornerInfoConfig.unit;
+        info.precision = ConfigCheckUtils.checkNumberOrUndefined('precision', cornerInfoConfig.precision);
+        info.directionLetters = cornerInfoConfig.direction_letters;
         if (info.entity || info.label) {
             info.show = true;
         }

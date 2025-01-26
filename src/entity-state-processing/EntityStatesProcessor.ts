@@ -26,15 +26,16 @@ export class EntityStatesProcessor {
         this.cardConfig = cardConfig;
         this.windDirectionConverter = new WindDirectionConverter(cardConfig.windDirectionEntity);
 
-        this.windDirectionState = new EntityState(this.cardConfig.currentDirection.showArrow, this.cardConfig.windDirectionEntity.entity);
-        this.compassDirectionState = new EntityState(this.cardConfig.compassConfig.autoRotate, this.cardConfig.compassConfig.entity);
+        this.windDirectionState = new EntityState(this.cardConfig.currentDirection.showArrow,
+            this.cardConfig.windDirectionEntity.entity, this.cardConfig.windDirectionEntity.attribute);
+        this.compassDirectionState = new EntityState(this.cardConfig.compassConfig.autoRotate,
+            this.cardConfig.compassConfig.entity, this.cardConfig.compassConfig.attribute);
 
         const cornerInfo = this.cardConfig.cornersInfo;
-        this.cornerTopLeftState = new EntityState(cornerInfo.topLeftInfo.show, cornerInfo.topLeftInfo.entity);
-        this.cornerTopRightState = new EntityState(cornerInfo.topRightInfo.show, cornerInfo.topRightInfo.entity);
-        this.cornerBottomLeftState = new EntityState(cornerInfo.bottomLeftInfo.show, cornerInfo.bottomLeftInfo.entity);
-        this.cornerBottomRightState = new EntityState(cornerInfo.bottomRightInfo.show, cornerInfo.bottomRightInfo.entity);
-
+        this.cornerTopLeftState = new EntityState(cornerInfo.topLeftInfo.show, cornerInfo.topLeftInfo.entity, cornerInfo.topLeftInfo.attribute);
+        this.cornerTopRightState = new EntityState(cornerInfo.topRightInfo.show, cornerInfo.topRightInfo.entity, cornerInfo.topRightInfo.attribute);
+        this.cornerBottomLeftState = new EntityState(cornerInfo.bottomLeftInfo.show, cornerInfo.bottomLeftInfo.entity, cornerInfo.bottomLeftInfo.attribute);
+        this.cornerBottomRightState = new EntityState(cornerInfo.bottomRightInfo.show, cornerInfo.bottomRightInfo.entity, cornerInfo.bottomRightInfo.attribute);
 
         this.cornerInfoStates = [this.cornerTopLeftState, this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
         this.entityStates = [this.windDirectionState, this.compassDirectionState, this.cornerTopLeftState,
@@ -61,7 +62,12 @@ export class EntityStatesProcessor {
         if (entityState.entity === undefined || !entityState.active) {
             return;
         }
-        const newState = hass.states[entityState.entity].state;
+        let newState;
+        if (entityState.attribute) {
+            newState = hass.states[entityState.entity].attributes[entityState.attribute];
+        } else {
+            newState = hass.states[entityState.entity].state;
+        }
         if (newState !== undefined && entityState.state != newState) {
             entityState.updated = true;
             entityState.state = newState;

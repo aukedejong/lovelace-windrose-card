@@ -9,6 +9,7 @@ export class WindSpeedEntity {
 
     constructor(
         public readonly entity: string,
+        public readonly attribute: string | undefined,
         public readonly name: string,
         public readonly useStatistics: boolean,
         public readonly renderRelativeScale: boolean,
@@ -75,10 +76,11 @@ export class WindSpeedEntity {
         }
         const dynamicSpeedRanges = this.checkDynamicSpeedRanges(entityConfig.dynamic_speed_ranges);
         this.checkSpeedRangeCombi(outputSpeedUnit, speedRangeStep, speedRangeMax);
+        this.checkAttribuutStatsCombi(useStatistics, entityConfig.attribute);
 
-        return new WindSpeedEntity(entity, name, useStatistics, renderRelativeScale, windspeedBarFull, inputSpeedUnit,
-            outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort, speedRangeStep, speedRangeMax, speedRanges,
-            dynamicSpeedRanges);
+        return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, renderRelativeScale,
+            windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
+            speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges);
     }
 
     private static checkInputSpeedUnit(inputSpeedUnit: string): string {
@@ -193,6 +195,12 @@ export class WindSpeedEntity {
             }
         }
         return sorted;
+    }
+
+    private static checkAttribuutStatsCombi(useStatistics: boolean, attribute: string) {
+        if (useStatistics && attribute) {
+            throw new Error("Statistics not supported for attribute values.");
+        }
     }
 
 }

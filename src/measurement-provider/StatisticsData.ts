@@ -1,6 +1,5 @@
 interface StatisticsData {
-
     start: number;
     end: number;
-    mean: number;
+    mean: string;
 }
