@@ -47,7 +47,7 @@ export class SpeedUnits {
         (speed: number) => speed * 3.2808399, 10, 100);
 
     static readonly knots = new SpeedUnit('knots',
-        ['knots', 'kts', 'knts', 'kn'],
+        ['knots', 'kts', 'knts', 'kn', 'knot'],
         (speed: number) => speed / 1.9438444924406,
         (speed: number) => speed * 1.9438444924406, 5, 60);
 
