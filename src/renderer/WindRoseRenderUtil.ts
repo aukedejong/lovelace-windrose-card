@@ -45,7 +45,7 @@ export class WindRoseRenderUtil {
         this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
-    public drawBackground(windRoseData: WindRoseData): SVG.G {
+    public drawBackground(windRoseData: WindRoseData, centerCalm: boolean): SVG.G {
 
         var roseLinesGroup = this.svg.group();
 
@@ -63,9 +63,13 @@ export class WindRoseRenderUtil {
         }
 
         // Circles
+        let centerRadius = this.centerRadius;
+        if (!centerCalm) {
+            centerRadius = 0;
+        }
         const circleCount = windRoseData.circleCount;
-        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.centerRadius) / circleCount;
-        let circleRadius = this.centerRadius + radiusStep;
+        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - centerRadius) / circleCount;
+        let circleRadius = centerRadius + radiusStep;
         for (let i = 1; i <= circleCount; i++) {
             roseLinesGroup.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(circleRadius)));
             circleRadius += radiusStep;

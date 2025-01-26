@@ -61,7 +61,7 @@ export class WindRoseRendererStandaard {
         this.windRoseData = windRoseData;
         this.speedRanges = this.speedRangeService.getSpeedRanges();
 
-        const backgroundLines = this.windRoseRenderUtil.drawBackground(windRoseData);
+        const backgroundLines = this.windRoseRenderUtil.drawBackground(windRoseData, false);
         this.windDirectionTextGroup = this.windRoseRenderUtil.drawWindDirectionText();
         const windDirections = this.drawWindDirections();
 
