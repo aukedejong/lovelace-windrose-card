@@ -180,7 +180,7 @@ export class CardConfigWrapper {
 
     private checkWindspeedEntities(): WindSpeedEntity[] {
         if (!this.cardConfig.windspeed_entities || this.cardConfig.windspeed_entities.length == 0) {
-            throw new Error('WindRoseCard: No wind_speed_entities configured, minimal 1 needed.');
+            throw new Error('WindRoseCard: No windspeed_entities configured, minimal 1 needed.');
         }
         const entities:WindSpeedEntity[] = [];
         const parentWindSpeedConfig = {
