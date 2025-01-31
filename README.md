@@ -103,29 +103,45 @@ Select "Manage Resources"
 
 ### Object data_period
 
-Only one of the options should be configured.
+| Name                   |  Type   | Default | Required | Description                                                                                                                                                                                      |
+|------------------------|:-------:|:-------:|:--------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| hours_to_show          | number  |         |    -     | Show winddata for the last number of hours. Number higher then 0.                                                                                                                                |
+| from_hour_of_day       | number  |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used. |
+| time_interval          | number  |   60    |    -     | Time interval in seconds. Only used by the time-frame matching strategy. More info at [Matching strategies](#Matching-strategies)                                                                |
+| log_measurement_counts | boolean |  false  |    -     | When set to true, will log measurement and match counts to the browsers console. Can be useful to check the data where the graph is based on. Example output below.                              |
 
-| Name             |  Type  | Default | Required | Description                                                                                                                                                                                      |
-|------------------|:------:|:-------:|:--------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| hours_to_show    | number |         |    -     | Show winddata for the last number of hours. Number higher then 0.                                                                                                                                |
-| from_hour_of_day | number |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used. |
-| time_interval    | number |   60    |    -     | Time interval in seconds. Only used by the time-frame matching strategy. More info at [Matching strategies](#Matching-strategies)                                                                |
+#### Example console output, when log_measurement_counts is set to true
+```
+Measurements:
+Directions: 1213 - 20/01/2025, 18:18:01 - 30/01/2025, 18:11:37
+Speed:      964 - 20/01/2025, 18:18:01 - 30/01/2025, 18:01:37
+Matches:    1213 - min: 0 - max: 67.3 - strategy: direction-first
+```
 
 ### Home Assistant data retention
 
 The hours_to_show option does not have a limit yet. When set higher then is available in Home Assistant, the card will not show a message.
 Home Assistant has a default entity state retention of 10 days. This can be changed in the recorder configuration. See [https://www.home-assistant.io/integrations/recorder/#purge_keep_days](https://www.home-assistant.io/integrations/recorder/#purge_keep_days).
 
+Information about the retrieved entity states, counts, dates can writen to the browser console (F12).
+Set config  log_measurement_counts to true.
+
+```
+date_period:
+  hours_to_show: 59
+  log_measurements_counts: true
+```
+
 #### State data
 When using entity state data, using an hours_to_show of more then 240 hours (10 days, in reality it's a little bit more) will not give the card more measurements.
 
 #### Statistics data
-When using statistics data, currently the card has not more then 10 days data available. This is because the card uses the short-term statistics, 5 minute period data.
+When using statistics data, the card uses 5 minute period by default. This is short-term statistics and will not contain more then 10 days (default) history.
+You can change the default period with the statistics_period config.
+Keep in mind that the measurement interval for the direction and speed sensor should not differ very much for the best results.
+So, using monthly for the direction sensor and a 5minute period for the speed sensor will not give a graph with useful information I think.
 
 More info about Home Assistant statistics data: [https://data.home-assistant.io/docs/statistics/](https://data.home-assistant.io/docs/statistics/).
-
-I'm working on making the long-term statistics available to the card. Long-term statistics is never purged and only contains hourly data.
-
 
 ### Object wind_direction_entity
 
@@ -137,6 +153,7 @@ When the state is numeric, a degree value is assumed. When the state is letters,
 | entity                                                | string  |         |    x     | Wind direction entity                                                                                                                                                                                                                     |
 | attribute                                             | string  |         |          | If used, not the state but the attributtes value is deplayed.                                                                                                                                                                             |
 | use_statistics                                        | boolean |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                                                      |
+| statistics_period                                     | string  | 5minute |    -     | Statistics period, possible options: 5minute, hour, day, week, month and year. More info about [data retention](#Home-Assistant-data-retention)                                                                                           |
 | direction_unit (not used anymore since version 1.8.2) | string  | degrees |    -     | Wind direction unit, options: degrees, letters. Where letters being N, NE upto 32 directions.                                                                                                                                             |
 | direction_compensation                                | number  |    0    |    -     | Compensate the measured direction in degrees.                                                                                                                                                                                             |
 | direction_letters                                     | string  |  NESWX  |    -     | Only used when the state consists of letters. Some weather integrations use language specific letters. With this property you can change the default letters used. See https://en.wikipedia.org/wiki/Points_of_the_compass for more info. |
@@ -146,33 +163,35 @@ When the state is numeric, a degree value is assumed. When the state is letters,
 
 See [here](#Examples-using-custom-speed-ranges) for some example speed ragne configurations.
 
-| Name                    |                  Type                  |           Default            | Required | Description                                                                                                                                                                                          |
-|-------------------------|:--------------------------------------:|:----------------------------:|:--------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| entity                  |                 string                 |                              |    x     | Wind speed entity.                                                                                                                                                                                   |
-| attribute               |                 string                 |                              |          | If used, not the state but the attributtes value is deplayed.                                                                                                                                        |
-| name                    |                 string                 |                              |    -     | Label, displayed with the windspeed bar.                                                                                                                                                             |
-| use_statistics          |                boolean                 |            false             |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                 |
-| render_relative_scale   |                boolean                 |             true             |    -     | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks.                                                                                 |
-| speed_unit              | [string](#Windspeed-unit-options)      |             auto             |    -     | Windspeed unit of measurement, see Windspeed unit options bellow. When the speed_range_beaufort property is not set or set to true, the bars will show Beaufort ranges.                              |
-| windspeed_bar_full      |                boolean                 |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                 |
-| output_speed_unit       |                 string                 |             mps              |    -     | Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                      |
-| output_speed_unit_label |                 string                 |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                                                             |
-| speed_range_beaufort    |                boolean                 |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false. |
-| speed_range_step        |                 number                 | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                                                |
-| speed_range_max         |                 number                 | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                 |
-| speed_ranges            |     [object](#Object-speed_ranges)     | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                                               |
-| dynamic_speed_ranges    | [object](#Object-dynamic_speed_ranges) |                              |    -     | Speed range step and max config, depending on the average wind speed                                                                                                                                 |
+| Name                                   |                  Type                  |           Default            | Required | Description                                                                                                                                                                                          |
+|----------------------------------------|:--------------------------------------:|:----------------------------:|:--------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entity                                 |                 string                 |                              |    x     | Wind speed entity.                                                                                                                                                                                   |
+| attribute                              |                 string                 |                              |          | If used, not the state but the attributtes value is deplayed.                                                                                                                                        |
+| name                                   |                 string                 |                              |    -     | Label, displayed with the windspeed bar.                                                                                                                                                             |
+| use_statistics                         |                boolean                 |            false             |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                 |
+| statistics_period                      |                 string                 |           5minute            |    -     | Statistics period, possible options: 5minute, hour, day, week, month and year. More info about [data retention](#Home-Assistant-data-retention)                                                      |
+| render_relative_scale                  |                boolean                 |             true             |    -     | Renders the blocks in the windspeed bar relative to the speedrange size. Set to false evenly distributes the blocks.                                                                                 |
+| speed_unit                             |   [string](#Windspeed-unit-options)    |             auto             |    -     | Windspeed unit of measurement, see Windspeed unit options bellow. When the speed_range_beaufort property is not set or set to true, the bars will show Beaufort ranges.                              |
+| windspeed_bar_full                     |                boolean                 |             true             |    -     | When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                 |
+| output_speed_unit                      |                 string                 |             mps              |    -     | Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                      |
+| output_speed_unit_label                |                 string                 |                              |    -     | Overwrite the output speed units name, only for display.                                                                                                                                             |
+| speed_range_beaufort                   |                boolean                 |             true             |    -     | Uses the Beaufort speed ranges. The exact Beaufort ranges depend on the output windspeed unit. Default is true, when you want to show other speed unit on the bar graph, set this property to false. |
+| speed_range_step                       |                 number                 | depends on output speed unit |    -     | Sets the speed range step to use. Not possible for output speed unit bft (Beaufort) .                                                                                                                |
+| speed_range_max                        |                 number                 | depends on output speed unit |    -     | Sets the speed range max to use. Not possible for output speed unit bft (Beaufort). For example: step 5, max 20 creates ranges: 0-5, 5-10, 10-15, 15-20, 20-infinity                                 |
+| speed_ranges                           |     [object](#Object-speed_ranges)     | depends on output speed unit |    -     | Define custom speedranges and colours.                                                                                                                                                               |
+| dynamic_speed_ranges                   | [object](#Object-dynamic_speed_ranges) |                              |    -     | Speed range step and max config, depending on the average wind speed                                                                                                                                 |
 
 ### Windspeed unit options:
 
 Default is auto. When no windspeed unit is configured, the unit_of_measurement from Home Assisstant is used.
+When using entity attributes, the speed unit will probably not be auto determined. Then you need to add the speed_unit property.
 
 When your windspeed entity uses an unit of measurement not mentioned in the table below, please open an issue in GitHub.
 
 | Name     |    Description     | Input | Output | Recognized HA units of measurements |
 |----------|:------------------:|:-----:|:------:|-------------------------------------|
 | auto     |     automatic      |   x   |        |                                     |
-| Beaufort |     Beaufort       |   x   |        | Beaufort                            |
+| Beaufort |      Beaufort      |   x   |        | Beaufort                            |
 | mps      | metres per second  |   x   |   x    | mps, m/s                            |
 | kph      | kilometer per hour |   x   |   x    | kph, km/h                           |
 | mph      |   miles per hour   |   x   |   x    | mps, m/h                            |

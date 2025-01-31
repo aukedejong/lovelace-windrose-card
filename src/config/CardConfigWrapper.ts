@@ -123,21 +123,22 @@ export class CardConfigWrapper {
         const oldHoursToShowCheck = this.checkHoursToShow(oldHoursToShow);
         const hoursToShowCheck = this.checkHoursToShow(dataPeriod?.hours_to_show);
         const fromHourOfDayCheck = this.checkFromHourOfDay(dataPeriod?.from_hour_of_day);
+        const logMeasurementCounts = ConfigCheckUtils.checkBooleanDefaultFalse(dataPeriod?.log_measurement_counts);
         let timeInterval = ConfigCheckUtils.checkNummerOrDefault(dataPeriod?.time_interval, 60);
         if (timeInterval === 0) {
             timeInterval = 60;
         }
         if (oldHoursToShowCheck) {
             Log.warn('WindRoseCard: hours_to_show config is deprecated, use the data_period object.');
-            return new DataPeriod(oldHoursToShow, undefined, timeInterval);
+            return new DataPeriod(oldHoursToShow, undefined, timeInterval, logMeasurementCounts);
         }
         if (hoursToShowCheck && fromHourOfDayCheck) {
             throw new Error('WindRoseCard: Only one is allowed: hours_to_show or from_hour_of_day');
         }
         if (!hoursToShowCheck && !fromHourOfDayCheck) {
-            throw new Error('WindRoseCard: One config option of object data_period should be filled.');
+            throw new Error('WindRoseCard: hours_to_show or from_hour_of_day of object data_period should be filled.');
         }
-        return new DataPeriod(dataPeriod.hours_to_show, dataPeriod.from_hour_of_day, timeInterval);
+        return new DataPeriod(dataPeriod.hours_to_show, dataPeriod.from_hour_of_day, timeInterval, logMeasurementCounts);
     }
 
     private checkHoursToShow(hoursToShow: number): boolean {
@@ -268,28 +269,5 @@ export class CardConfigWrapper {
             }
         }
        return new CompassConfig(autoRotate, entity, attribute);
-    }
-
-    createRawEntitiesArray(): string[] {
-        const entities: string[] = [];
-        if (!this.windDirectionEntity.useStatistics) {
-            entities.push(this.windDirectionEntity.entity);
-        }
-        return entities.concat(this.windspeedEntities.filter(config => !config.useStatistics).map(config => config.entity));
-    }
-
-    createStatisticsEntitiesArray(): string[] {
-        const entities: string[] = [];
-        if (this.windDirectionEntity.useStatistics) {
-            entities.push(this.windDirectionEntity.entity);
-        }
-        return entities.concat(this.windspeedEntities.filter(config => config.useStatistics).map(config => config.entity));
-    }
-
-    attributesConfigured(): boolean {
-        if (this.windDirectionEntity.attribute || this.windspeedEntities.some((entity) => entity.attribute)) {
-            return true;
-        }
-        return false;
     }
 }

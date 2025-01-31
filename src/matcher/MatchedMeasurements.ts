@@ -40,4 +40,8 @@ export class MatchedMeasurements {
     getMeasurementCount(): number {
         return this.count;
     }
+
+    getInfo(): string {
+        return `Matches:    ${this.count} - min: ${this.minSpeed} - max: ${this.maxSpeed}`;
+    }
 }

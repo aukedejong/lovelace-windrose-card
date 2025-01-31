@@ -11,8 +11,14 @@ export class EntityChecker {
 
         for (const entity of cardConfig.windspeedEntities) {
             this.checkEntity(entity.entity, entity.attribute, entity.useStatistics, hass);
-            if (entity.speedUnit === 'auto' && hass.states[entity.entity].attributes.unit_of_measurement !== undefined) {
-                entity.speedUnit = hass.states[entity.entity].attributes.unit_of_measurement as string;
+            if (entity.speedUnit === 'auto') {
+                if (hass.states[entity.entity].attributes.unit_of_measurement !== undefined) {
+                    entity.speedUnit = hass.states[entity.entity].attributes.unit_of_measurement as string;
+                } else if (hass.states[entity.entity].attributes.wind_speed_unit !== undefined) {
+                    entity.speedUnit = hass.states[entity.entity].attributes.wind_speed_unit as string;
+                } else {
+                    throw new Error(`Entity ${entity.entity} speed unit could not be auto determined, please configure the unit.`)
+                }
             }
         }
 

@@ -6,6 +6,7 @@ export interface CardConfigWindSpeedEntity {
     attribute: string;
     name: string;
     use_statistics: boolean;
+    statistics_period: string;
     render_relative_scale: boolean;
     windspeed_bar_full: boolean;
     speed_unit: string;

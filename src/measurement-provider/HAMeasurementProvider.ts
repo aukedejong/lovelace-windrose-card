@@ -8,18 +8,14 @@ import {WindDirectionEntity} from "../config/WindDirectionEntity";
 
 export class HAMeasurementProvider {
 
-    private readonly rawEntities: string[];
-    private readonly statsEntities: string[];
-    private readonly queryAttributes: boolean;
+    private readonly cardConfig: CardConfigWrapper;
     private readonly dataPeriod: DataPeriod;
     private readonly directionEntity: WindDirectionEntity;
 
     constructor(private readonly haWebservice: HAWebservice,
-                private readonly cardConfig: CardConfigWrapper) {
+                cardConfig: CardConfigWrapper) {
 
-        this.rawEntities = cardConfig.createRawEntitiesArray();
-        this.statsEntities = cardConfig.createStatisticsEntitiesArray();
-        this.queryAttributes = cardConfig.attributesConfigured();
+        this.cardConfig = cardConfig;
         this.dataPeriod = cardConfig.dataPeriod;
         this.directionEntity = cardConfig.windDirectionEntity;
     }
@@ -27,14 +23,19 @@ export class HAMeasurementProvider {
     getMeasurements(): Promise<MeasurementHolder> {
         const startTime = HAMeasurementProvider.calculateStartTime(this.dataPeriod);
 
-        return Promise.all([this.haWebservice.getHistory(startTime, new Date(), this.rawEntities, this.queryAttributes),
-                            this.haWebservice.getStatistics(startTime, this.statsEntities)]).then(results => {
-            Log.debug('WebSocket results: ', results);
-            const measurementHolder = new MeasurementHolder();
+        const requests = [];
+        requests.push(this.haWebservice.getMeasurementData(startTime, this.cardConfig.windDirectionEntity));
+        for (const windspeedEntity of this.cardConfig.windspeedEntities) {
+            requests.push(this.haWebservice.getMeasurementData(startTime, windspeedEntity));
+        }
 
+        return Promise.all(requests).then(results => {
+            Log.debug('WebSocket results: ', results);
+
+            const measurementHolder = new MeasurementHolder();
             if (this.cardConfig.windDirectionEntity.useStatistics) {
                 measurementHolder.directionMeasurements = HAMeasurementProvider.parseStatsMeasurements(
-                    results[1][this.directionEntity.entity],
+                    results[0][this.directionEntity.entity],
                     this.directionEntity.entity,
                     false);
             } else {
@@ -46,22 +47,22 @@ export class HAMeasurementProvider {
                 HAMeasurementProvider.sortAndFillEndTime(measurementHolder.directionMeasurements);
             }
 
-            for (const speedEntity of this.cardConfig.windspeedEntities) {
+            this.cardConfig.windspeedEntities.forEach((speedEntity, i) => {
                 if (speedEntity.useStatistics) {
                     measurementHolder.addSpeedMeasurements(HAMeasurementProvider.parseStatsMeasurements(
-                        results[1][speedEntity.entity],
+                        results[i + 1][speedEntity.entity],
                         speedEntity.entity,
                         true));
                 } else {
                     const measurements = HAMeasurementProvider.parseHistoryMeasurements(
-                        results[0][speedEntity.entity],
+                        results[i + 1][speedEntity.entity],
                         speedEntity.entity,
                         speedEntity.attribute,
                         true);
                     HAMeasurementProvider.sortAndFillEndTime(measurements);
                     measurementHolder.addSpeedMeasurements(measurements);
                 }
-            }
+            });
             return Promise.resolve(measurementHolder);
         });
     }

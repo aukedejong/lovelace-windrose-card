@@ -35,6 +35,7 @@ export class WindRoseDirigent {
     private measurementMatcher!: MeasurementMatcher;
     private entityStatesProcessor!: EntityStatesProcessor;
     private percentageCalculator!: PercentageCalculator;
+    public infoText: string = '';
 
     //For every windspeed entity
     private measurementCounters: MeasurementCounter[] = [];
@@ -130,6 +131,10 @@ export class WindRoseDirigent {
                     this.windRoseData.push(this.percentageCalculator.calculate(windCounts));
                 }
                 this.measurementsReady = true;
+
+                if (this.cardConfig.dataPeriod.logMeasurementCounts) {
+                    console.log(`Measurements:\n${measurementHolder.getInfoText()}${matchedGroups[0].getInfo()} - strategy: ${this.cardConfig.matchingStrategy}`);
+                }
                 return Promise.resolve(true);
             });
         } else {

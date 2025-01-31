@@ -4,14 +4,16 @@ import {GlobalConfig} from "./GlobalConfig";
 import {CardConfigSpeedRange} from "../card/CardConfigSpeedRange";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
 import {DynamicSpeedRange} from "./DynamicSpeedRange";
+import {HARequestData} from "../measurement-provider/HARequestData";
 
-export class WindSpeedEntity {
+export class WindSpeedEntity implements HARequestData {
 
     constructor(
         public readonly entity: string,
         public readonly attribute: string | undefined,
         public readonly name: string,
         public readonly useStatistics: boolean,
+        public readonly statisticsPeriod: string,
         public readonly renderRelativeScale: boolean,
         public readonly windspeedBarFull: boolean,
         public speedUnit: string,
@@ -32,6 +34,7 @@ export class WindSpeedEntity {
         const useStatistics = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.use_statistics);
         const inputSpeedUnit = this.checkInputSpeedUnit(entityConfig.speed_unit);
         const renderRelativeScale = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
+        const statsPeriod = ConfigCheckUtils.checkStatisticsPeriod(entityConfig.statistics_period);
         let windspeedBarFull;
         if (entityConfig.windspeed_bar_full === undefined) {
             windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(parentEntityConfig.windspeed_bar_full);
@@ -78,7 +81,7 @@ export class WindSpeedEntity {
         this.checkSpeedRangeCombi(outputSpeedUnit, speedRangeStep, speedRangeMax);
         this.checkAttribuutStatsCombi(useStatistics, entityConfig.attribute);
 
-        return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, renderRelativeScale,
+        return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, renderRelativeScale,
             windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
             speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges);
     }

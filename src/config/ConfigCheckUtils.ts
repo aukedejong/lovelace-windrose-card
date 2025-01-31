@@ -1,6 +1,5 @@
 export class ConfigCheckUtils {
 
-
     public static checkNumberOrUndefined(name: string, number: string | number | undefined): number | undefined {
         if (number === null || number === undefined) {
             return undefined;
@@ -16,7 +15,6 @@ export class ConfigCheckUtils {
         }
         return +number;
     }
-
 
     public static checkBooleanDefaultFalse(value: boolean | undefined): boolean {
         if (value === undefined || value === null) {
@@ -37,6 +35,15 @@ export class ConfigCheckUtils {
             return undefined;
         }
         return value;
+    }
+
+    public static checkStatisticsPeriod(period: string | undefined | null): string {
+        if (period === undefined) {
+            return '5minute';
+        } else  if (period === '5minute' || period === 'hour' || period === 'day' || period === 'week' || period === 'month' || period === 'year') {
+            return period;
+        }
+        throw new Error(`statistics_period ${period} is invalid, should be one of 5minute, hour, day, week, month, year`);
     }
 
 }
