@@ -695,7 +695,7 @@ current_direction:
   arrow_size: 50
   center_circle_size: 30
 compass_direction:
-  auto_rotate: true
+  auto_rotate: false
   entity: input_number.compass
 corner_info:
   top_left:
