@@ -705,7 +705,7 @@ corner_info:
     label_text_size: 50
     value_text_size: 50
     input_unit: kph
-    output_unit: knpts
+    output_unit: knots
   top_right:
     label: Wind direction
     unit: °
