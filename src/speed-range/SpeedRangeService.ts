@@ -24,7 +24,7 @@ export class SpeedRangeService {
         if (this.dynamicSpeedRangeConfig.length > 0) {
             for (let i = this.dynamicSpeedRangeConfig.length - 1; i >= 0; i--) {
                 const config = this.dynamicSpeedRangeConfig[i];
-                if (averageSpeed > config.average_above) {
+                if (averageSpeed >= config.average_above) {
                     this.speedRanges = SpeedRangeFactory.generateStepMax(config.step, config.max);
                     break;
                 }

@@ -42,6 +42,6 @@ export class MatchedMeasurements {
     }
 
     getInfo(): string {
-        return `Matches:    ${this.count} - min: ${this.minSpeed} - max: ${this.maxSpeed}`;
+        return `Matches:    ${this.count} - min: ${this.minSpeed} - max: ${this.maxSpeed} - average: ${this.getAverageSpeed()}`;
     }
 }

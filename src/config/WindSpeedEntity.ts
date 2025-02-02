@@ -78,7 +78,7 @@ export class WindSpeedEntity implements HARequestData {
             speedRanges = this.checkSpeedRanges(parentEntityConfig.speed_ranges);
         }
         const dynamicSpeedRanges = this.checkDynamicSpeedRanges(entityConfig.dynamic_speed_ranges);
-        this.checkSpeedRangeCombi(outputSpeedUnit, speedRangeStep, speedRangeMax);
+        this.checkSpeedRangeCombi(speedRanges, speedRangeStep, speedRangeMax, dynamicSpeedRanges, speedRangeBeaufort);
         this.checkAttribuutStatsCombi(useStatistics, entityConfig.attribute);
 
         return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, renderRelativeScale,
@@ -167,14 +167,27 @@ export class WindSpeedEntity implements HARequestData {
         return speedRangeConfigs;
     }
 
-    private static checkSpeedRangeCombi(outputSpeedUnit: string | undefined, speedRangeStep: number | undefined,
-                                 speedRangeMax: number | undefined): void {
-        if (outputSpeedUnit === 'bft' && (speedRangeStep || speedRangeMax)) {
-            throw new Error("WindRoseCard: speed_range_step and/or speed_range_max should not be set when using output " +
-                "speed unit Beaufort (bft). Beaufort uses fixed speed ranges.");
+    private static checkSpeedRangeCombi(speedRanges: SpeedRange[], speedRangeStep: number | undefined, speedRangeMax: number | undefined,
+                                        dynamicSpeedRanges: DynamicSpeedRange[], speedRangeBeaufort: boolean): void {
+        if (speedRangeBeaufort && (speedRangeStep || speedRangeMax || dynamicSpeedRanges.length > 0 || speedRanges.length > 0)) {
+            throw new Error("WindRoseCard: speed_range_step, speed_range_max, speed_ranges or dynamic_speed_ranges should not be set when using speed_range_beaufort. " +
+                "Beaufort uses fixed speed ranges.");
         }
         if ((speedRangeStep && !speedRangeMax) || (!speedRangeStep && speedRangeMax)) {
             throw new Error(`WindRoseCard: speed_range_step and speed_range_max should both be set, step: ${speedRangeStep}, max: ${speedRangeMax}`)
+        }
+        let speedRangeOptionCount = 0;
+        if (speedRangeStep || speedRangeMax) {
+            speedRangeOptionCount++;
+        }
+        if (speedRanges?.length > 0) {
+            speedRangeOptionCount++;
+        }
+        if (dynamicSpeedRanges?.length > 0) {
+            speedRangeOptionCount++;
+        }
+        if (speedRangeOptionCount > 1) {
+            throw new Error(`WindRoseCard: speed_range_step/max, speed_ranges and dynamic_speed_ranges should not be configured next to each other.`)
         }
     }
 

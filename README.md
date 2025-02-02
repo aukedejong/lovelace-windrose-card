@@ -115,7 +115,7 @@ Select "Manage Resources"
 Measurements:
 Directions: 1213 - 20/01/2025, 18:18:01 - 30/01/2025, 18:11:37
 Speed:      964 - 20/01/2025, 18:18:01 - 30/01/2025, 18:01:37
-Matches:    1213 - min: 0 - max: 67.3 - strategy: direction-first
+Matches:    1213 - min: 0 - max: 67.3 - average: 24.972333 - strategy: direction-first
 ```
 
 ### Home Assistant data retention
@@ -129,7 +129,7 @@ Set config  log_measurement_counts to true.
 ```
 date_period:
   hours_to_show: 59
-  log_measurements_counts: true
+  log_measurement_counts: true
 ```
 
 #### State data
@@ -232,11 +232,13 @@ for i in range(count):
 
 ### Object dynamic_speed_ranges
 
-| Name          |  Type   | Default | Required | Description                                                          |
-|---------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------|
-| average_above | number  |         |    x     | Average wind speed above this value. Option with 0 is required.      |
-| step          | number  |         |    x     | Range steps to be used if average speed is above configurated value. |
-| max           | number  |         |    x     | Max speed, used to calculate how many steps are used.                |
+When using dynamic speed range, speed_range_beaufort should be false.
+
+| Name          |  Type   | Default | Required | Description                                                                                                                                                                      |
+|---------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| average_above | number  |         |    x     | Average wind speed above or equal this value. Option with 0 is required. Speed defined here should be in the output speed unit. If none is defined, it's meter per second (mps). |
+| step          | number  |         |    x     | Range steps to be used if average speed is above configurated value.                                                                                                             |
+| max           | number  |         |    x     | Max speed, used to calculate how many steps are used.                                                                                                                            |
 
 ```yaml
 windspeed_entities:
@@ -643,7 +645,7 @@ data_period:
 wind_direction_entity:
   entity: sensor.wind_direction
 windspeed_entities:
-  - entity: sensor.fwind_speed
+  - entity: sensor.wind_speed
     name: Speed
 current_direction:
   show_arrow: true
@@ -706,6 +708,7 @@ corner_info:
     value_text_size: 50
     input_unit: kph
     output_unit: knots
+    precision: 1
   top_right:
     label: Wind direction
     unit: °
