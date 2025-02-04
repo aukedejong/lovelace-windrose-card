@@ -21,7 +21,7 @@ import {HAWebservice} from "../measurement-provider/HAWebservice";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.15.1 `,
+    `%c  WINROSE-CARD  %c Version 1.15.2 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -114,11 +114,9 @@ export class WindRoseCard extends LitElement {
         this.log.debug('card render()');
         return html`
             <ha-card header="${this.cardConfig?.title}">
-                <div id="top-info-container"></div>
-                <div id="warning-container">${this.warningMessage}</div>
-                <div id="error-container">${this.errorMessage}</div>
-                <div class="card-content" id="svg-container"></div>
-                <div id="bottom-info-container"></div>
+                <div class="card-content" id="svg-container">
+                    <div id="error-container">${this.errorMessage}</div>
+                </div>
             </ha-card>
         `;
     }
