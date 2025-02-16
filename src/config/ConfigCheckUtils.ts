@@ -37,6 +37,13 @@ export class ConfigCheckUtils {
         return value;
     }
 
+    public static checkStringOrDefault(value: string | undefined | null, defaultValue: string): string {
+        if (ConfigCheckUtils.checkString(value) === undefined) {
+            return defaultValue;
+        }
+        return value!;
+    }
+
     public static checkStatisticsPeriod(period: string | undefined | null): string {
         if (period === undefined) {
             return '5minute';

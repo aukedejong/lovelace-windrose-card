@@ -103,12 +103,15 @@ Select "Manage Resources"
 
 ### Object data_period
 
-| Name                   |  Type   | Default | Required | Description                                                                                                                                                                                      |
-|------------------------|:-------:|:-------:|:--------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| hours_to_show          | number  |         |    -     | Show winddata for the last number of hours. Number higher then 0.                                                                                                                                |
-| from_hour_of_day       | number  |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used. |
-| time_interval          | number  |   60    |    -     | Time interval in seconds. Only used by the time-frame matching strategy. More info at [Matching strategies](#Matching-strategies)                                                                |
-| log_measurement_counts | boolean |  false  |    -     | When set to true, will log measurement and match counts to the browsers console. Can be useful to check the data where the graph is based on. Example output below.                              |
+Only one of the first three options can be used at the same time.
+
+| Name                   |               Type                | Default | Required | Description                                                                                                                                                                                      |
+|------------------------|:---------------------------------:|:-------:|:--------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| hours_to_show          |              number               |         |    -     | Show winddata for the last number of hours. Number higher then 0.                                                                                                                                |
+| period_selector        | [object](#Object-period_selector) |         |    -     | Shows period selector buttons, button configured as active will be used as initial hours_to_show value.                                                                                          |
+| from_hour_of_day       |              number               |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used. |
+| time_interval          |              number               |   60    |    -     | Time interval in seconds. Only used by the time-frame matching strategy. More info at [Matching strategies](#Matching-strategies)                                                                |
+| log_measurement_counts |              boolean              |  false  |    -     | When set to true, will log measurement and match counts to the browsers console. Can be useful to check the data where the graph is based on. Example output below.                              |
 
 #### Example console output, when log_measurement_counts is set to true
 ```
@@ -116,6 +119,61 @@ Measurements:
 Directions: 1213 - 20/01/2025, 18:18:01 - 30/01/2025, 18:11:37
 Speed:      964 - 20/01/2025, 18:18:01 - 30/01/2025, 18:01:37
 Matches:    1213 - min: 0 - max: 67.3 - average: 24.972333 - strategy: direction-first
+```
+
+### Object period_selector
+
+Renders buttons to change how many hours back of data is used in the windrose.
+
+| Name            |           Type           | Default | Required | Description                                     |
+|-----------------|:------------------------:|:-------:|:--------:|-------------------------------------------------|
+| location        |          string          |   top   |    -     | Location of the buttons, options: top or bottom |
+| buttons         | [object](#Object-button) |         |    -     | List of the period buttons.                     |
+| active_color    |          string          |   red   |    -     | The text color of the active button.            |
+| active_bg_color |          string          | inherit |    -     | The background color of the active button.      |
+
+#### Object button
+
+Default the first button is active after load, if no other active button is configured.
+
+| Name   |  Type   | Default | Required | Description                                                                                                                                       |
+|--------|:-------:|:-------:|:--------:|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| hours  | number  |         |    x     | How many hours back of data will be in the windrose.                                                                                              |
+| title  | string  |         |    x     | Button title.                                                                                                                                     |
+| active | boolean |  false  |    -     | Only one or none should be true. The period with object with true is initial active after loading. When none, the first period is initial active. |
+
+
+#### Minimal example
+```yaml
+data_period:
+   period_selector:
+      buttons:
+         - hours: 1
+           title: 1 hour
+         - hours: 8
+           title: 8 hours
+```
+
+#### Full example
+```yaml
+data_period:
+   period_selector:
+      location: bottom
+      active_color: black
+      active_bg_color: yellow
+      buttons:
+         - hours: 1
+           title: 1 hour
+           active: false
+         - hours: 8
+           title: 8 hours
+           active: false
+         - hours: 24
+           title: 1 day
+           active: true
+         - hours: 240
+           title: 10 days
+           active: false
 ```
 
 ### Home Assistant data retention

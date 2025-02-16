@@ -11,6 +11,9 @@ import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProc
 import {Log2} from "../util/Log2";
 import {HAMeasurementProvider} from "../measurement-provider/HAMeasurementProvider";
 import {HAWebservice} from "../measurement-provider/HAWebservice";
+import {repeat} from 'lit/directives/repeat.js';
+import {Button} from "../config/Button";
+import {PeriodSelector} from "../config/PeriodSelector";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -21,7 +24,7 @@ import {HAWebservice} from "../measurement-provider/HAWebservice";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.15.2 `,
+    `%c  WINROSE-CARD  %c Version 1.16.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -114,10 +117,30 @@ export class WindRoseCard extends LitElement {
         this.log.debug('card render()');
         return html`
             <ha-card header="${this.cardConfig?.title}">
-                <div class="card-content" id="svg-container">
+                <div class="card-content">
                     <div id="error-container">${this.errorMessage}</div>
+                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'top')}
+                    <div id="svg-container"></div>
+                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'bottom')}
                 </div>
             </ha-card>
+        `;
+    }
+
+    renderPeriodSelector(periodSelector: PeriodSelector | undefined, location: string): TemplateResult {
+        if (periodSelector === undefined || periodSelector.location !== location) {
+            return html``;
+        }
+        return html`
+            <div id="period-selector" class="${location}">
+                ${repeat(periodSelector.buttons, (button) => button.hours, (button, index) =>
+                        html`<div id="period-${index}" 
+                                  @click="${this.updatePeriodFunc(button)}" 
+                                  class="${button.active ? 'active' : ''}" 
+                                  style="color: ${button.active ? periodSelector.activeColor: ''}; background-color: ${button.active ? periodSelector.activeBgColor : ''}">
+                            ${button.title}
+                        </div>`)}
+            </div>
         `;
     }
 
@@ -145,15 +168,41 @@ export class WindRoseCard extends LitElement {
 
     static get styles(): CSSResultGroup {
         return css`
-          :host {
-            display: block;
-          }
-          #warning-container {
-              color: yellow;
-          }
-          #error-container {
-              color: red;
-          }`
+            :host {
+                display: block;
+            } 
+            #warning-container {
+                  color: yellow;
+            }
+            #error-container {
+                color: red;
+            }
+            #period-selector {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                margin: 0 -5px 0 -5px;
+            }
+            #period-selector.top {
+                margin-bottom: 10px;
+            }
+            #period-selector > div {
+                display: inline-block;
+                flex: 1;
+                text-align: center;
+                border-width: 1px;
+                border-radius: 10px;
+                border-style: solid;
+                border-color: rgb(100, 100, 100);
+                cursor: pointer;
+                margin: 0 5px;
+                padding: 2px;
+            }
+            #period-selector > div.active {
+                color: red;
+            }
+        `
     }
 
     connectedCallback() {
@@ -184,6 +233,14 @@ export class WindRoseCard extends LitElement {
     //     };
     // }
 
+    updatePeriodFunc(period: Button): () => void {
+        return () => {
+            this.cardConfig.dataPeriod.periodSelector?.buttons.forEach((period) => period.active = false);
+            period.active = true;
+            this.cardConfig.dataPeriod.hourstoShow = period.hours;
+            this.refreshMeasurements();
+        }
+    }
 
     refreshMeasurements(): void {
         this.windRoseDirigent.refreshData().then((refresh: boolean) => {
