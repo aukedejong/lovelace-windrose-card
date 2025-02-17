@@ -24,7 +24,7 @@ import {PeriodSelector} from "../config/PeriodSelector";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.16.0 `,
+    `%c  WINROSE-CARD  %c Version 1.16.1 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -182,7 +182,8 @@ export class WindRoseCard extends LitElement {
                 flex-direction: row;
                 justify-content: space-between;
                 flex-wrap: wrap;
-                margin: 0 -5px 0 -5px;
+                row-gap: 8px;
+                column-gap: 8px;
             }
             #period-selector.top {
                 margin-bottom: 10px;
@@ -196,8 +197,8 @@ export class WindRoseCard extends LitElement {
                 border-style: solid;
                 border-color: rgb(100, 100, 100);
                 cursor: pointer;
-                margin: 0 5px;
-                padding: 2px;
+                padding: 4px;
+                white-space: nowrap;
             }
             #period-selector > div.active {
                 color: red;
