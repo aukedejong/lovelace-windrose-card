@@ -12,7 +12,7 @@ export class DataPeriod {
         public readonly logMeasurementCounts: boolean) {
     }
 
-    static fromConfig(oldHoursToShow: number, dataPeriod: CardConfigDataPeriod): DataPeriod {
+    static fromConfig(oldHoursToShow: number, dataPeriod: CardConfigDataPeriod | undefined): DataPeriod {
         const oldHoursToShowCheck = this.checkHoursToShow(oldHoursToShow);
         const hoursToShowCheck = this.checkHoursToShow(dataPeriod?.hours_to_show);
         const fromHourOfDayCheck = this.checkFromHourOfDay(dataPeriod?.from_hour_of_day);
@@ -21,7 +21,7 @@ export class DataPeriod {
         if (timeInterval === 0) {
             timeInterval = 60;
         }
-        const periodSelector = PeriodSelector.fromConfig(dataPeriod.period_selector);
+        const periodSelector = PeriodSelector.fromConfig(dataPeriod?.period_selector);
         if (oldHoursToShowCheck) {
             Log.warn('WindRoseCard: hours_to_show config is deprecated, use the data_period object.');
             return new DataPeriod(oldHoursToShow, undefined, undefined, timeInterval, logMeasurementCounts);
@@ -46,10 +46,10 @@ export class DataPeriod {
             const activePeriod = periodSelector.buttons.find((button) => button.active);
             hoursToShow = activePeriod!.hours;
         }
-        return new DataPeriod(hoursToShow, periodSelector, dataPeriod.from_hour_of_day, timeInterval, logMeasurementCounts);
+        return new DataPeriod(hoursToShow, periodSelector, dataPeriod?.from_hour_of_day, timeInterval, logMeasurementCounts);
     }
 
-    private static checkHoursToShow(hoursToShow: number): boolean {
+    private static checkHoursToShow(hoursToShow: number | undefined): boolean {
         if (hoursToShow && isNaN(hoursToShow) ) {
             throw new Error('WindRoseCard: Invalid hours_to_show, should be a number above 0.');
         } else if (hoursToShow) {
@@ -58,7 +58,7 @@ export class DataPeriod {
         return false;
     }
 
-    private static checkFromHourOfDay(fromHourOfDay: number): boolean {
+    private static checkFromHourOfDay(fromHourOfDay: number | undefined): boolean {
         if (fromHourOfDay && (isNaN(fromHourOfDay) || fromHourOfDay < 0 || fromHourOfDay > 23)) {
             throw new Error('WindRoseCard: Invalid hours_to_show, should be a number between 0 and 23, hour of the day..');
         } else if (fromHourOfDay != null && fromHourOfDay >= 0) {
