@@ -394,11 +394,12 @@ Shows the current wind direction. The arrow is pointing too where to wind is flo
 When the sensor state is not a direction a red center dot is displayed.
 Some sensors can have a value like CALM or VRB, indicating there is no direction measured.
 
-| Name               |  Type   | Default | Required | Description                                                                                                                           |
-|--------------------|:-------:|:-------:|:--------:|---------------------------------------------------------------------------------------------------------------------------------------|
-| show_arrow         | boolean |  false  |    x     | Start speed of a speed range                                                                                                          |
-| arrow_size         | number  |   50    |          | Size of the arrow                                                                                                                     |
-| center_circle_size | number  |   30    |          | Size of the center circle, only when not using the center_calm_percentage. Then a red circle is displeyed around the center percante. |
+| Name                       |  Type   | Default | Required | Description                                                                                                                                     |
+|----------------------------|:-------:|:-------:|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| show_arrow                 | boolean |  false  |    x     | Start speed of a speed range                                                                                                                    |
+| arrow_size                 | number  |   50    |          | Size of the arrow                                                                                                                               |
+| center_circle_size         | number  |   30    |          | Size of the center circle, only when not using center_calm_percentage. Then a red circle is displayed around the center percentage.             |
+| hide_direction_below_speed | number  |         |          | When current windspeed (output speed unit is used) is equal or below this value, the arrow is hidden and the center red dot or circle is shown. |                                                                                                                                      |
 
 
 ### Object compass_direction
@@ -715,7 +716,20 @@ current_direction:
 type: custom:windrose-card
 title: Maximum configuration
 data_period:
-  hours_to_show: 200
+   period_selector:
+      location: bottom
+      active_color: black
+      active_bg_color: yellow
+      buttons:
+         - hours: 1
+           title: 1 hour
+         - hours: 8
+           title: 8 hours
+         - hours: 24
+           title: 1 day
+           active: true
+         - hours: 240
+           title: 10 days
 refresh_interval: 300
 windspeed_bar_location: bottom
 wind_direction_entity:
@@ -754,6 +768,7 @@ current_direction:
   show_arrow: true
   arrow_size: 50
   center_circle_size: 30
+  hide_direction_below_speed: 3
 compass_direction:
   auto_rotate: false
   entity: input_number.compass

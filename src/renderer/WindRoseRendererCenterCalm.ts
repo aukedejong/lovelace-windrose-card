@@ -15,6 +15,7 @@ import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardColors} from "../config/CardColors";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 import {WindRoseRenderUtil} from "./WindRoseRenderUtil";
+import {GlobalConfig} from "../config/GlobalConfig";
 
 export class WindRoseRendererCenterCalm {
     private readonly cardColors: CardColors;
@@ -39,7 +40,7 @@ export class WindRoseRendererCenterCalm {
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
-        this.centerRadius = 60;
+        this.centerRadius = GlobalConfig.defaultCenterCalmPercenteCircleSize;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
@@ -73,7 +74,7 @@ export class WindRoseRendererCenterCalm {
             .add(windDirections);
         this.roseGroup.rotate(this.degreesCalculator.getRoseRenderDegrees(), this.roseCenter.x, this.roseCenter.y);
 
-        const circleLegend = this.drawCircleLegend();
+        this.drawCircleLegend();
         this.drawCenterZeroSpeed();
     }
 

@@ -94,10 +94,10 @@ export class CardConfigWrapper {
         this.windDirectionEntity = WindDirectionEntity.fromConfig(cardConfig.wind_direction_entity);
         this.windspeedEntities = this.checkWindspeedEntities();
         this.windRoseDrawNorthOffset = this.checkWindRoseDrawNorthOffset();
+        this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
         this.currentDirection = this.checkCurrentDirection()
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
-        this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
         this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels, cardConfig.cardinal_direction_letters);
         this.windDirectionCount = this.checkWindDirectionCount();
         this.matchingStrategy = this.checkMatchingStrategy();
@@ -129,13 +129,20 @@ export class CardConfigWrapper {
 
     private checkCurrentDirection(): CurrentDirectionConfig {
         if (this.cardConfig.current_direction) {
+            let centerCircleSize;
+            if (this.centerCalmPercentage) {
+                centerCircleSize = GlobalConfig.defaultCurrentDirectionCircleSizeCenterCalm;
+            } else {
+                centerCircleSize = ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize);
+            }
             return new CurrentDirectionConfig(
                 ConfigCheckUtils.checkBooleanDefaultFalse(this.cardConfig.current_direction.show_arrow),
                 ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.arrow_size, GlobalConfig.defaultCurrentDirectionArrowSize),
-                ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize)
+                centerCircleSize,
+                ConfigCheckUtils.checkNumberOrUndefined('hide_direction_below_speed', this.cardConfig.current_direction.hide_direction_below_speed)
             )
         }
-        return new CurrentDirectionConfig(false, undefined, undefined);
+        return new CurrentDirectionConfig(false, undefined, undefined, 0);
     }
 
     private checkWindspeedEntities(): WindSpeedEntity[] {

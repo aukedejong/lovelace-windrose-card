@@ -13,8 +13,10 @@ export class GlobalConfig {
     static defaultCenterCalmPercentage = true;
     static defaultLogLevel: 'NONE';
     static defaultSpeedRangeBeaufort = true;
+    static defaultCenterCalmPercenteCircleSize = 60
     static defaultCurrentDirectionArrowSize = 50;
     static defaultCurrentDirectionCircleSize = 30;
+    static defaultCurrentDirectionCircleSizeCenterCalm = 60;
     static defaultCardinalDirectionLabelSize = 50;
     static defaultIntercardinalDirectionLabelSize = 40;
     static defaultSubIntercardinalDirectionLabelSize = 30;

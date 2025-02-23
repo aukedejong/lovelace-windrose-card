@@ -88,7 +88,7 @@ export class WindRoseDirigent {
         }
 
         this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation, cardConfig.directionLabels, this.svg);
-        this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate);
+        this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate, cardConfig.currentDirection.hideDirectionBelowSpeed);
 
         this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionConfig, this.sendEvent, this.svg);
 
@@ -167,8 +167,9 @@ export class WindRoseDirigent {
     }
 
     updateRender(): void {
-        if (this.entityStatesProcessor.hasWindDirectionUpdate()) {
+        if (this.entityStatesProcessor.hasWindDirectionUpdate() || this.entityStatesProcessor.hasWindSpeedUpdate()) {
             this.degreesCalculator.setWindDirectionDegrees(this.entityStatesProcessor.getWindDirection());
+            this.degreesCalculator.setWindSpeed(this.entityStatesProcessor.getWindSpeed());
             this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
         }
         if (this.entityStatesProcessor.hasCompassDirectionUpdate()) {

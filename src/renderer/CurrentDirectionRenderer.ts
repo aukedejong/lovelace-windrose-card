@@ -71,9 +71,8 @@ export class CurrentDirectionRenderer {
         if (this.config.centerCalmPercentage) {
 
             this.centerElement = this.svgUtil.drawCircle(new CircleCoordinate(this.roseCenter, this.config.currentDirection.centerCircleSize!));
+            this.centerElement.stroke({ color: this.config.cardColor.roseCurrentDirectionArrow, width: 5});
             this.centerElement.attr({
-                stroke: this.config.cardColor.roseCurrentDirectionArrow,
-                strokeWidth: 4,
                 fill: "none"
             });
 
