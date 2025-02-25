@@ -8,7 +8,9 @@ export class PeriodSelector {
         public readonly location: string,
         public readonly buttons: Button[],
         public readonly activeColor: string,
-        public readonly activeBgColor: string
+        public readonly activeBgColor: string,
+        public readonly color: string,
+        public readonly bgColor: string
     ) {
     }
 
@@ -20,7 +22,9 @@ export class PeriodSelector {
         const buttons = this.checkButtons(periodSelector.buttons);
         const activeColor = ConfigCheckUtils.checkStringOrDefault(periodSelector.active_color, 'red');
         const acitveBgColor = ConfigCheckUtils.checkStringOrDefault(periodSelector.active_bg_color, 'inherit');
-        return new PeriodSelector(position, buttons, activeColor, acitveBgColor);
+        const color = ConfigCheckUtils.checkStringOrDefault(periodSelector.color, 'inherit');
+        const bgColor = ConfigCheckUtils.checkStringOrDefault(periodSelector.bg_color, 'inherit');
+        return new PeriodSelector(position, buttons, activeColor, acitveBgColor, color, bgColor);
     }
 
     private static checkLocation(location: string | undefined) {

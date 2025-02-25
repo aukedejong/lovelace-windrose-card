@@ -35,6 +35,7 @@ export class CardConfigWrapper {
     cornersInfo: CornersInfo;
     backgroundImage: string | undefined;
     actions: CardConfigActions | undefined;
+    cardWidth: number;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -102,6 +103,7 @@ export class CardConfigWrapper {
         this.windDirectionCount = this.checkWindDirectionCount();
         this.matchingStrategy = this.checkMatchingStrategy();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
+        this.cardWidth = !cardConfig.card_width ? 4 : cardConfig.card_width;
         this.cardColor = CardColors.fromConfig(cardConfig.colors);
         this.compassConfig = this.checkCompassConfig(cardConfig.compass_direction);
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);

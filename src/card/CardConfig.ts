@@ -34,6 +34,7 @@ export interface CardConfig {
     windspeed_bar_location: string;
     windspeed_bar_full: boolean;
     hide_windspeed_bar: boolean;
+    card_width: number;
     cardinal_direction_letters: string; //Deprecated
     direction_labels: CardConfigDirectionLabels;
     wind_direction_count: number;

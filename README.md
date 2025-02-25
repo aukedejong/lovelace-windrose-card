@@ -79,6 +79,7 @@ Select "Manage Resources"
 | data_period                             |      [object](#Object-data_period)      |                              |    x     | Configure what data period to query. See object data_period below. Only one options should be configured.                                                                                                                                                    |
 | windspeed_bar_location                  |                 string                  |            bottom            |    -     | Location of the speed bar graph: `bottom`, `right`                                                                                                                                                                                                           |
 | center_calm_percentage                  |                 boolean                 |             true             |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave.                                                                                               |
+| card_width (EXPERIMENTAL)               |                 number                  |              4               |    -     | Defines the width of the card in sections layout. Default is 4, max is 16 (I think), full width.                                                                                                                                                             |
 | hide_windspeed_bar                      |                 boolean                 |            false             |    -     | Hides all windspeed bars.                                                                                                                                                                                                                                    |
 | windspeed_bar_full (DEPRECATED)         |                 boolean                 |             true             |    -     | Deprecated. Moved to windspeed_entities object. When true, renders all wind ranges, when false, doesn't render the speed range without measurements.                                                                                                         |
 | output_speed_unit (DEPRECATED)          |                 string                  |             mps              |    -     | Deprecated. Moved to windspeed_entities object. Windspeed unit used on card, see Windspeed unit options bellow.                                                                                                                                              |
@@ -131,6 +132,9 @@ Renders buttons to change how many hours back of data is used in the windrose.
 | buttons         | [object](#Object-button) |         |    -     | List of the period buttons.                     |
 | active_color    |          string          |   red   |    -     | The text color of the active button.            |
 | active_bg_color |          string          | inherit |    -     | The background color of the active button.      |
+| color           |          string          | inherit |    -     | The text color of the inactive buttons.         |
+| bg_color        |          string          | inherit |    -     | The background color of the inactive buttons.   |
+
 
 #### Object button
 
@@ -161,6 +165,8 @@ data_period:
       location: bottom
       active_color: black
       active_bg_color: yellow
+      color: red
+      bg_color: black
       buttons:
          - hours: 1
            title: 1 hour

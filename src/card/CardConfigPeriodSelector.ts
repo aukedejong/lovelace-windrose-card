@@ -5,4 +5,6 @@ export interface CardConfigPeriodSelector {
     buttons: Button[] | undefined;
     active_color: string;
     active_bg_color: string;
+    color: string;
+    bg_color: string;
 }

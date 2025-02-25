@@ -24,7 +24,7 @@ import {PeriodSelector} from "../config/PeriodSelector";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.17.0 `,
+    `%c  WINROSE-CARD  %c Version 1.18.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -137,7 +137,7 @@ export class WindRoseCard extends LitElement {
                         html`<div id="period-${index}" 
                                   @click="${this.updatePeriodFunc(button)}" 
                                   class="${button.active ? 'active' : ''}" 
-                                  style="color: ${button.active ? periodSelector.activeColor: ''}; background-color: ${button.active ? periodSelector.activeBgColor : ''}">
+                                  style="color: ${button.active ? periodSelector.activeColor: periodSelector.color}; background-color: ${button.active ? periodSelector.activeBgColor : periodSelector.bgColor}">
                             ${button.title}
                         </div>`)}
             </div>
@@ -225,14 +225,12 @@ export class WindRoseCard extends LitElement {
         return 9;
     }
 
-    // public getLayoutOptions() {
-    //     this.log.debug('getLayoutOptions()');
-    //     return {
-    //         grid_rows: 8,
-    //         grid_columns: 6,
-    //         grid_min_rows: 5,
-    //     };
-    // }
+    public getLayoutOptions() {
+        this.log.debug('getLayoutOptions()');
+        return {
+            grid_columns: this.cardConfig.cardWidth
+        };
+    }
 
     updatePeriodFunc(period: Button): () => void {
         return () => {
