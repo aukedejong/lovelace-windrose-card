@@ -83,7 +83,13 @@ export class WindDirectionLettersConverter {
             deling = this.windDirectionLetters.length === 5 ? 11.25 : 22.5;
         }
 
-        const index = Math.round(direction / deling);
+        let index = Math.round(direction / deling);
+        if (this.windDirectionLetters?.length === 4) {
+            index = index * 2;
+        }
+        if (index === 32) {
+            index = 0;
+        }
         const entries = Object.entries(this.directions);
         if (this.windDirectionLetters) {
             return this.convertDirectionLettersFromDefault(entries[index][0]);
