@@ -73,17 +73,19 @@ export class WindDirectionLettersConverter {
         return convertedDirection;
     }
 
-    convertToLetters(direction: number | undefined): string | undefined {
+    convertToLetters(direction: number | string | undefined): string | undefined {
         if (direction === undefined) {
             return 'CALM';
         }
-
+        if (direction === '' || isNaN(+direction) || +direction < 0) {
+            Log.warn('Can not convert wind direction to cardinal letters, direction: ', direction);
+            return 'CALM';
+        }
         let deling = 11.25 //DefaultLetters is 5
         if (this.windDirectionLetters) {
             deling = this.windDirectionLetters.length === 5 ? 11.25 : 22.5;
         }
-
-        let index = Math.round(direction / deling);
+        let index = Math.round(+direction / deling);
         if (this.windDirectionLetters?.length === 4) {
             index = index * 2;
         }

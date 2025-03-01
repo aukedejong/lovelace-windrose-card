@@ -31,6 +31,22 @@ describe('WindDirectionLettersConverter tests', () => {
 
         });
 
+        describe('Test invalid degrees letters to letters.', () => {
+
+            test('Convert abcd degrees to letters', () => {
+                expect(windDirectionLettersConverter.convertToLetters('abcd')).toEqual('CALM');
+            });
+
+            test('Convert -230 degrees to letters', () => {
+                expect(windDirectionLettersConverter.convertToLetters(-234)).toEqual('CALM');
+            });
+
+            test('Convert empty string degrees to letters', () => {
+                expect(windDirectionLettersConverter.convertToLetters('')).toEqual('CALM');
+            });
+
+        });
+
         describe('Test degrees letters to letters.', () => {
 
             test('Convert 354 degrees to letters', () => {

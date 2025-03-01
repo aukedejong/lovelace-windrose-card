@@ -68,7 +68,7 @@ export class CornersInfo {
         this.checkUnitCombinations(info.inputUnit, info.outputUnit);
         info.unit = cornerInfoConfig.unit;
         info.precision = ConfigCheckUtils.checkNumberOrUndefined('precision', cornerInfoConfig.precision);
-        info.directionLetters = cornerInfoConfig.direction_letters;
+        info.directionLetters = this.checkDirectionLetters(cornerInfoConfig.direction_letters);
         if (info.entity || info.label) {
             info.show = true;
         }
@@ -101,6 +101,16 @@ export class CornersInfo {
         if (inputUnit !== 'letters' && outputUnit === 'degrees') {
             throw new Error('WindRoseCard: Invalid unit combination, output unit degrees should always have input unit letters.');
         }
+    }
+
+    private static checkDirectionLetters(directionLetters: string | undefined): string | undefined {
+        if (directionLetters) {
+            if (directionLetters.length === 4 || directionLetters.length === 5) {
+                return directionLetters;
+            }
+            throw new Error('WindRoseCard: Invalid direction letters option should contain 4 or 5 letters.');
+        }
+        return undefined;
     }
 
 }
