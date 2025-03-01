@@ -446,7 +446,7 @@ Configuration for displaying information in the corners around the windrose.
 | input_unit        | string |                      |          | Input unit, not automatically determined. See for options [Unit conversion](#Corner-Info-unit-conversion)                     |
 | output_unit       | string |                      |          | Output unit                                                                                                                   |
 | precision         | string |                      |          | Overwrites (if available) the precision of the entity. For rounding the value, for example after converting to an other unit. |
-| direction_letters | string |        NESWX         |          | The cardinal direction letters use for winddirection conversion.                                                              |
+| direction_letters | string |        NESWX         |          | The cardinal direction letters used for winddirection conversion. When using 4 letters, the x directions will not be used.    |
 
 ### Corner Info unit conversion
 
