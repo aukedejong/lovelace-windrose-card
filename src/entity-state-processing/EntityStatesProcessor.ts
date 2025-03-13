@@ -16,7 +16,7 @@ export class EntityStatesProcessor {
     private windSpeedConverterFunc!: (speed: number) => number;
 
     private windDirectionState!: EntityState;
-    private windSpeedState!: EntityState;
+    private windSpeedStates: EntityState[] = [];
     private compassDirectionState!: EntityState;
     private cornerTopLeftState!: EntityState;
     private cornerTopRightState!: EntityState;
@@ -33,8 +33,12 @@ export class EntityStatesProcessor {
 
         this.windDirectionState = new EntityState(this.cardConfig.currentDirection.showArrow,
             this.cardConfig.windDirectionEntity.entity, this.cardConfig.windDirectionEntity.attribute);
-        this.windSpeedState = new EntityState(this.cardConfig.currentDirection.showArrow,
-            this.cardConfig.windspeedEntities[0].entity, this.cardConfig.windspeedEntities[0].attribute);
+
+        this.windSpeedStates = [];
+        for (const windSpeedEntity of this.cardConfig.windspeedEntities) {
+            this.windSpeedStates.push(new EntityState(windSpeedEntity.currentSpeedArrow, windSpeedEntity.entity, windSpeedEntity.attribute));
+        }
+
         this.compassDirectionState = new EntityState(this.cardConfig.compassConfig.autoRotate,
             this.cardConfig.compassConfig.entity, this.cardConfig.compassConfig.attribute);
 
@@ -45,8 +49,9 @@ export class EntityStatesProcessor {
         this.cornerBottomRightState = new EntityState(cornerInfo.bottomRightInfo.show, cornerInfo.bottomRightInfo.entity, cornerInfo.bottomRightInfo.attribute);
 
         this.cornerInfoStates = [this.cornerTopLeftState, this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
-        this.entityStates = [this.windDirectionState, this.windSpeedState, this.compassDirectionState, this.cornerTopLeftState,
+        this.entityStates = [this.windDirectionState, this.compassDirectionState, this.cornerTopLeftState,
                 this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
+        this.entityStates = this.entityStates.concat(this.windSpeedStates);
         this.initReady = true;
     }
 
@@ -54,13 +59,12 @@ export class EntityStatesProcessor {
         //this.log.debug("Before updated values: "  + this.windDirectionUpdated + "  " + this.compassDirectionUpdated);
         if (this.initReady) {
             this.windDirectionState.updated = false;
-            this.windSpeedState.updated = false;
+            this.windSpeedStates.forEach(state => state.updated = false);
             this.compassDirectionState.updated = false;
 
             this.entityStates.forEach((state: EntityState) => {
                 this.procesState(hass, state);
             });
-            this.log.trace("Updated speed values: "  + this.windSpeedState.updated + "  " + this.windSpeedState.state);
             this.log.trace("Updated wind values: "  + this.windDirectionState.updated + "  " + this.windDirectionState.state);
             this.log.trace("Updated compass values: "  + this.compassDirectionState.updated + "  " + this.compassDirectionState.state);
         }
@@ -103,19 +107,20 @@ export class EntityStatesProcessor {
         return +converted;
     }
 
-    hasWindSpeedUpdate(): boolean {
-        return this.windSpeedState.updated;
+    hasWindSpeedUpdate(index: number): boolean {
+        return this.windSpeedStates[index].updated;
     }
 
-    getWindSpeed(): number | undefined {
-        if (this.windSpeedState.state === undefined) {
+    getWindSpeed(index: number): number | undefined {
+        if (this.windSpeedStates[index].state === undefined) {
             return undefined;
         }
-        const converted = this.windSpeedConverterFunc(+this.windSpeedState.state);
-        this.log.trace("Wind speed state: " + this.windSpeedState.state + " Converted: " + converted);
+        const converted = this.windSpeedConverterFunc(+this.windSpeedStates[index].state);
+        this.log.trace("Wind speed state: " + this.windSpeedStates[index].state + " Converted: " + converted);
         if (converted === undefined) {
             return undefined;
         }
+        this.windSpeedStates[index].updated = false;
         return converted;
     }
 

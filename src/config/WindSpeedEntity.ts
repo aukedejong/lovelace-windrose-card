@@ -23,7 +23,8 @@ export class WindSpeedEntity implements HARequestData {
         public readonly speedRangeStep: number | undefined,
         public readonly speedRangeMax: number | undefined,
         public readonly speedRanges: SpeedRange[] = [],
-        public readonly dynamicSpeedRanges: DynamicSpeedRange[] = []
+        public readonly dynamicSpeedRanges: DynamicSpeedRange[] = [],
+        public readonly currentSpeedArrow: boolean
     ) {}
 
     static fromConfig(entityConfig: CardConfigWindSpeedEntity,
@@ -35,6 +36,7 @@ export class WindSpeedEntity implements HARequestData {
         const inputSpeedUnit = this.checkInputSpeedUnit(entityConfig.speed_unit);
         const renderRelativeScale = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
         const statsPeriod = ConfigCheckUtils.checkStatisticsPeriod(entityConfig.statistics_period);
+        const currentSpeedArrow = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.current_speed_arrow);
         let windspeedBarFull;
         if (entityConfig.windspeed_bar_full === undefined) {
             windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(parentEntityConfig.windspeed_bar_full);
@@ -83,7 +85,7 @@ export class WindSpeedEntity implements HARequestData {
 
         return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, renderRelativeScale,
             windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
-            speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges);
+            speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow);
     }
 
     private static checkInputSpeedUnit(inputSpeedUnit: string): string {

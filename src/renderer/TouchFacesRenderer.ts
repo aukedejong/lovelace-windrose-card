@@ -7,7 +7,7 @@ import {CardConfigAction} from "../card/CardConfigAction";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardConfigHaAction} from "../card/CardConfigHaAction";
 import {CircleCoordinate} from "./CircleCoordinate";
-import {WindBarDimensionCalculator} from "./WindBarDimensionCalculator";
+import {WindBarDimensionCalculator} from "../render-bar/WindBarDimensionCalculator";
 
 export class TouchFacesRenderer {
 

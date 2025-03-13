@@ -20,26 +20,31 @@ export class SvgUtil {
             .move(rectCoordinates.startPoint.x, rectCoordinates.startPoint.y);
     }
 
-    public drawPolyRect(rectCoordinates: RectCoordinates): SVG.Path {
-        const x = rectCoordinates.startPoint.x;
-        const y = rectCoordinates.startPoint.y;
-        const w = rectCoordinates.width;
-        const wn = rectCoordinates.width * -1;
-        const h = rectCoordinates.height;
-        return this.svg.path(new PathArray(`M ${x} ${y} l ${w} 0 l 0 ${h} l ${wn} 0 Z`));
+    public drawPathRect(x: number, y: number, x2: number, y2: number): SVG.Path {
+        return this.svg.path(new PathArray(`M ${x} ${y} L ${x2} ${y} L ${x2} ${y2} L ${x} ${y2} Z`));
     }
 
     public drawTriangle(x: number, y: number, dx1: number, dy1: number, dx2: number, dy2: number): SVG.Path {
         return this.svg.path(new PathArray(`M ${x} ${y} L ${dx1} ${dy1} L ${dx2} ${dy2} Z`));
     }
 
-    public drawArrow(x: number, y: number, size: number): SVG.Path {
+    public drawArrowBottom(x: number, y: number, size: number): SVG.Path {
         const dx1 = -size/2;
         const dy1 = -size;
         const dx2 = size/2;
         const dy2 = size/4;
         const dx3 = size/2;
         const dy3 = -size/4;
+        return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
+    }
+
+    public drawArrowRight(x: number, y: number, size: number): SVG.Path {
+        const dx1 = -size/4;
+        const dy1 = -size/2;
+        const dx2 = size;
+        const dy2 = size/2;
+        const dx3 = -size;
+        const dy3 = size/2;
         return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
     }
 
@@ -66,5 +71,9 @@ export class SvgUtil {
 
     public drawText(coordinate: Coordinate, text: string, attributes: TextAttributes): SVG.Text {
         return this.svg.plain(text).dmove(coordinate.x, coordinate.y).attr(attributes);
+    }
+
+    public drawText2(x: number, y: number, text: string, attributes: TextAttributes): SVG.Text {
+        return this.svg.plain(text).dmove(x, y).attr(attributes);
     }
 }

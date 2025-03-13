@@ -8,18 +8,18 @@ export class SpeedUnits {
         (speed: number) => {
             switch (speed) {
                 case 0: return 0;
-                case 1: return 1;
-                case 2: return 2.5;
-                case 3: return 4;
-                case 4: return 6.5;
-                case 5: return 9;
-                case 6: return 12;
-                case 7: return 15.5;
-                case 8: return 18.5;
-                case 9: return 22.5;
-                case 10: return 26.5;
-                case 11: return 30;
-                case 12: return 34;
+                case 1: return 0.9; //0.3–1.5 m/s
+                case 2: return 2.45; //1.6–3.3 m/s
+                case 3: return 4.4; //3.4–5.4 m/s
+                case 4: return 6.7; //5.5–7.9 m/s
+                case 5: return 9.35; //8–10.7 m/s
+                case 6: return 12.3; //10.8–13.8 m/s
+                case 7: return 15.5; //13.9–17.1 m/s
+                case 8: return 18.95; //17.2–20.7 m/s
+                case 9: return 22.6; //20.8–24.4 m/s
+                case 10: return 26.45; //24.5–28.4 m/s
+                case 11: return 30.55; //28.5–32.6 m/s
+                case 12: return 35; //≥ 32.7 m/s
                 default: return 0; //throw new Error("Incorrect Beaufort speed: " + speed);
             }
         },

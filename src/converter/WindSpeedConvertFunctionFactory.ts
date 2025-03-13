@@ -25,7 +25,7 @@ export class WindSpeedConvertFunctionFactory {
         },
         (speed: number) => {
             if (speed < 0) {
-                throw new Error("Windsnelheid kan niet negatief zijn");
+                throw new Error("Windspeed can't be negative");
             }
             if (speed < 0.3) return 0;  // Kalm
             if (speed < 1.6) return 1;  // Zwakke wind

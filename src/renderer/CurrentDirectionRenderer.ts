@@ -59,7 +59,7 @@ export class CurrentDirectionRenderer {
         const x = this.roseCenter.x;
         const y = this.roseCenter.y - this.cfg.roseRadius + (this.config.currentDirection.arrowSize! / 2);
 
-        this.arrowElement = this.svgUtil.drawArrow(x, y, this.config.currentDirection.arrowSize!);
+        this.arrowElement = this.svgUtil.drawArrowBottom(x, y, this.config.currentDirection.arrowSize!);
         this.arrowElement.attr({
             stroke: this.config.cardColor.roseCurrentDirectionArrow,
             fill: this.config.cardColor.roseCurrentDirectionArrow

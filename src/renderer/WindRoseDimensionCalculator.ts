@@ -68,9 +68,9 @@ export class WindRoseDimensionCalculator {
         var width = this.cfg.marginLeft + roseWidth + this.cfg.marginRight;
         var height: number;
         if (this.cfg.barCount === 1) {
-            height = this.cfg.marginTop + roseWidth + this.cfg.marginBottom + barBottomCfg.barHeight + barBottomCfg.barMarginBottom;
+            height = this.cfg.marginTop + roseWidth + this.cfg.marginBottom + barBottomCfg.barMarginTop + barBottomCfg.barHeight + barBottomCfg.barMarginBottom;
         } else {
-            height = this.cfg.marginTop + roseWidth + this.cfg.marginBottom + (barBottomCfg.barHeight * this.cfg.barCount) +
+            height = this.cfg.marginTop + roseWidth + this.cfg.marginBottom + barBottomCfg.barMarginTop + (barBottomCfg.barHeight * this.cfg.barCount) +
                 (barBottomCfg.multiBarSpacing * (this.cfg.barCount - 1)) + barBottomCfg.barMarginBottom;
         }
         return "0 0 " + width + " " + height;

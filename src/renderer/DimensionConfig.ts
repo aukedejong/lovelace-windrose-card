@@ -14,6 +14,7 @@ export class DimensionConfig {
     readonly barBottom = {
         barLength: 0,
         barHeight: 40,
+        barMarginTop: 40,
         barMarginLeft: 10,
         barMarginBottom: 40,
         multiBarSpacing: 90
@@ -24,11 +25,11 @@ export class DimensionConfig {
         barHeight: this.roseRadius * 2,
         barMarginLeft: 40,
         barMarginRight: 80,
-        multiBarSpacing: 100
+        multiBarSpacing: 120
     }
 
-    constructor(readonly barCount: number,
-                readonly barLocation: string,
+    constructor(public readonly barCount: number,
+                public readonly barLocation: string,
                 readonly directionLabels: DirectionLabels,
                 readonly svg: Svg) {
 
