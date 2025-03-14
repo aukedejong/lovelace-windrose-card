@@ -13,7 +13,7 @@ export class EntityStatesProcessor {
     private initReady = false;
     private cardConfig!: CardConfigWrapper;
     private windDirectionConverter!: WindDirectionConverter;
-    private windSpeedConverterFunc!: (speed: number) => number;
+    private windSpeedConverterFuncs: ((speed: number) => number)[] = [];
 
     private windDirectionState!: EntityState;
     private windSpeedStates: EntityState[] = [];
@@ -29,15 +29,16 @@ export class EntityStatesProcessor {
     init(cardConfig: CardConfigWrapper) {
         this.cardConfig = cardConfig;
         this.windDirectionConverter = new WindDirectionConverter(cardConfig.windDirectionEntity);
-        this.windSpeedConverterFunc = new WindSpeedConverter(SpeedUnits.getSpeedUnit(cardConfig.windspeedEntities[0].outputSpeedUnit)).getSpeedConverterFunc(cardConfig.windspeedEntities[0].speedUnit);
 
         this.windDirectionState = new EntityState(this.cardConfig.currentDirection.showArrow,
             this.cardConfig.windDirectionEntity.entity, this.cardConfig.windDirectionEntity.attribute);
 
         this.windSpeedStates = [];
-        for (const windSpeedEntity of this.cardConfig.windspeedEntities) {
+        this.cardConfig.windspeedEntities.forEach((windSpeedEntity, index) => {
             this.windSpeedStates.push(new EntityState(windSpeedEntity.currentSpeedArrow, windSpeedEntity.entity, windSpeedEntity.attribute));
-        }
+            this.windSpeedConverterFuncs.push(new WindSpeedConverter(SpeedUnits.getSpeedUnit(cardConfig.windspeedEntities[index].outputSpeedUnit))
+                .getSpeedConverterFunc(cardConfig.windspeedEntities[index].speedUnit));
+        });
 
         this.compassDirectionState = new EntityState(this.cardConfig.compassConfig.autoRotate,
             this.cardConfig.compassConfig.entity, this.cardConfig.compassConfig.attribute);
@@ -65,7 +66,7 @@ export class EntityStatesProcessor {
             this.entityStates.forEach((state: EntityState) => {
                 this.procesState(hass, state);
             });
-            this.log.trace("Updated wind values: "  + this.windDirectionState.updated + "  " + this.windDirectionState.state);
+            this.log.trace("Updated wind direction values: "  + this.windDirectionState.updated + "  " + this.windDirectionState.state);
             this.log.trace("Updated compass values: "  + this.compassDirectionState.updated + "  " + this.compassDirectionState.state);
         }
     }
@@ -115,7 +116,7 @@ export class EntityStatesProcessor {
         if (this.windSpeedStates[index].state === undefined) {
             return undefined;
         }
-        const converted = this.windSpeedConverterFunc(+this.windSpeedStates[index].state);
+        const converted = this.windSpeedConverterFuncs[index](+this.windSpeedStates[index].state);
         this.log.trace("Wind speed state: " + this.windSpeedStates[index].state + " Converted: " + converted);
         if (converted === undefined) {
             return undefined;

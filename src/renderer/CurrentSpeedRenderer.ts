@@ -68,6 +68,7 @@ export class CurrentSpeedRenderer {
         if (redraw || !this.arrowElement) {
             this.drawArrow();
         }
+        console.log('Draw current speed', currentSpeed);
         let arrowPos = 0;
         if (currentSpeed || currentSpeed === 0) {
             let rangeIndex = this.speedRangeService.determineSpeedRangeIndex(currentSpeed);
