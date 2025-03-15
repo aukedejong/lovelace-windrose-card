@@ -4,7 +4,7 @@ import {Log} from "../util/Log";
 export class WindSpeedConvertFunctionFactory {
 
     readonly bft = new SpeedUnit('Beaufort',
-        ['bft', 'Beaufort'],
+        ['bft', 'beaufort'],
         (speed: number) => {
             switch (speed) {
                 case 0: return 0;
@@ -76,6 +76,14 @@ export class WindSpeedConvertFunctionFactory {
         const toMpsFunction = inputSpeedUnit.toMpsFunc;
         const fromMpsFunction = outputSpeedUnit.fromMpsFunc;
         return (speed: number) => fromMpsFunction(toMpsFunction(speed));
+    }
+
+    speedUnitRecognized(unit: string): boolean {
+        if (unit === null || unit === undefined || unit === '') {
+            return false;
+        }
+        const speedUnit = this.units.find(speedUnit => speedUnit.configs.includes(unit));
+        return speedUnit !== undefined;
     }
 
     private getSpeedUnit(unit: string): SpeedUnit {

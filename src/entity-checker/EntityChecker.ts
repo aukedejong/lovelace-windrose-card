@@ -1,6 +1,9 @@
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CornerInfo} from "../config/CornerInfo";
 import {HomeAssistant} from "../util/HomeAssistant";
+import {WindSpeedEntity} from "../config/WindSpeedEntity";
+import {WindSpeedConvertFunctionFactory} from "../converter/WindSpeedConvertFunctionFactory";
+import {Log} from "../util/Log";
 
 export class EntityChecker {
 
@@ -12,13 +15,7 @@ export class EntityChecker {
         for (const entity of cardConfig.windspeedEntities) {
             this.checkEntity(entity.entity, entity.attribute, entity.useStatistics, hass);
             if (entity.speedUnit === 'auto') {
-                if (hass.states[entity.entity].attributes.unit_of_measurement !== undefined) {
-                    entity.speedUnit = hass.states[entity.entity].attributes.unit_of_measurement as string;
-                } else if (hass.states[entity.entity].attributes.wind_speed_unit !== undefined) {
-                    entity.speedUnit = hass.states[entity.entity].attributes.wind_speed_unit as string;
-                } else {
-                    throw new Error(`Entity ${entity.entity} speed unit could not be auto determined, please configure the unit.`)
-                }
+                entity.speedUnit = this.determineAutoSppedUnit(entity, hass);
             }
         }
 
@@ -30,6 +27,19 @@ export class EntityChecker {
         this.checkCornerInfo(cardConfig.cornersInfo.topRightInfo, hass);
         this.checkCornerInfo(cardConfig.cornersInfo.bottomLeftInfo, hass);
         this.checkCornerInfo(cardConfig.cornersInfo.bottomRightInfo, hass);
+    }
+
+    private determineAutoSppedUnit(entity: WindSpeedEntity, hass: HomeAssistant): string {
+        let speedUnit = hass.states[entity.entity].attributes.unit_of_measurement as string;
+        if (speedUnit === undefined) {
+            speedUnit = hass.states[entity.entity].attributes.wind_speed_unit;
+        }
+        speedUnit = speedUnit.toLowerCase();
+        if (new WindSpeedConvertFunctionFactory().speedUnitRecognized(speedUnit)) {
+            Log.info(`Recognized spped unit ${speedUnit} for entity ${entity.entity}`);
+            return speedUnit;
+        }
+        throw new Error(`Entity ${entity.entity} speed unit (${speedUnit}) could not be auto determined, please configure the unit.`)
     }
 
     private checkCornerInfo(cornerInfo: CornerInfo, hass: HomeAssistant) {

@@ -4,7 +4,7 @@ import {Log} from "../util/Log";
 export class SpeedUnits {
 
     static readonly bft = new SpeedUnit('Beaufort',
-        ['bft', 'Beaufort'],
+        ['bft', 'beaufort'],
         (speed: number) => {
             switch (speed) {
                 case 0: return 0;
