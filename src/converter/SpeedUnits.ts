@@ -37,7 +37,7 @@ export class SpeedUnits {
         (speed: number) => speed * 3.6, 10, 100);
 
     static readonly mph = new SpeedUnit('m/h',
-        ['mph', 'm/h'],
+        ['mph', 'm/h', 'mi/h'],
         (speed: number) => speed / 2.2369,
         (speed: number) => speed * 2.2369, 10, 70);
 
