@@ -8,9 +8,12 @@ Attention! Version (1.0.0 and higher) has breaking configuration changes. The ea
 
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
+It's developed for wind data, but it's not limited to wind data only. It is also used for solar winds and lightning data.
+If you miss a feature that would make this card more useful for other use-cases, please submit an issue on GitHub and let me know.
 
-<img alt="Peview dark" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-dark.png?raw=true" width="482"/>
-<img alt="Peview light" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-north-orientation-white.png?raw=true" width="482"/>
+
+<img alt="Peview bars right" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-right.png?raw=true" width="482"/>
+<img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-bottom.png?raw=true" width="482"/>
 
 ## Install
 
