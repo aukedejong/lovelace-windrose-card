@@ -23,10 +23,15 @@ export class DegreesCalculator {
             } else {
                 this.roseRenderDegrees = +this.northOfffset + this.compassDegrees;
             }
+
             if (this.windDirectionDegrees === undefined) {
                 this.windDirectionRenderDegrees = undefined;
             } else {
-                this.windDirectionRenderDegrees = this.northOfffset + this.compassDegrees + this.windDirectionDegrees;
+                if (this.asHeading) {
+                    this.windDirectionRenderDegrees = this.northOfffset + (360 - this.compassDegrees) + this.windDirectionDegrees;
+                } else {
+                    this.windDirectionRenderDegrees = this.northOfffset + this.compassDegrees + this.windDirectionDegrees;
+                }
             }
 
         } else {
