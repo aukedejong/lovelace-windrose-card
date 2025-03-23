@@ -10,6 +10,7 @@ export class DegreesCalculator {
 
     constructor(private readonly northOfffset: number,
                 private readonly autoRotate: boolean,
+                private readonly asHeading: boolean,
                 private readonly hideDirectionBelowSpeed: number | undefined) {
         this.log.debug('HideDirectionBelowSpeed: ', hideDirectionBelowSpeed);
         this.updateRenderDegrees();
@@ -17,8 +18,11 @@ export class DegreesCalculator {
 
     private updateRenderDegrees() {
         if (this.autoRotate) {
-
-            this.roseRenderDegrees = +this.northOfffset + this.compassDegrees;
+            if (this.asHeading) {
+                this.roseRenderDegrees = +this.northOfffset + (360 - this.compassDegrees);
+            } else {
+                this.roseRenderDegrees = +this.northOfffset + this.compassDegrees;
+            }
             if (this.windDirectionDegrees === undefined) {
                 this.windDirectionRenderDegrees = undefined;
             } else {

@@ -6,7 +6,6 @@ import {WindSpeedEntity} from "./WindSpeedEntity";
 import {WindDirectionEntity} from "./WindDirectionEntity";
 import {DataPeriod} from "./DataPeriod";
 import {CompassConfig} from "./CompassConfig";
-import {CardConfigCompass} from "../card/CardConfigCompass";
 import {CurrentDirectionConfig} from "./CurrentDirectionConfig";
 import {CornersInfo} from "./CornersInfo";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
@@ -105,7 +104,7 @@ export class CardConfigWrapper {
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.cardWidth = !cardConfig.card_width ? 4 : cardConfig.card_width;
         this.cardColor = CardColors.fromConfig(cardConfig.colors);
-        this.compassConfig = this.checkCompassConfig(cardConfig.compass_direction);
+        this.compassConfig = CompassConfig.fromConfig(cardConfig.compass_direction);
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
         this.backgroundImage = ConfigCheckUtils.checkString(cardConfig.background_image);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
@@ -219,23 +218,5 @@ export class CardConfigWrapper {
         return this.windDirectionEntity + ',' + this.windspeedEntities
             .map(config => config.entity)
             .join(',');
-    }
-
-    private checkCompassConfig(compassDirection: CardConfigCompass | undefined): CompassConfig {
-        let entity = undefined;
-        let autoRotate = false;
-        let attribute = undefined;
-        if (compassDirection) {
-            autoRotate = ConfigCheckUtils.checkBooleanDefaultFalse(compassDirection.auto_rotate);
-            if (autoRotate) {
-                if (compassDirection.entity) {
-                    entity = compassDirection.entity;
-                    attribute = compassDirection.attribute;
-                } else {
-                    throw new Error('WindRoseCard: compass direction auto rotate set to true, but no entity configured.');
-                }
-            }
-        }
-       return new CompassConfig(autoRotate, entity, attribute);
     }
 }

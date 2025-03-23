@@ -89,8 +89,10 @@ export class WindRoseDirigent {
             this.measurementCounters.push(new MeasurementCounter(cardConfig, windSpeedConverter, speedRangeService));
         }
 
-        this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation, cardConfig.directionLabels, this.svg);
-        this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate, cardConfig.currentDirection.hideDirectionBelowSpeed);
+        this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation,
+            cardConfig.directionLabels, this.svg);
+        this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate,
+            cardConfig.compassConfig.asHeading, cardConfig.currentDirection.hideDirectionBelowSpeed);
 
         this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionConfig, this.sendEvent, this.svg);
 

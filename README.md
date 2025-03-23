@@ -424,6 +424,7 @@ You can also make a helper number entity to rotate the windrose on manual input.
 | auto_rotate | boolean |         |    x     | Use auto rotation, false to turn off.                         |
 | entity      | string  |         |    x     | Compass or other direction entity, needs degrees as unit.     |
 | attribute   | string  |         |          | If used, not the state but the attributtes value is deplayed. |
+| as_heading  | boolean |  false  |          | Use compass degrees as heading instead of north direction.    |
 
 
 ### Object corner_info
@@ -782,6 +783,7 @@ current_direction:
   hide_direction_below_speed: 3
 compass_direction:
   auto_rotate: false
+  as_heading: false
   entity: input_number.compass
 corner_info:
   top_left:
