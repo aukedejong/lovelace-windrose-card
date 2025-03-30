@@ -1,9 +1,8 @@
-import {Coordinate} from "./Coordinate";
-
 export class RectCoordinates {
 
     constructor(
-       public readonly startPoint: Coordinate,
+       public readonly x: number,
+       public readonly y: number,
        public readonly width: number,
        public readonly height: number) {
     }

@@ -4,8 +4,6 @@ import {Log} from "../util/Log";
 import {SpeedUnit} from "../converter/SpeedUnit";
 import {SvgUtil} from "../renderer/SvgUtil";
 import {TextAttributes} from "../renderer/TextAttributes";
-import {WindBarDimensionCalculator} from "./WindBarDimensionCalculator";
-import {DimensionConfig} from "../renderer/DimensionConfig";
 import {ColorUtil} from "../util/ColorUtil";
 import {Svg} from "@svgdotjs/svg.js";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
@@ -14,24 +12,28 @@ import {CardColors} from "../config/CardColors";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 import {WindBarRangeCalcUtil} from "./WindBarRangeCalcUtil";
 import {SegmentPosition} from "./SegmentPosition";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class WindBarRenderer {
 
     private readonly config: CardConfigWrapper;
+    private readonly dimensionCalculator: DimensionCalculator;
     private readonly cardColors: CardColors;
     private readonly windSpeedEntityConfig: WindSpeedEntity;
     private readonly speedRangeService: SpeedRangeService;
-    private readonly dimensionConfig: DimensionConfig;
 
     private readonly svg: Svg;
     private readonly svgUtil!: SvgUtil;
     private readonly outputSpeedUnitLabel: string;
     private speedRanges: SpeedRange[] = [];
-    private readonly dimensionCalculator: WindBarDimensionCalculator;
+    private readonly barWidth: number;
+    private readonly barHeight: number;
     private readonly positionIndex: number;
+    private readonly barLabelTextSize: number;
+    private readonly barSpeedTextSize: number;
 
     constructor(config: CardConfigWrapper,
-                dimensionConfig: DimensionConfig,
+                dimensionCalculator: DimensionCalculator,
                 outputSpeedUnit: SpeedUnit,
                 speedRangeService: SpeedRangeService,
                 positionIndex: number,
@@ -39,9 +41,10 @@ export class WindBarRenderer {
 
         Log.debug('WindBarRenderer init', config, outputSpeedUnit);
         this.config = config;
-        this.dimensionConfig = dimensionConfig;
         this.cardColors = config.cardColor;
         this.windSpeedEntityConfig = config.windspeedEntities[positionIndex];
+        this.barLabelTextSize = this.windSpeedEntityConfig.barLabelTextSize;
+        this.barSpeedTextSize = this.windSpeedEntityConfig.barSpeedTextSize;
         this.svg = svg;
         if (this.windSpeedEntityConfig.outputSpeedUnitLabel) {
             this.outputSpeedUnitLabel = this.windSpeedEntityConfig.outputSpeedUnitLabel;
@@ -53,7 +56,10 @@ export class WindBarRenderer {
         this.speedRangeService = speedRangeService;
         this.positionIndex = positionIndex;
         this.svgUtil = new SvgUtil(this.svg);
-        this.dimensionCalculator = new WindBarDimensionCalculator(dimensionConfig);
+        this.dimensionCalculator = dimensionCalculator;
+
+        this.barWidth = this.dimensionCalculator.barWidth(this.positionIndex);
+        this.barHeight = this.dimensionCalculator.barHeight(this.positionIndex);
     }
 
     drawWindBar(windBarData: WindRoseData) {
@@ -77,22 +83,24 @@ export class WindBarRenderer {
 
 
         if (this.config.windspeedBarLocation === 'bottom') {
-            this.drawBarLegendBottomNew(windBarData.speedRangePercentages, segmentPositions);
+            this.drawBarLegendBottom(windBarData.speedRangePercentages, segmentPositions);
 
         } else if (this.config.windspeedBarLocation === 'right') {
-            this.drawBarLegendRightNew(windBarData.speedRangePercentages, segmentPositions);
+            this.drawBarLegendRight(windBarData.speedRangePercentages, segmentPositions);
         }
     }
 
-    private drawBarLegendBottomNew(percentages: number[], segmentPositions: SegmentPosition[]) {
-        const y = this.dimensionCalculator.barBottomY(this.positionIndex);
-        const y2 = y + this.dimensionConfig.barBottom.barHeight;
-        const labelUnitY = y - 10;
-        const percLabelY = y + (this.dimensionConfig.barBottom.barHeight / 2) + 2;
-        const speedLabelY = y2 + 10;
+    private drawBarLegendBottom(percentages: number[], segmentPositions: SegmentPosition[]) {
+        const y = this.dimensionCalculator.barStartY(this.positionIndex);
+        const y2 = y + this.barHeight;
+        const labelUnitY = this.dimensionCalculator.barLabelY(this.positionIndex)
+        const percLabelY = y + (this.barHeight / 2) + 2;
+        const speedLabelY = this.dimensionCalculator.barSpeedLabelY(this.positionIndex);
 
         //Bar label
-        this.svgUtil.drawText2(segmentPositions[0].start, labelUnitY, this.windSpeedEntityConfig.name, TextAttributes.windBarAttribute(this.cardColors.barName, 35, "auto", "start"))
+        this.svgUtil.drawText2(segmentPositions[0].start, labelUnitY, this.windSpeedEntityConfig.name,
+            TextAttributes.windBarAttribute(this.cardColors.barName, this.barLabelTextSize,
+                "auto", "start"))
 
         segmentPositions.forEach((segmentPosition, index) => {
 
@@ -102,40 +110,39 @@ export class WindBarRenderer {
 
             //Speed labels
             if (this.windSpeedEntityConfig.speedRangeBeaufort) {
-                this.svgUtil.drawText2(segmentPosition.center, speedLabelY, index + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, 30, "hanging", "middle"));
+                this.svgUtil.drawText2(segmentPosition.center, speedLabelY, index + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", "middle"));
             } else {
                 let align = 'middle';
                 if (index === 0) {
                     align = 'start';
                 }
-                this.svgUtil.drawText2(segmentPosition.start, y2 + 10, segmentPosition.minSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, 30, "hanging", align));
+                this.svgUtil.drawText2(segmentPosition.start, speedLabelY, segmentPosition.minSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", align));
             }
 
             //Percentages
             if (percentages[index] > 0) {
                 let percentageTextColor = this.getPercentageTextColor(this.cardColors.barPercentages, this.speedRanges[index].color);
-                this.svgUtil.drawText2(segmentPosition.center, percLabelY, `${Math.round(percentages[index])}%`, TextAttributes.windBarAttribute(percentageTextColor, 35, "middle", "middle"));
+                this.svgUtil.drawText2(segmentPosition.center, percLabelY, `${Math.round(percentages[index])}%`, TextAttributes.windBarAttribute(percentageTextColor, this.windSpeedEntityConfig.barPercentageTextSize, "middle", "middle"));
             }
         });
         //Last label if needed
         const lastSegment = segmentPositions[segmentPositions.length - 1];
         if (!this.windSpeedEntityConfig.speedRangeBeaufort && lastSegment.showLastLabel) {
-            this.svgUtil.drawText2(lastSegment.end, speedLabelY, lastSegment.maxSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, 30, "hanging", "end"))
+            this.svgUtil.drawText2(lastSegment.end, speedLabelY, lastSegment.maxSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", "end"))
         }
         //Unit label
-        this.svgUtil.drawText2(lastSegment.end, labelUnitY , this.outputSpeedUnitLabel, TextAttributes.windBarAttribute(this.cardColors.barUnitName, 35, "auto", "end"))
+        this.svgUtil.drawText2(lastSegment.end, labelUnitY , this.outputSpeedUnitLabel, TextAttributes.windBarAttribute(this.cardColors.barUnitName, this.barLabelTextSize, "auto", "end"))
     }
 
-    private drawBarLegendRightNew(percentages: number[], segmentPositions: SegmentPosition[]) {
-        const x = this.dimensionCalculator.barRightX(this.positionIndex);
-        const x2 = x + this.dimensionConfig.barRight.barWidth;
-        const labelX = x - 10;
-        const unitX = x + this.dimensionConfig.barRight.barWidth / 2;
-        const percLabelX = x + (this.dimensionConfig.barRight.barWidth / 2);
-        const speedLabelX = x2 + 10;
+    private drawBarLegendRight(percentages: number[], segmentPositions: SegmentPosition[]) {
+        const x = this.dimensionCalculator.barStartX(this.positionIndex);
+        const x2 = x + this.barWidth;
+        const labelX = this.dimensionCalculator.barLabelX(this.positionIndex);
+        const barCenterX = x + (this.barWidth / 2);
+        const speedLabelX = this.dimensionCalculator.barSpeedLabelX(this.positionIndex);
 
         //Bar label
-        var barLabel = this.svgUtil.drawText2(labelX, segmentPositions[0].start, this.windSpeedEntityConfig.name, TextAttributes.windBarAttribute(this.cardColors.barName, 40, "auto", "left"))
+        var barLabel = this.svgUtil.drawText2(labelX, segmentPositions[0].start, this.windSpeedEntityConfig.name, TextAttributes.windBarAttribute(this.cardColors.barName, this.barLabelTextSize, "auto", "left"))
         barLabel.rotate(270, labelX, segmentPositions[0].start);
 
         segmentPositions.forEach((segmentPosition, index) => {
@@ -146,32 +153,32 @@ export class WindBarRenderer {
 
             //Speed labels
             if (this.windSpeedEntityConfig.speedRangeBeaufort) {
-                this.svgUtil.drawText2(speedLabelX, segmentPosition.center, index + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, 40, "middle", "left"));
+                this.svgUtil.drawText2(speedLabelX, segmentPosition.center, index + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "middle", "left"));
             } else {
                 let baseline = 'middle';
                 if (index === 0) {
                     baseline = 'start';
                 }
-                this.svgUtil.drawText2(speedLabelX, segmentPosition.start, segmentPosition.minSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, 40, baseline, "left"));
+                this.svgUtil.drawText2(speedLabelX, segmentPosition.start, segmentPosition.minSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, baseline, "left"));
             }
 
             //Percentages
             if (percentages[index] > 0) {
                 let percentage = Math.round(percentages[index]);
-                let percFontSize = percentage === 100 ? 35 : 40;
+                let percFontSize = percentage === 100 ? this.windSpeedEntityConfig.barPercentageTextSize * 0.8 : this.windSpeedEntityConfig.barPercentageTextSize
                 let percentageTextColor = this.getPercentageTextColor(this.cardColors.barPercentages, this.speedRanges[index].color);
-                this.svgUtil.drawText2(percLabelX, segmentPosition.center, `${percentage}%`, TextAttributes.windBarAttribute(percentageTextColor, percFontSize, "middle", "middle"));
+                this.svgUtil.drawText2(barCenterX, segmentPosition.center, `${percentage}%`, TextAttributes.windBarAttribute(percentageTextColor, percFontSize, "middle", "middle"));
             }
 
         });
         const lastSegment = segmentPositions[segmentPositions.length - 1];
         //Last label if needed
         if (!this.windSpeedEntityConfig.speedRangeBeaufort && lastSegment.showLastLabel) {
-            this.svgUtil.drawText2(speedLabelX, lastSegment.end, lastSegment.maxSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, 40, "hanging", "left"))
+            this.svgUtil.drawText2(speedLabelX, lastSegment.end, lastSegment.maxSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", "left"))
         }
 
         //Unit label
-        this.svgUtil.drawText2(unitX, lastSegment.end - 15, this.outputSpeedUnitLabel, TextAttributes.windBarAttribute(this.cardColors.barUnitName, 40, "auto", "middle"))
+        this.svgUtil.drawText2(barCenterX, lastSegment.end - 15, this.outputSpeedUnitLabel, TextAttributes.windBarAttribute(this.cardColors.barUnitName, this.barLabelTextSize, "auto", "middle"))
     }
 
     private getPercentageTextColor(configColor: string, backgroundColor: string) {

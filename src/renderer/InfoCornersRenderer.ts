@@ -1,5 +1,3 @@
-import {DimensionConfig} from "./DimensionConfig";
-import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {SvgUtil} from "./SvgUtil";
 import {Coordinate} from "./Coordinate";
 import {TextAttributes} from "./TextAttributes";
@@ -9,10 +7,11 @@ import SVG, {Svg} from "@svgdotjs/svg.js";
 import {WindSpeedConvertFunctionFactory} from "../converter/WindSpeedConvertFunctionFactory";
 import {WindDirectionLettersConverter} from "../converter/WindDirectionLettersConverter";
 import {CornersInfo} from "../config/CornersInfo";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class InfoCornersRenderer {
 
-    private readonly dimensionCalculator: WindRoseDimensionCalculator;
+    private readonly dimensionCalculator: DimensionCalculator;
     private svgUtil!: SvgUtil;
 
     private leftTopCoor: Coordinate;
@@ -35,9 +34,9 @@ export class InfoCornersRenderer {
     private leftBottomConverter: (input: any) => any;
     private rightBottomConverter: (input: any) => any;
 
-    constructor(cornersInfo: CornersInfo, dimensionConfig: DimensionConfig, svg: Svg) {
+    constructor(cornersInfo: CornersInfo, dimensionCalculator: DimensionCalculator, svg: Svg) {
 
-        this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
+        this.dimensionCalculator = dimensionCalculator;
         this.svgUtil = new SvgUtil(svg);
 
         this.leftTopCoor = this.dimensionCalculator.infoCornerLeftTop();
@@ -87,13 +86,13 @@ export class InfoCornersRenderer {
         if (this.leftBottomConfig.label) {
             const leftBottom = this.svgUtil.drawText(this.dimensionCalculator.infoCornetLabelLeftBottom(), this.leftBottomConfig.label,
                 TextAttributes.infoCornerLabelAttribute(this.leftBottomConfig.color, this.leftBottomConfig.labelTextSize));
-            leftBottom.attr({"text-anchor": "left", "dominant-baseline": "hanging"});
+            leftBottom.attr({"text-anchor": "left", "dominant-baseline": "auto"});
             leftBottom.addClass("corner-label-left-bottom");
         }
         if (this.rightBottomConfig.label) {
             const rightBottom = this.svgUtil.drawText(this.dimensionCalculator.infoCornetLabelRightBottom(), this.rightBottomConfig.label,
                 TextAttributes.infoCornerLabelAttribute(this.rightBottomConfig.color, this.rightBottomConfig.labelTextSize));
-            rightBottom.attr({"text-anchor": "end", "dominant-baseline": "hanging"});
+            rightBottom.attr({"text-anchor": "end", "dominant-baseline": "auto"});
             rightBottom.addClass("corner-label-right-bottom");
         }
     }

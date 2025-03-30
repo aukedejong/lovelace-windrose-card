@@ -3,3 +3,4 @@
 /node_modules/
 .idea
 /ha-windrose-card-project.iml
+/coverage/

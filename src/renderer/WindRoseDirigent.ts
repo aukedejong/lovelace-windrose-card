@@ -8,7 +8,6 @@ import {WindRoseData} from "./WindRoseData";
 import {WindRoseRendererCenterCalm} from "./WindRoseRendererCenterCalm";
 import {PercentageCalculatorCenterCalm} from "./PercentageCalculatorCenterCalm";
 import {WindRoseRenderer} from "./WindRoseRenderer";
-import {DimensionConfig} from "./DimensionConfig";
 import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
 import {DegreesCalculator} from "./DegreesCalculator";
 import {Log2} from "../util/Log2";
@@ -23,6 +22,11 @@ import {HAMeasurementProvider} from "../measurement-provider/HAMeasurementProvid
 import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
 import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
 import {CurrentSpeedRenderer} from "./CurrentSpeedRenderer";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
+import {DimensionCalculatorBarHidden} from "../dimensions/DimensionCalculatorBarHidden";
+import {SvgUtil} from "./SvgUtil";
+import {DimensionCalculatorBarRight} from "../dimensions/DimensionCalculatorBarRight";
+import {DimensionCalculatorBarBottom} from "../dimensions/DimensionCalculatorBarBottom";
 
 export class WindRoseDirigent {
     //Util
@@ -45,7 +49,7 @@ export class WindRoseDirigent {
 
     //Rendering
     private degreesCalculator!: DegreesCalculator;
-    private dimensionConfig!: DimensionConfig;
+    private dimensionCalculator!: DimensionCalculator;
     private windRoseRenderer!: WindRoseRenderer;
     private windBarRenderers: WindBarRenderer[] = [];
     private currentDirectionRenderer!: CurrentDirectionRenderer;
@@ -57,6 +61,7 @@ export class WindRoseDirigent {
     private windRoseData: WindRoseData[] = [];
 
     private readonly svg: Svg;
+    private svgUtil!: SvgUtil;
     private backgroundElement: Element | undefined;
     private readonly sendEvent: (event: CustomEvent) => void;
     private initReady = false;
@@ -77,6 +82,7 @@ export class WindRoseDirigent {
         this.cardConfig = cardConfig;
         this.measurementProvider = measurementProvider;
         this.measurementMatcher = new MeasurementMatcher(cardConfig);
+        this.svgUtil = new SvgUtil(this.svg);
         this.entityStatesProcessor = entityStatesProcessor;
 
         for (const windSpeedEntity of this.cardConfig.windspeedEntities) {
@@ -89,33 +95,39 @@ export class WindRoseDirigent {
             this.measurementCounters.push(new MeasurementCounter(cardConfig, windSpeedConverter, speedRangeService));
         }
 
-        this.dimensionConfig = new DimensionConfig(cardConfig.windBarCount(), cardConfig.windspeedBarLocation,
-            cardConfig.directionLabels, this.svg);
+        if (this.cardConfig.hideWindspeedBar) {
+            this.dimensionCalculator = new DimensionCalculatorBarHidden(cardConfig.directionLabels, cardConfig.cornersInfo, this.svgUtil);
+        } else if (this.cardConfig.windspeedBarLocation === 'right') {
+            this.dimensionCalculator = new DimensionCalculatorBarRight(cardConfig.directionLabels, this.speedRangeServices, this.cardConfig.windspeedEntities, cardConfig.cornersInfo, this.svgUtil);
+        } else if (this.cardConfig.windspeedBarLocation === 'bottom') {
+            this.dimensionCalculator = new DimensionCalculatorBarBottom(cardConfig.directionLabels, cardConfig.windspeedEntities, cardConfig.cornersInfo, this.svgUtil);
+        }
+
         this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate,
             cardConfig.compassConfig.asHeading, cardConfig.currentDirection.hideDirectionBelowSpeed);
 
-        this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionConfig, this.sendEvent, this.svg);
+        this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionCalculator, this.sendEvent, this.svg);
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
-            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionConfig, this.speedRangeServices[0], this.svg, this.degreesCalculator);
+            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator);
         } else {
             this.percentageCalculator = new PercentageCalculator();
-            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionConfig, this.speedRangeServices[0], this.svg, this.degreesCalculator);
+            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator);
         }
         if (this.cardConfig.currentDirection.showArrow) {
-            this.currentDirectionRenderer = new CurrentDirectionRenderer(cardConfig, this.dimensionConfig, this.svg);
+            this.currentDirectionRenderer = new CurrentDirectionRenderer(cardConfig, this.dimensionCalculator, this.svg);
         }
         if (this.cardConfig.cornersInfo.isCornerInfoSet()) {
-            this.infoCornersRendeerer = new InfoCornersRenderer(cardConfig.cornersInfo, this.dimensionConfig, this.svg);
+            this.infoCornersRendeerer = new InfoCornersRenderer(cardConfig.cornersInfo, this.dimensionCalculator, this.svg);
         }
 
         this.windBarRenderers = [];
         if (!cardConfig.hideWindspeedBar) {
             for (let i = 0; i < cardConfig.windBarCount(); i++) {
-                this.windBarRenderers.push(new WindBarRenderer(this.cardConfig, this.dimensionConfig, this.outputSpeedUnits[i], this.speedRangeServices[i], i, this.svg));
+                this.windBarRenderers.push(new WindBarRenderer(this.cardConfig, this.dimensionCalculator, this.outputSpeedUnits[i], this.speedRangeServices[i], i, this.svg));
                 if (cardConfig.windspeedEntities[i].currentSpeedArrow) {
-                    this.currentSpeedRenderers.push(new CurrentSpeedRenderer(cardConfig, cardConfig.windspeedEntities[i], this.dimensionConfig, this.speedRangeServices[i], i, this.svg));
+                    this.currentSpeedRenderers.push(new CurrentSpeedRenderer(cardConfig, cardConfig.windspeedEntities[i], this.dimensionCalculator, this.speedRangeServices[i], i, this.svg));
                 }
             }
         }
@@ -137,6 +149,7 @@ export class WindRoseDirigent {
                     const windCounts = this.measurementCounters[i].getMeasurementCounts();
                     this.windRoseData.push(this.percentageCalculator.calculate(windCounts));
                 }
+                this.dimensionCalculator.updateLabelLengths(this.windRoseData);
                 this.measurementsReady = true;
 
                 if (this.cardConfig.dataPeriod.logMeasurementCounts) {
@@ -170,7 +183,7 @@ export class WindRoseDirigent {
             if (this.cardConfig.backgroundImage !== undefined) {
                 this.backgroundElement = this.svg.image(this.cardConfig.backgroundImage)
                     .size(1000, 1000)
-                    .move(this.dimensionConfig.marginLeft, this.dimensionConfig.marginTop)
+                    .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
                     .back();
             }
         } else {

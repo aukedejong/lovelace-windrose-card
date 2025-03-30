@@ -1,6 +1,5 @@
 import SVG, {Svg} from "@svgdotjs/svg.js";
 import {SvgUtil} from "./SvgUtil";
-import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {WindRoseData} from "./WindRoseData";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardColors} from "../config/CardColors";
@@ -8,11 +7,12 @@ import {Coordinate} from "./Coordinate";
 import {DegreesCalculator} from "./DegreesCalculator";
 import {CardConfigCustomDirectionLabels} from "../card/CardConfigCustomDirectionLabels";
 import {DirectionLabels} from "../config/DirectionLabels";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class WindRoseRenderUtil {
 
     private readonly cardColors: CardColors;
-    private readonly dimensionCalculator: WindRoseDimensionCalculator;
+    private readonly dimensionCalculator: DimensionCalculator;
     private readonly degreesCalculator: DegreesCalculator;
     private readonly svgUtil!: SvgUtil;
     private readonly svg: Svg;
@@ -25,7 +25,7 @@ export class WindRoseRenderUtil {
     private readonly showSecondaryIntercardinalDirections: boolean;
 
     constructor(config: CardConfigWrapper,
-                dimensionCalculator: WindRoseDimensionCalculator,
+                dimensionCalculator: DimensionCalculator,
                 degreesCalculator: DegreesCalculator,
                 svg: Svg) {
 
@@ -68,7 +68,7 @@ export class WindRoseRenderUtil {
             centerRadius = 0;
         }
         const circleCount = windRoseData.circleCount;
-        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - centerRadius) / circleCount;
+        const radiusStep = (this.dimensionCalculator.roseRadius - centerRadius) / circleCount;
         let circleRadius = centerRadius + radiusStep;
         for (let i = 1; i <= circleCount; i++) {
             roseLinesGroup.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(circleRadius)));

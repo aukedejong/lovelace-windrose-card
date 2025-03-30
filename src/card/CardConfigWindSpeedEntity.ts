@@ -19,4 +19,8 @@ export interface CardConfigWindSpeedEntity {
     speed_ranges: CardConfigSpeedRange[];
     dynamic_speed_ranges: CardConfigDynamicSpeedRange[];
     current_speed_arrow: boolean;
+
+    bar_label_text_size: number;
+    bar_speed_text_size: number;
+    bar_percentage_text_size: number;
 }

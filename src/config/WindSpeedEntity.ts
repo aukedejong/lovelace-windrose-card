@@ -24,7 +24,10 @@ export class WindSpeedEntity implements HARequestData {
         public readonly speedRangeMax: number | undefined,
         public readonly speedRanges: SpeedRange[] = [],
         public readonly dynamicSpeedRanges: DynamicSpeedRange[] = [],
-        public readonly currentSpeedArrow: boolean
+        public readonly currentSpeedArrow: boolean,
+        public readonly barLabelTextSize: number,
+        public readonly barSpeedTextSize: number,
+        public readonly barPercentageTextSize: number
     ) {}
 
     static fromConfig(entityConfig: CardConfigWindSpeedEntity,
@@ -37,6 +40,9 @@ export class WindSpeedEntity implements HARequestData {
         const renderRelativeScale = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
         const statsPeriod = ConfigCheckUtils.checkStatisticsPeriod(entityConfig.statistics_period);
         const currentSpeedArrow = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.current_speed_arrow);
+        const barLabelTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_label_text_size, 40);
+        const barSpeedTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_speed_text_size, 40);
+        const barPercentageTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_percentage_text_size, 40);
         let windspeedBarFull;
         if (entityConfig.windspeed_bar_full === undefined) {
             windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(parentEntityConfig.windspeed_bar_full);
@@ -85,7 +91,8 @@ export class WindSpeedEntity implements HARequestData {
 
         return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, renderRelativeScale,
             windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
-            speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow);
+            speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow, barLabelTextSize,
+            barSpeedTextSize, barPercentageTextSize);
     }
 
     private static checkInputSpeedUnit(inputSpeedUnit: string): string {

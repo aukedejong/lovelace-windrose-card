@@ -1,31 +1,27 @@
-import {DimensionConfig} from "./DimensionConfig";
 import {Element, Svg} from "@svgdotjs/svg.js";
-import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {SvgUtil} from "./SvgUtil";
 import {CardConfigActions} from "../card/CardConfigActions";
 import {CardConfigAction} from "../card/CardConfigAction";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardConfigHaAction} from "../card/CardConfigHaAction";
 import {CircleCoordinate} from "./CircleCoordinate";
-import {WindBarDimensionCalculator} from "../render-bar/WindBarDimensionCalculator";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class TouchFacesRenderer {
 
     private readonly cardConfig: CardConfigWrapper;
-    private readonly roseDimensionCalculator: WindRoseDimensionCalculator;
-    private readonly barDimensionCalculator: WindBarDimensionCalculator;
+    private readonly dimensionCalculator: DimensionCalculator;
     private readonly sendEvent: (event: CustomEvent) => void
     private svgUtil!: SvgUtil;
     private actionsConfig: CardConfigActions | undefined;
 
     constructor(cardConfig: CardConfigWrapper,
-                dimensionConfig: DimensionConfig,
+                dimensionCalculator: DimensionCalculator,
                 sendEvent: (event: CustomEvent) => void,
                 svg: Svg) {
 
         this.cardConfig = cardConfig;
-        this.roseDimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
-        this.barDimensionCalculator = new WindBarDimensionCalculator(dimensionConfig);
+        this.dimensionCalculator = dimensionCalculator;
         this.sendEvent = sendEvent;
         this.svgUtil = new SvgUtil(svg);
         this.actionsConfig = this.cardConfig.actions;
@@ -35,8 +31,8 @@ export class TouchFacesRenderer {
         if (this.actionsConfig === undefined) {
             return;
         }
-        const radius = this.roseDimensionCalculator.cfg.roseRadius;
-        const center = this.roseDimensionCalculator.roseCenter();
+        const radius = this.dimensionCalculator.roseRadius;
+        const center = this.dimensionCalculator.roseCenter();
         if (this.actionsConfig.top_left) {
             const topLeftCorner = this.svgUtil.drawTriangle(0, 0, center.x, 0, 0, center.y);
             topLeftCorner.attr({ fill: "transparent", cursor: "pointer" });
@@ -64,32 +60,16 @@ export class TouchFacesRenderer {
         }
 
         if (this.actionsConfig.speed_bar_1) {
-            if (this.cardConfig.windspeedBarLocation === 'bottom') {
-                const barRect = this.barDimensionCalculator.touchFaceBarBottom(0);
-                const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent", cursor: "pointer" });
-                this.addEventHandler(this.actionsConfig.speed_bar_1, rect);
-
-            } else if (this.cardConfig.windspeedBarLocation === 'right') {
-                const barRect = this.barDimensionCalculator.touchFaceBarRight(0);
-                const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent", cursor: "pointer" });
-                this.addEventHandler(this.actionsConfig.speed_bar_1, rect);
-            }
+            const barRect = this.dimensionCalculator.touchFaceBar(0);
+            const rect = this.svgUtil.drawRect(barRect);
+            rect.attr({ fill: "transparent", cursor: "pointer" });
+            this.addEventHandler(this.actionsConfig.speed_bar_1, rect);
         }
         if (this.actionsConfig.speed_bar_2) {
-            if (this.cardConfig.windspeedBarLocation === 'bottom') {
-                const barRect = this.barDimensionCalculator.touchFaceBarBottom(1);
-                const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent", cursor: "pointer" });
-                this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
-
-            } else if (this.cardConfig.windspeedBarLocation === 'right') {
-                const barRect = this.barDimensionCalculator.touchFaceBarRight(1);
-                const rect = this.svgUtil.drawRect(barRect);
-                rect.attr({ fill: "transparent", cursor: "pointer" });
-                this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
-            }
+            const barRect = this.dimensionCalculator.touchFaceBar(1);
+            const rect = this.svgUtil.drawRect(barRect);
+            rect.attr({ fill: "transparent", cursor: "pointer" });
+            this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
         }
     }
 

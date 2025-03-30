@@ -3,8 +3,6 @@ import {SpeedRange} from "../speed-range/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
 import {Log} from "../util/Log";
 import {SvgUtil} from "./SvgUtil";
-import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
-import {DimensionConfig} from "./DimensionConfig";
 import {TextAttributes} from "./TextAttributes";
 import {CircleCoordinate} from "./CircleCoordinate";
 import {Coordinate} from "./Coordinate";
@@ -16,13 +14,14 @@ import {CardColors} from "../config/CardColors";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 import {WindRoseRenderUtil} from "./WindRoseRenderUtil";
 import {GlobalConfig} from "../config/GlobalConfig";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class WindRoseRendererCenterCalm {
     private readonly cardColors: CardColors;
     private speedRanges: SpeedRange[] = [];
     private readonly svg: Svg;
 
-    private readonly dimensionCalculator: WindRoseDimensionCalculator;
+    private readonly dimensionCalculator: DimensionCalculator;
     private readonly windRoseRenderUtil: WindRoseRenderUtil;
     private readonly degreesCalculator: DegreesCalculator;
     private readonly speedRangeService: SpeedRangeService;
@@ -35,7 +34,7 @@ export class WindRoseRendererCenterCalm {
     private windDirectionTextGroup!: SVG.G;
 
     constructor(config: CardConfigWrapper,
-                dimensionConfig: DimensionConfig,
+                dimensionCalculator: DimensionCalculator,
                 speedRangeService: SpeedRangeService,
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
@@ -44,7 +43,7 @@ export class WindRoseRendererCenterCalm {
         this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
-        this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
+        this.dimensionCalculator = dimensionCalculator;
         this.windRoseRenderUtil = new WindRoseRenderUtil(config, this.dimensionCalculator, degreesCalculator, svg);
         this.degreesCalculator = degreesCalculator;
         this.roseCenter = this.dimensionCalculator.roseCenter();
@@ -120,7 +119,7 @@ export class WindRoseRendererCenterCalm {
                 }
             }
         }
-        const maxDirectionRadius = (directionPercentage * (this.dimensionCalculator.cfg.roseRadius - this.centerRadius)) / this.windRoseData.maxCirclePercentage;
+        const maxDirectionRadius = (directionPercentage * (this.dimensionCalculator.roseRadius - this.centerRadius)) / this.windRoseData.maxCirclePercentage;
         for (let i = this.speedRanges.length - 1; i >= 0; i--) {
             const sppedPart = this.drawSpeedPart(this.svg,
                 degrees - 90,
@@ -148,14 +147,14 @@ export class WindRoseRendererCenterCalm {
     private drawCircleLegend(): SVG.G {
         const circleLegendGroup = this.svg.group();
         const center = this.dimensionCalculator.roseCenter();
-        const radiusStep = (this.dimensionCalculator.cfg.roseRadius - this.centerRadius) / this.windRoseData.circleCount;
+        const radiusStep = (this.dimensionCalculator.roseRadius - this.centerRadius) / this.windRoseData.circleCount;
         const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.centerRadius;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
 
         for (let i = 1; i <= this.windRoseData.circleCount; i++) {
-            const xPos = centerXY + (xy * i) + center.x;
-            const yPos = centerXY + (xy * i) + center.y;
-            const text = this.svgUtil.drawText(new Coordinate(xPos, yPos),
+            const text = this.svgUtil.drawText2(
+                centerXY + (xy * i) + center.x,
+                centerXY + (xy * i) + center.y,
                 (this.windRoseData.percentagePerCircle * i) + "%",
                 TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages));
             circleLegendGroup.add(text);
@@ -176,7 +175,7 @@ export class WindRoseRendererCenterCalm {
              textColor = ColorUtil.getTextColorBasedOnBackground(this.speedRanges[0].color);
         }
         if (!isNaN(this.windRoseData.speedRangePercentages[0])) {
-            this.svgUtil.drawText(center, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
+            this.svgUtil.drawText2(center.x, center.y, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
                 TextAttributes.windBarAttribute(textColor, 40, "middle", "middle"));
         }
     }

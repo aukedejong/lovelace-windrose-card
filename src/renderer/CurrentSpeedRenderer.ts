@@ -1,48 +1,42 @@
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {DimensionConfig} from "./DimensionConfig";
 import {SvgUtil} from "./SvgUtil";
 import SVG, {Svg} from "@svgdotjs/svg.js";
-import {WindBarDimensionCalculator} from "../render-bar/WindBarDimensionCalculator";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 import {WindRoseData} from "./WindRoseData";
 import {WindBarRangeCalcUtil} from "../render-bar/WindBarRangeCalcUtil";
 import {SegmentPosition} from "../render-bar/SegmentPosition";
 import {WindSpeedEntity} from "../config/WindSpeedEntity";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class CurrentSpeedRenderer {
 
     private readonly config: CardConfigWrapper;
     private readonly windSpeedEntityConfig: WindSpeedEntity;
-    private readonly dimensionCalculator: WindBarDimensionCalculator;
+    private readonly dimensionCalculator: DimensionCalculator;
     private readonly speedRangeService: SpeedRangeService;
     private readonly barIndex: number;
     private svgUtil!: SvgUtil;
-    private readonly arrowStartX: number;
-    private readonly arrowStartY: number;
+    private arrowStartX: number = 0;
+    private arrowStartY: number = 0;
     private initDone = false;
     private segmentPositions: SegmentPosition[] = [];
     private readonly positionMinus: boolean;
 
     private arrowElement: SVG.Path | undefined = undefined;
 
-    constructor(config: CardConfigWrapper, windSpeedEntityConfig: WindSpeedEntity, dimensionConfig: DimensionConfig,
-                speedRangeService: SpeedRangeService, positionIndex: number, svg: Svg) {
+    constructor(config: CardConfigWrapper,
+                windSpeedEntityConfig: WindSpeedEntity,
+                dimensionCalculator: DimensionCalculator,
+                speedRangeService: SpeedRangeService,
+                positionIndex: number,
+                svg: Svg) {
         this.config = config;
         this.windSpeedEntityConfig = windSpeedEntityConfig;
         this.svgUtil = new SvgUtil(svg);
-        this.dimensionCalculator = new WindBarDimensionCalculator(dimensionConfig);
+        this.dimensionCalculator = dimensionCalculator;
         this.speedRangeService = speedRangeService;
         this.barIndex = positionIndex;
         this.positionMinus = config.windspeedBarLocation !== 'bottom';
-        if (config.windspeedBarLocation === 'bottom') {
-            const barRect = this.dimensionCalculator.barRectBottom(positionIndex).startPoint;
-            this.arrowStartX = barRect.x;
-            this.arrowStartY = barRect.y - 20;
-        } else {
-            const barRect = this.dimensionCalculator.barRectRight(positionIndex).startPoint;
-            this.arrowStartX = barRect.x - 20;
-            this.arrowStartY = barRect.y;
-        }
     }
 
     getBarIndex(): number {
@@ -59,6 +53,14 @@ export class CurrentSpeedRenderer {
             this.segmentPositions = WindBarRangeCalcUtil.calcFixedSizeSegments(this.speedRangeService.getSpeedRanges(), barStart, barLength, this.positionMinus, segmentCount);
         }
         this.initDone = true;
+
+        this.arrowStartX = this.dimensionCalculator.barStartX(this.barIndex);
+        this.arrowStartY = this.dimensionCalculator.barStartY(this.barIndex);
+        if (this.config.windspeedBarLocation === 'bottom') {
+            this.arrowStartY -= 20;
+        } else {
+            this.arrowStartX -= 20;
+        }
     }
 
     drawCurrentSpeed(currentSpeed: number | undefined, redraw: boolean): void {

@@ -1,17 +1,15 @@
-import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {SvgUtil} from "./SvgUtil";
-import {DimensionConfig} from "./DimensionConfig";
 import {Coordinate} from "./Coordinate";
 import {Log} from "../util/Log";
 import {CircleCoordinate} from "./CircleCoordinate";
 import SVG, {Svg} from "@svgdotjs/svg.js";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class CurrentDirectionRenderer {
 
     private config: CardConfigWrapper;
-    private readonly dimensionCalculator: WindRoseDimensionCalculator;
-    private readonly cfg!: DimensionConfig;
+    private readonly dimensionCalculator: DimensionCalculator;
     private svgUtil!: SvgUtil;
 
     private arrowElement: SVG.Path | undefined = undefined;
@@ -19,11 +17,10 @@ export class CurrentDirectionRenderer {
 
     private readonly roseCenter: Coordinate;
 
-    constructor(config: CardConfigWrapper, dimensionConfig: DimensionConfig, svg: Svg) {
+    constructor(config: CardConfigWrapper, dimensionCalculator: DimensionCalculator, svg: Svg) {
         this.config = config;
-        this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
+        this.dimensionCalculator = dimensionCalculator;
         this.svgUtil = new SvgUtil(svg);
-        this.cfg = this.dimensionCalculator.cfg;
         this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
@@ -57,7 +54,7 @@ export class CurrentDirectionRenderer {
 
     private drawArrow() {
         const x = this.roseCenter.x;
-        const y = this.roseCenter.y - this.cfg.roseRadius + (this.config.currentDirection.arrowSize! / 2);
+        const y = this.roseCenter.y - this.dimensionCalculator.roseRadius + (this.config.currentDirection.arrowSize! / 2);
 
         this.arrowElement = this.svgUtil.drawArrowBottom(x, y, this.config.currentDirection.arrowSize!);
         this.arrowElement.attr({

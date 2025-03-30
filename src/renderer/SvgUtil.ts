@@ -17,7 +17,7 @@ export class SvgUtil {
 
     public drawRect(rectCoordinates: RectCoordinates): SVG.Rect {
         return this.svg.rect(rectCoordinates.width, rectCoordinates.height)
-            .move(rectCoordinates.startPoint.x, rectCoordinates.startPoint.y);
+            .move(rectCoordinates.x, rectCoordinates.y);
     }
 
     public drawPathRect(x: number, y: number, x2: number, y2: number): SVG.Path {
@@ -49,9 +49,27 @@ export class SvgUtil {
     }
 
     public drawWindDirectionText(coord: Coordinate, text: string, rotateDegrees: number, color: string, size: number): SVG.Text {
-        var textElement = this.drawText(coord, text,  TextAttributes.windBarAttribute(color, size, "central", "middle"));
+        var textElement = this.drawText2(coord.x, coord.y, text,  TextAttributes.windBarAttribute(color, size, "central", "middle"));
         this.rotate(textElement, rotateDegrees, coord);
         return textElement;
+    }
+
+    public getLengthLongest(texts: string[], size: number): number {
+        const lenghts: number[] = [];
+        texts.forEach(text => {
+            if (text) {
+                lenghts.push(this.getTextLength(text, size));
+            }
+        });
+        console.log('Max: ', this.getMax(lenghts), lenghts);
+        return this.getMax(lenghts);
+    }
+
+    private getMax(values: number[]): number {
+        if (values.length === 0) {
+            throw new Error("List to get max from is empty.");
+        }
+        return values.reduce((prev, current) => (prev > current) ? prev : current);
     }
 
     public getTextLength(text: string, size: number): number{

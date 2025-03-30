@@ -4,21 +4,20 @@ import {WindRoseData} from "./WindRoseData";
 import {Log} from "../util/Log";
 import {TextAttributes} from "./TextAttributes";
 import {SvgUtil} from "./SvgUtil";
-import {WindRoseDimensionCalculator} from "./WindRoseDimensionCalculator";
 import {Coordinate} from "./Coordinate";
-import {DimensionConfig} from "./DimensionConfig";
 import {DegreesCalculator} from "./DegreesCalculator";
 import SVG, {PathArray, Svg} from "@svgdotjs/svg.js";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardColors} from "../config/CardColors";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 import {WindRoseRenderUtil} from "./WindRoseRenderUtil";
+import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 
 export class WindRoseRendererStandaard {
     private readonly cardColors: CardColors;
     private speedRanges: SpeedRange[] = [];
     private readonly svg: Svg;
-    private readonly dimensionCalculator: WindRoseDimensionCalculator;
+    private readonly dimensionCalculator: DimensionCalculator;
     private readonly windRoseRenderUtil: WindRoseRenderUtil;
     private readonly degreesCalculator: DegreesCalculator;
     private readonly speedRangeService: SpeedRangeService;
@@ -34,7 +33,7 @@ export class WindRoseRendererStandaard {
     private westText!: SVG.Text;
 
     constructor(config: CardConfigWrapper,
-                dimensionConfig: DimensionConfig,
+                imensionCalculator: DimensionCalculator,
                 speedRangeService: SpeedRangeService,
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
@@ -43,7 +42,7 @@ export class WindRoseRendererStandaard {
         this.svg = svg;
         this.degreesCalculator = degreesCalculator;
         this.svgUtil = new SvgUtil(svg);
-        this.dimensionCalculator = new WindRoseDimensionCalculator(dimensionConfig);
+        this.dimensionCalculator = imensionCalculator;
         this.windRoseRenderUtil = new WindRoseRenderUtil(config, this.dimensionCalculator, this.degreesCalculator, svg);
         this.roseCenter = this.dimensionCalculator.roseCenter();
         this.leaveArc = (360 / config.windDirectionCount) - 8;
@@ -124,7 +123,7 @@ export class WindRoseRendererStandaard {
                 }
             }
         }
-        const maxDirectionRadius = (directionPercentage * this.dimensionCalculator.cfg.roseRadius) / this.windRoseData.maxCirclePercentage;
+        const maxDirectionRadius = (directionPercentage * this.dimensionCalculator.roseRadius) / this.windRoseData.maxCirclePercentage;
         for (let i = this.speedRanges.length - 1; i >= 0; i--) {
             const radius = (maxDirectionRadius * (percentages[i] / 100));
             if (radius > 0) {
@@ -163,13 +162,14 @@ export class WindRoseRendererStandaard {
 
     private drawCircleLegend(): SVG.G {
         const circleLegendGroup = this.svg.group();
-        const radiusStep = this.dimensionCalculator.cfg.roseRadius / this.windRoseData.circleCount;
+        const radiusStep = this.dimensionCalculator.roseRadius / this.windRoseData.circleCount;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
         const center = this.dimensionCalculator.roseCenter();
 
         for (let i = 1; i <= this.windRoseData.circleCount; i++) {
-            const coordinate = new Coordinate(center.x + (xy * i), center.y + (xy * i));
-            const text = this.svgUtil.drawText(coordinate,
+            const text = this.svgUtil.drawText2(
+                center.x + (xy * i),
+                center.y + (xy * i),
                 (this.windRoseData.percentagePerCircle * i) + "%",
                 TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages));
             circleLegendGroup.add(text);
