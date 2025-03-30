@@ -45,7 +45,7 @@ export class WindRoseRendererStandaard {
         this.dimensionCalculator = imensionCalculator;
         this.windRoseRenderUtil = new WindRoseRenderUtil(config, this.dimensionCalculator, this.degreesCalculator, svg);
         this.roseCenter = this.dimensionCalculator.roseCenter();
-        this.leaveArc = (360 / config.windDirectionCount) - 8;
+        this.leaveArc = this.windRoseRenderUtil.calcLeaveArc(config.windDirectionCount);
     }
 
     drawWindRose(windRoseData: WindRoseData): void {

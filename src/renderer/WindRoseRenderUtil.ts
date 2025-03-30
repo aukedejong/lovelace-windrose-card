@@ -45,6 +45,11 @@ export class WindRoseRenderUtil {
         this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
+    public calcLeaveArc(windDirectionCount: number): number {
+       const spaceArc = windDirectionCount > 16 ? 4 : 7;
+        return (360 - (windDirectionCount * spaceArc)) / windDirectionCount;
+    }
+
     public drawBackground(windRoseData: WindRoseData, centerCalm: boolean): SVG.G {
 
         var roseLinesGroup = this.svg.group();
