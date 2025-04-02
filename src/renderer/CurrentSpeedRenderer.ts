@@ -21,6 +21,9 @@ export class CurrentSpeedRenderer {
     private initDone = false;
     private segmentPositions: SegmentPosition[] = [];
     private readonly positionMinus: boolean;
+    private readonly arrowSize: number;
+    private readonly arrowNameSide: boolean;
+    private readonly maxRotation: number;
 
     private arrowElement: SVG.Path | undefined = undefined;
 
@@ -37,6 +40,14 @@ export class CurrentSpeedRenderer {
         this.speedRangeService = speedRangeService;
         this.barIndex = positionIndex;
         this.positionMinus = config.windspeedBarLocation !== 'bottom';
+        this.arrowSize = this.windSpeedEntityConfig.currentSpeedArrowSize;
+        this.arrowNameSide = this.windSpeedEntityConfig.currentSpeedArrowLocation === 'left' ||
+            this.windSpeedEntityConfig.currentSpeedArrowLocation === 'above';
+        if (this.arrowNameSide) {
+            this.maxRotation = -90;
+        } else {
+            this.maxRotation = 90;
+        }
     }
 
     getBarIndex(): number {
@@ -54,12 +65,22 @@ export class CurrentSpeedRenderer {
         }
         this.initDone = true;
 
-        this.arrowStartX = this.dimensionCalculator.barStartX(this.barIndex);
-        this.arrowStartY = this.dimensionCalculator.barStartY(this.barIndex);
         if (this.config.windspeedBarLocation === 'bottom') {
-            this.arrowStartY -= 20;
-        } else {
-            this.arrowStartX -= 20;
+            this.arrowStartX = this.dimensionCalculator.barStartX(this.barIndex);
+            if (this.arrowNameSide) {
+                this.arrowStartY = this.dimensionCalculator.barStartY(this.barIndex) - (this.arrowSize / 2);
+            } else {
+                this.arrowStartY = this.dimensionCalculator.barStartY(this.barIndex) +
+                    this.dimensionCalculator.barHeight(this.barIndex) + (this.arrowSize / 2);
+            }
+        } else { // location = right
+            this.arrowStartY = this.dimensionCalculator.barStartY(this.barIndex);
+            if (this.arrowNameSide) {
+                this.arrowStartX = this.dimensionCalculator.barStartX(this.barIndex) - (this.arrowSize / 2);
+            } else {
+                this.arrowStartX = this.dimensionCalculator.barStartX(this.barIndex) +
+                    this.dimensionCalculator.barWidth(this.barIndex) + (this.arrowSize / 2);
+            }
         }
     }
 
@@ -83,13 +104,13 @@ export class CurrentSpeedRenderer {
             let transform;
             if (this.config.windspeedBarLocation === 'bottom') {
                 if (currentSpeed > this.segmentPositions[rangeIndex].maxSpeed) {
-                    transform = { position: { x: arrowPos, y: this.arrowStartY }, rotate: -90 };
+                    transform = { position: { x: arrowPos - (this.arrowSize / 2), y: this.arrowStartY }, rotate: this.maxRotation };
                 } else {
                     transform = { position: { x: arrowPos, y: this.arrowStartY } };
                 }
             } else {
                 if (currentSpeed > this.segmentPositions[rangeIndex].maxSpeed) {
-                    transform = { position: { x: this.arrowStartX, y: arrowPos }, rotate: -90 };
+                    transform = { position: { x: this.arrowStartX, y: arrowPos }, rotate: this.maxRotation };
                 } else {
                     transform = { position: { x: this.arrowStartX, y: arrowPos } };
                 }
@@ -103,9 +124,17 @@ export class CurrentSpeedRenderer {
     private drawArrow() {
 
         if (this.config.windspeedBarLocation === 'bottom') {
-            this.arrowElement = this.svgUtil.drawArrowBottom(this.arrowStartX, this.arrowStartY, 40);
-        } else {
-            this.arrowElement = this.svgUtil.drawArrowRight(this.arrowStartX, this.arrowStartY, 40);
+            if (this.arrowNameSide) {
+                this.arrowElement = this.svgUtil.drawArrowDown(this.arrowStartX, this.arrowStartY, this.arrowSize);
+            } else {
+                this.arrowElement = this.svgUtil.drawArrowUp(this.arrowStartX, this.arrowStartY, this.arrowSize);
+            }
+        } else { // location = right
+            if (this.arrowNameSide) {
+                this.arrowElement = this.svgUtil.drawArrowRight(this.arrowStartX, this.arrowStartY, this.arrowSize);
+            } else {
+                this.arrowElement = this.svgUtil.drawArrowLeft(this.arrowStartX, this.arrowStartY, this.arrowSize);
+            }
         }
         this.arrowElement.attr({
             stroke: this.config.cardColor.roseCurrentDirectionArrow,

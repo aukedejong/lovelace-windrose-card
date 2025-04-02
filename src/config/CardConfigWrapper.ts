@@ -91,12 +91,13 @@ export class CardConfigWrapper {
         this.title = this.cardConfig.title;
         this.dataPeriod = DataPeriod.fromConfig(cardConfig.hours_to_show, cardConfig.data_period);
         this.refreshInterval = this.checkRefreshInterval();
+        this.windspeedBarLocation = this.checkWindspeedBarLocation();
         this.windDirectionEntity = WindDirectionEntity.fromConfig(cardConfig.wind_direction_entity);
         this.windspeedEntities = this.checkWindspeedEntities();
         this.windRoseDrawNorthOffset = this.checkWindRoseDrawNorthOffset();
         this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
         this.currentDirection = this.checkCurrentDirection()
-        this.windspeedBarLocation = this.checkWindspeedBarLocation();
+
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
         this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels, cardConfig.cardinal_direction_letters);
         this.windDirectionCount = this.checkWindDirectionCount();
@@ -166,7 +167,7 @@ export class CardConfigWrapper {
             speed_ranges: this.cardConfig.speed_ranges
         } as CardConfigWindSpeedEntity;
         for (const entityConfig of this.cardConfig.windspeed_entities) {
-            entities.push(WindSpeedEntity.fromConfig(entityConfig, parentWindSpeedConfig))
+            entities.push(WindSpeedEntity.fromConfig(entityConfig, parentWindSpeedConfig, this.windspeedBarLocation))
         }
         return entities;
     }

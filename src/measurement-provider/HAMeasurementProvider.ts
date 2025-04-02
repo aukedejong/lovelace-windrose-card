@@ -85,6 +85,9 @@ export class HAMeasurementProvider {
 
     private static parseHistoryMeasurements(historyData: HistoryData[], entity: string, attribute: string | undefined, numeric: boolean): Measurement[] {
         const measurements: Measurement[] = [];
+        if (historyData === undefined || historyData.length === 0) {
+            throw new Error('No history data found for entity ' + entity);
+        }
         Measurement.init(attribute, false);
         for (const data of historyData) {
             const value = Measurement.getHistoryValue(data);
@@ -107,6 +110,9 @@ export class HAMeasurementProvider {
 
     private static parseStatsMeasurements(statisticsData: StatisticsData[], entity: string, numeric: boolean): Measurement[] {
         const measurements: Measurement[] = [];
+        if (statisticsData === undefined || statisticsData.length === 0) {
+            throw new Error('No statistics data found for entity ' + entity);
+        }
         Measurement.init(undefined, true);
         for (const data of statisticsData) {
             const value = Measurement.getStatsValue(data);

@@ -34,7 +34,7 @@ export class EntityChecker {
         if (speedUnit === undefined) {
             speedUnit = hass.states[entity.entity].attributes.wind_speed_unit;
         }
-        speedUnit = speedUnit.toLowerCase();
+        speedUnit = speedUnit?.toLowerCase();
         if (new WindSpeedConvertFunctionFactory().speedUnitRecognized(speedUnit)) {
             Log.info(`Recognized spped unit ${speedUnit} for entity ${entity.entity}`);
             return speedUnit;

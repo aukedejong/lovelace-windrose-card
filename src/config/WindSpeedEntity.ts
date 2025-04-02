@@ -25,13 +25,16 @@ export class WindSpeedEntity implements HARequestData {
         public readonly speedRanges: SpeedRange[] = [],
         public readonly dynamicSpeedRanges: DynamicSpeedRange[] = [],
         public readonly currentSpeedArrow: boolean,
+        public readonly currentSpeedArrowSize: number,
+        public readonly currentSpeedArrowLocation: string,
         public readonly barLabelTextSize: number,
         public readonly barSpeedTextSize: number,
         public readonly barPercentageTextSize: number
     ) {}
 
     static fromConfig(entityConfig: CardConfigWindSpeedEntity,
-                      parentEntityConfig: CardConfigWindSpeedEntity): WindSpeedEntity {
+                      parentEntityConfig: CardConfigWindSpeedEntity,
+                      windspeedBarLocation: string): WindSpeedEntity {
 
         const entity = entityConfig.entity;
         const name = entityConfig.name;
@@ -40,9 +43,12 @@ export class WindSpeedEntity implements HARequestData {
         const renderRelativeScale = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
         const statsPeriod = ConfigCheckUtils.checkStatisticsPeriod(entityConfig.statistics_period);
         const currentSpeedArrow = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.current_speed_arrow);
+        const currentSpeedArrowSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.current_speed_arrow_size, 40);
+        const currentSpeedArrowLocation = this.checkCurrentSpeedArrowLocation(entityConfig.current_speed_arrow_location, windspeedBarLocation);
         const barLabelTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_label_text_size, 40);
         const barSpeedTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_speed_text_size, 40);
         const barPercentageTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_percentage_text_size, 40);
+
         let windspeedBarFull;
         if (entityConfig.windspeed_bar_full === undefined) {
             windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(parentEntityConfig.windspeed_bar_full);
@@ -91,8 +97,8 @@ export class WindSpeedEntity implements HARequestData {
 
         return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, renderRelativeScale,
             windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
-            speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow, barLabelTextSize,
-            barSpeedTextSize, barPercentageTextSize);
+            speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow, currentSpeedArrowSize,
+            currentSpeedArrowLocation, barLabelTextSize, barSpeedTextSize, barPercentageTextSize);
     }
 
     private static checkInputSpeedUnit(inputSpeedUnit: string): string {
@@ -226,6 +232,23 @@ export class WindSpeedEntity implements HARequestData {
         if (useStatistics && attribute) {
             throw new Error("Statistics not supported for attribute values.");
         }
+    }
+
+    private static checkCurrentSpeedArrowLocation(location: string, barLocation: string): string {
+        if (barLocation === 'right') {
+            if (location === undefined || location === null || location === '') {
+                return 'left';
+            } else if (location !== 'left' && location !== 'right') {
+                throw new Error('Current speed arrow location can only be left or right when speedbars are displayed vertical.');
+            }
+        } else {
+            if (location === undefined || location === null || location === '') {
+                return 'above';
+            } else if (location !== 'below' && location !== 'above') {
+                throw new Error('Current speed arrow location can only be above or below when speedbars are displayed horizontall');
+            }
+        }
+        return location;
     }
 
 }

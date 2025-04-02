@@ -28,7 +28,7 @@ export class SvgUtil {
         return this.svg.path(new PathArray(`M ${x} ${y} L ${dx1} ${dy1} L ${dx2} ${dy2} Z`));
     }
 
-    public drawArrowBottom(x: number, y: number, size: number): SVG.Path {
+    public drawArrowDown(x: number, y: number, size: number): SVG.Path {
         const dx1 = -size/2;
         const dy1 = -size;
         const dx2 = size/2;
@@ -38,12 +38,32 @@ export class SvgUtil {
         return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
     }
 
+    public drawArrowUp(x: number, y: number, size: number): SVG.Path {
+        const dx1 = -size/2;
+        const dy1 = size;
+        const dx2 = size/2;
+        const dy2 = -size/4;
+        const dx3 = size/2;
+        const dy3 = size/4;
+        return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
+    }
+
     public drawArrowRight(x: number, y: number, size: number): SVG.Path {
         const dx1 = -size/4;
         const dy1 = -size/2;
         const dx2 = size;
         const dy2 = size/2;
         const dx3 = -size;
+        const dy3 = size/2;
+        return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
+    }
+
+    public drawArrowLeft(x: number, y: number, size: number): SVG.Path {
+        const dx1 = size/4;
+        const dy1 = -size/2;
+        const dx2 = -size;
+        const dy2 = size/2;
+        const dx3 = size;
         const dy3 = size/2;
         return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
     }
