@@ -61,7 +61,6 @@ export abstract class DimensionCalculatorWindRose {
         
         this.x67FromCenter = Math.round(this.cos67 * this.directionLetterFromCenter);
         this.y67FromCenter = Math.round(this.sin67 * this.directionLetterFromCenter);
-
     }
 
     roseCenter(): Coordinate {
@@ -192,11 +191,11 @@ export abstract class DimensionCalculatorWindRose {
 
     // Labels
     infoCornerLabelLeftTop(): Coordinate {
-        return new Coordinate(this.roseMarginLeft, this.roseMarginTop);
+        return new Coordinate(this.roseMarginLeft, this.roseMarginTop + (this.cornersInfo.topLeftInfo.labelTextSize * 0.20));
     }
 
     infoCornerLabelRightTop(): Coordinate {
-        return new Coordinate(this.roseCompleteWidth, this.roseMarginTop);
+        return new Coordinate(this.roseCompleteWidth, this.roseMarginTop + (this.cornersInfo.topRightInfo.labelTextSize * 0.20));
     }
 
     infoCornetLabelLeftBottom(): Coordinate {
