@@ -80,19 +80,25 @@ export class TouchFacesRenderer {
         if (actionConfig.double_tap_action) {
             svgElement.dblclick(this.createDoubleTapEventFunction(actionConfig.double_tap_action));
         }
+        if (actionConfig.hold_action) {
+            let holdTimer: NodeJS.Timeout;
+            svgElement.mousedown(() => {
+                holdTimer = setTimeout(this.createHoldEventFunction(actionConfig.hold_action!), 500);
+            });
+            svgElement.mouseup(() => {
+                clearTimeout(holdTimer);
+            });
+            svgElement.touchstart(() => {
+                holdTimer = setTimeout(this.createHoldEventFunction(actionConfig.hold_action!), 500);
+            });
+            svgElement.touchend(() => {
+                clearTimeout(holdTimer);
+            });
+        }
     }
 
     createTapEventFunction(haAction: CardConfigHaAction): () => void {
-        const actionObj = {
-            action: haAction.action,
-            navigation_path: haAction.navigation_path,
-            url_path: haAction.url_path,
-            perform_action: haAction.perform_action,
-            data: haAction.data,
-            target: haAction.target,
-            conformation: haAction.confirmation,
-            pipeline_id: haAction.pipeline_id
-        }
+        const actionObj = this.createActionObject(haAction);
         const event = new CustomEvent("hass-action", {
             bubbles: true,
             composed: true,
@@ -110,16 +116,7 @@ export class TouchFacesRenderer {
     }
 
     createDoubleTapEventFunction(haAction: CardConfigHaAction): () => void {
-        const actionObj = {
-            action: haAction.action,
-            navigation_path: haAction.navigation_path,
-            url_path: haAction.url_path,
-            perform_action: haAction.perform_action,
-            data: haAction.data,
-            target: haAction.target,
-            conformation: haAction.confirmation,
-            pipeline_id: haAction.pipeline_id
-        }
+        const actionObj = this.createTapEventFunction(haAction);
         const event = new CustomEvent("hass-action", {
             bubbles: true,
             composed: true,
@@ -133,6 +130,38 @@ export class TouchFacesRenderer {
         });
         return () => {
             this.sendEvent(event);
+        }
+    }
+
+    createHoldEventFunction(haAction: CardConfigHaAction): () => void {
+        const actionObj = this.createActionObject(haAction);
+        const event = new CustomEvent("hass-action", {
+            bubbles: true,
+            composed: true,
+            detail: {
+                action: 'hold',
+                config: {
+                    entity: haAction.entity,
+                    hold_action: actionObj
+                }
+            }
+        });
+        return () => {
+            this.sendEvent(event);
+        }
+    }
+
+
+    private createActionObject(haAction: CardConfigHaAction): any {
+        return {
+            action: haAction.action,
+            navigation_path: haAction.navigation_path,
+            url_path: haAction.url_path,
+            perform_action: haAction.perform_action,
+            data: haAction.data,
+            target: haAction.target,
+            conformation: haAction.confirmation,
+            pipeline_id: haAction.pipeline_id
         }
     }
 }

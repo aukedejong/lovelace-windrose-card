@@ -453,7 +453,7 @@ Configuration for displaying information in the corners around the windrose.
 | label_text_size   | number |          50          |          | The text size of the label.                                                                                                   |
 | value_text_size   | number |          80          |          | The text size of the entity's state.                                                                                          |
 | entity            | string |                      |    x     | State of the entity will be displayed                                                                                         |
-| attribute         | string |                      |          | If used, not the state but the attributtes value is deplayed.                                                                 |
+| attribute         | string |                      |          | If used, not the state but the attributes value is deplayed.                                                                  |
 | input_unit        | string |                      |          | Input unit, not automatically determined. See for options [Unit conversion](#Corner-Info-unit-conversion)                     |
 | output_unit       | string |                      |          | Output unit                                                                                                                   |
 | precision         | string |                      |          | Overwrites (if available) the precision of the entity. For rounding the value, for example after converting to an other unit. |
@@ -511,7 +511,7 @@ corner_info:
 
 ### Object actions
 
-The tap and double-tap actions described in the Home Assistant documentation are supported. See link:
+The hold, tap and double-tap actions described in the Home Assistant documentation are supported. See link:
 [Home Assistant action documentation](https://www.home-assistant.io/dashboards/actions/)
 
 See example yaml below on how to use.
@@ -540,8 +540,10 @@ actions:
   top_left:
     tap_action:
       entity: weather.home
-      attribute: wind_speed
       action: more-info
+    hold_action:
+       entity: weather.holiday_home
+       action: more-info
   top_right:
     double_tap_action:
       entity: switch.light
