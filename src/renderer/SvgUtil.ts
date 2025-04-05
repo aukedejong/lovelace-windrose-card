@@ -81,7 +81,6 @@ export class SvgUtil {
                 lenghts.push(this.getTextLength(text, size));
             }
         });
-        console.log('Max: ', this.getMax(lenghts), lenghts);
         return this.getMax(lenghts);
     }
 

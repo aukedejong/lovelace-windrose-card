@@ -22,25 +22,21 @@ describe('MatchUtils tests', () => {
 
     test('find measurement, first', () => {
         const m = MatchUtils.findMeasurementAtTime(1.5, measurements);
-        console.log('M', m);
         expect(m?.value).toEqual("1.0");
     });
 
     test('find measurement, border first', () => {
         const m = MatchUtils.findMeasurementAtTime(3, measurements);
-        console.log('M', m);
         expect(m?.value).toEqual("2.0");
     });
 
     test('find measurement, border last', () => {
         const m = MatchUtils.findMeasurementAtTime(4, measurements);
-        console.log('M', m);
         expect(m?.value).toEqual("3.0");
     });
 
     test('find measurement last', () => {
         const m = MatchUtils.findMeasurementAtTime(5.5, measurements);
-        console.log('M', m);
         expect(m?.value).toEqual("5.0");
     });
 });

@@ -68,7 +68,6 @@ export class DimensionCalculatorBarBottom extends DimensionCalculatorWindRose im
         for (let index = 0; index < positionIndex; index++) {
             top += this.barHeight(index) + this.barSpeedTextSpace[index] + this.multiBarSpacing + this.barLabelTextSpace[index + 1] + this.barLabelMargin;
         }
-        console.log('barstartY()', top, positionIndex);
         return top;
     }
 

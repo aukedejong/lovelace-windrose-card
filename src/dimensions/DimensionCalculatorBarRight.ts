@@ -40,7 +40,6 @@ export class DimensionCalculatorBarRight extends DimensionCalculatorWindRose imp
     }
 
     updateLabelLengths(windRoseData: WindRoseData[]) {
-        console.log('updateLabelLengths()');
         if (this.speedRangeServices[0].getRangeCount() === 0) {
             Log.debug('SpeedRanges not yet determined.');
             return;
@@ -83,9 +82,7 @@ export class DimensionCalculatorBarRight extends DimensionCalculatorWindRose imp
         var left = this.roseCompleteWidth + this.barBlockMarginLeft + this.barNameLabelSpace[0]
         for (let index = 0; index < positionIndex; index++) {
             left += this.barWidths[index] + this.barSpeedLabelMargin + this.barSpeedLabelSpace[index] + this.multiBarSpacing + this.barNameLabelSpace[index + 1];
-            console.log('barLabelSpace', this.barNameLabelSpace[index]);
         }
-        console.log('barstartX()', left, positionIndex);
         return left;
     }
 
