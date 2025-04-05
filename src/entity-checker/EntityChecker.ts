@@ -56,8 +56,9 @@ export class EntityChecker {
             throw new Error(`Entity ${entity} not found.`);
         }
         if (statsSupport) {
-            if (hass.states[entity].attributes['state_class'] !== 'measurement') {
-                throw new Error(`Entity ${entity} does not support long term statistics, state_class should be measurement.`);
+            const stateClass = hass.states[entity].attributes['state_class'];
+            if (stateClass !== 'measurement' && stateClass !== 'measurement_angle') {
+                throw new Error(`Entity ${entity} does not support long term statistics, state_class should be measurement or measurement_angle.`);
             }
         }
         if (attribute) {
