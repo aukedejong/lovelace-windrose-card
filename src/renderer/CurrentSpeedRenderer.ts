@@ -84,11 +84,11 @@ export class CurrentSpeedRenderer {
         }
     }
 
-    drawCurrentSpeed(currentSpeed: number | undefined, redraw: boolean): void {
+    drawCurrentSpeed(currentSpeed: number | undefined): void {
         if (!this.initDone) {
             return;
         }
-        if (redraw || !this.arrowElement) {
+        if (!this.arrowElement) {
             this.drawArrow();
         }
         let arrowPos = 0;
@@ -121,7 +121,6 @@ export class CurrentSpeedRenderer {
     }
 
     private drawArrow() {
-
         if (this.config.windspeedBarLocation === 'bottom') {
             if (this.arrowNameSide) {
                 this.arrowElement = this.svgUtil.drawArrowDown(this.arrowStartX, this.arrowStartY, this.arrowSize);

@@ -102,6 +102,7 @@ Select "Manage Resources"
 | matching_strategy                       |                 string                  |       direction-first        |    -     | How to match direction and speed measurements. Find a speed with each direction or a direction with each speed measurement. Options: `direction-first`, `speed-first`, `time-frame` or `full-time`. More info at [Matching strategies](#Matching-strategies) |
 | background_image                        |                 string                  |                              |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                                                                                                              |
 | colors                                  |        [object](#Object-colors)         |                              |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                                                                                                                    |
+| disable_animations                      |                 boolean                 |            false             |    -     | Disables windrose leave and windbar animation. Current wind direction and speed arrow animation are not disabled.                                                                                                                                            |
 | log_level                               |                 string                  |             WARN             |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                                                                                                                 |
 
 
@@ -420,8 +421,8 @@ Some sensors can have a value like CALM or VRB, indicating there is no direction
 
 ### Object compass_direction
 
-This configuration is only needed if you want the windrose to rotate on an compass entity.
-Usefull on for example a boat.
+This configuration is only needed if you want the windrose to rotate on a compass entity.
+Useful on for example a boat.
 You can also make a helper number entity to rotate the windrose on manual input.
 
 | Name        |  Type   | Default | Required | Description                                                   |

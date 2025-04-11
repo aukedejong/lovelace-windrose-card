@@ -57,12 +57,7 @@ export class EntityStatesProcessor {
     }
 
     updateHass(hass: HomeAssistant): void {
-        //this.log.debug("Before updated values: "  + this.windDirectionUpdated + "  " + this.compassDirectionUpdated);
         if (this.initReady) {
-            this.windDirectionState.updated = false;
-            this.windSpeedStates.forEach(state => state.updated = false);
-            this.compassDirectionState.updated = false;
-
             this.entityStates.forEach((state: EntityState) => {
                 this.procesState(hass, state);
             });
@@ -130,6 +125,7 @@ export class EntityStatesProcessor {
     }
 
     getCompassDirection(): number {
+        this.log.method('getCompassDirection()', this.compassDirectionState);
         if (this.compassDirectionState.state === undefined) {
             Log.warn("Current compass direction is undefined, showing north");
             this.compassDirectionState.state = "0";

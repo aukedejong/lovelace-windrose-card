@@ -1,4 +1,4 @@
-import {Element, Svg} from "@svgdotjs/svg.js";
+import SVG, {Element} from "@svgdotjs/svg.js";
 import {SvgUtil} from "./SvgUtil";
 import {CardConfigActions} from "../card/CardConfigActions";
 import {CardConfigAction} from "../card/CardConfigAction";
@@ -14,16 +14,17 @@ export class TouchFacesRenderer {
     private readonly sendEvent: (event: CustomEvent) => void
     private svgUtil!: SvgUtil;
     private actionsConfig: CardConfigActions | undefined;
+    private touchFacesGroup!: SVG.G;
 
     constructor(cardConfig: CardConfigWrapper,
                 dimensionCalculator: DimensionCalculator,
                 sendEvent: (event: CustomEvent) => void,
-                svg: Svg) {
+                svgUtil: SvgUtil) {
 
         this.cardConfig = cardConfig;
         this.dimensionCalculator = dimensionCalculator;
         this.sendEvent = sendEvent;
-        this.svgUtil = new SvgUtil(svg);
+        this.svgUtil = svgUtil;
         this.actionsConfig = this.cardConfig.actions;
     }
 
@@ -31,32 +32,41 @@ export class TouchFacesRenderer {
         if (this.actionsConfig === undefined) {
             return;
         }
+        if (this.touchFacesGroup) {
+            this.touchFacesGroup.remove();
+        }
+        this.touchFacesGroup = this.svgUtil.createGroup();
         const radius = this.dimensionCalculator.roseRadius;
         const center = this.dimensionCalculator.roseCenter();
         if (this.actionsConfig.top_left) {
             const topLeftCorner = this.svgUtil.drawTriangle(0, 0, center.x, 0, 0, center.y);
             topLeftCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.top_left, topLeftCorner);
+            this.touchFacesGroup.add(topLeftCorner);
         }
         if (this.actionsConfig.top_right) {
             const topRightCorner = this.svgUtil.drawTriangle(center.x, 0, center.x * 2, 0, center.x * 2, center.y);
             topRightCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.top_right, topRightCorner);
+            this.touchFacesGroup.add(topRightCorner);
         }
         if (this.actionsConfig.bottom_left) {
             const bottomLeftCorner = this.svgUtil.drawTriangle(0, center.y, center.x, center.y * 2, 0, center.y * 2);
             bottomLeftCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.bottom_left, bottomLeftCorner);
+            this.touchFacesGroup.add(bottomLeftCorner);
         }
         if (this.actionsConfig.bottom_right) {
             const bottomRightCorner = this.svgUtil.drawTriangle(center.x, center.y * 2, center.x * 2, center.y * 2, center.x * 2, center.y);
             bottomRightCorner.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.bottom_right, bottomRightCorner);
+            this.touchFacesGroup.add(bottomRightCorner);
         }
         if (this.actionsConfig.windrose) {
             const windrose = this.svgUtil.drawCircle(new CircleCoordinate(center, radius));
             windrose.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.windrose, windrose);
+            this.touchFacesGroup.add(windrose);
         }
 
         if (this.actionsConfig.speed_bar_1) {
@@ -64,12 +74,14 @@ export class TouchFacesRenderer {
             const rect = this.svgUtil.drawRect(barRect);
             rect.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.speed_bar_1, rect);
+            this.touchFacesGroup.add(rect);
         }
         if (this.actionsConfig.speed_bar_2) {
             const barRect = this.dimensionCalculator.touchFaceBar(1);
             const rect = this.svgUtil.drawRect(barRect);
             rect.attr({ fill: "transparent", cursor: "pointer" });
             this.addEventHandler(this.actionsConfig.speed_bar_2, rect);
+            this.touchFacesGroup.add(rect);
         }
     }
 

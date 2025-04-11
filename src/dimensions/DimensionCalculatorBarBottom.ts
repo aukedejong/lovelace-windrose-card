@@ -87,6 +87,14 @@ export class DimensionCalculatorBarBottom extends DimensionCalculatorWindRose im
         return this.barStartY(positionIndex) + this.barHeight(positionIndex) + this.barLabelMargin;
     }
 
+    barPercLabelX(): number {
+        throw new Error("NOOP");
+    }
+
+    barPercLabelY(positionIndex: number): number {
+        return this.barStartY(positionIndex) + (this.barHeight(positionIndex) / 2) + 2;
+    }
+
     touchFaceBar(positionIndex: number): RectCoordinates {
         return new RectCoordinates(
             this.barStartX(),

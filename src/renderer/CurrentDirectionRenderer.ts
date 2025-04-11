@@ -24,12 +24,11 @@ export class CurrentDirectionRenderer {
         this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
-    drawCurrentWindDirection(currentWindDirection: number | undefined, redraw: boolean): void {
-        if (this.arrowElement === undefined || redraw) {
-            Log.debug('Cur Init draw, redraw = ' + redraw);
+    drawCurrentWindDirection(currentWindDirection: number | undefined): void {
+        if (this.arrowElement === undefined) {
             this.drawArrow();
         }
-        if (this.centerElement === undefined || redraw) {
+        if (this.centerElement === undefined) {
             this.drawCenter();
 
         }
@@ -42,13 +41,9 @@ export class CurrentDirectionRenderer {
         } else {
             this.arrowElement!.attr({ visibility: "visible" });
             this.centerElement!.attr({ visibility: "hidden" });
-            if (redraw) { //Only animate when it's an update, not a redraw.
-                this.arrowElement!.transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y});
-            } else {
-                this.arrowElement!.animate(700, 0, 'now')
-                    .transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y})
-                    .ease('<>');
-            }
+            this.arrowElement!.animate(700, 0, 'now')
+                .transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y})
+                .ease('<>');
         }
     }
 

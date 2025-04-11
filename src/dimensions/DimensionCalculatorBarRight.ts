@@ -36,6 +36,7 @@ export class DimensionCalculatorBarRight extends DimensionCalculatorWindRose imp
         this.windspeedEntities.forEach((config: WindSpeedEntity) => {
             this.barWidths.push(svgUtil.getTextLength('99%', config.barPercentageTextSize) + 6);
             this.barNameLabelSpace.push(config.barLabelTextSize);
+            this.barSpeedLabelSpace.push(svgUtil.getTextLength('10', config.barPercentageTextSize));
         });
     }
 
@@ -104,6 +105,14 @@ export class DimensionCalculatorBarRight extends DimensionCalculatorWindRose imp
 
     barSpeedLabelY(): number {
         return this.barStartY();
+    }
+
+    barPercLabelX(positionIndex: number): number {
+        return this.barStartX(positionIndex) + this.barWidth(positionIndex) / 2;
+    }
+
+    barPercLabelY(): number {
+        throw new Error("NOOP");
     }
 
     touchFaceBar(positionIndex: number): RectCoordinates {

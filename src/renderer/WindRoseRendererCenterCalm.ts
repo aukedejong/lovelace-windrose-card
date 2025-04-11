@@ -1,7 +1,6 @@
 import {DrawUtil} from "../util/DrawUtil";
 import {SpeedRange} from "../speed-range/SpeedRange";
 import {WindRoseData} from "./WindRoseData";
-import {Log} from "../util/Log";
 import {SvgUtil} from "./SvgUtil";
 import {TextAttributes} from "./TextAttributes";
 import {CircleCoordinate} from "./CircleCoordinate";
@@ -15,8 +14,13 @@ import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 import {WindRoseRenderUtil} from "./WindRoseRenderUtil";
 import {GlobalConfig} from "../config/GlobalConfig";
 import {DimensionCalculator} from "../dimensions/DimensionCalculator";
+import {WindRoseRenderer} from "./WindRoseRenderer";
+import {Log2} from "../util/Log2";
 
-export class WindRoseRendererCenterCalm {
+export class WindRoseRendererCenterCalm implements WindRoseRenderer {
+
+    private readonly log = new Log2("WindRoseRendererCenterCalm");
+    
     private readonly cardColors: CardColors;
     private speedRanges: SpeedRange[] = [];
     private readonly svg: Svg;
@@ -30,8 +34,17 @@ export class WindRoseRendererCenterCalm {
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
     private readonly roseCenter: Coordinate;
+
+    private backgroundDrawn: boolean;
+    private roseDrawn: boolean;
+
     private roseGroup!: SVG.G;
     private windDirectionTextGroup!: SVG.G;
+    private leavesGroup!: SVG.G;
+    private roseCircles!: SVG.G;
+    private circleLegend!: SVG.G;
+    private centerZeroSpeedGroup!: SVG.G;
+    private doAnimation: boolean;
 
     constructor(config: CardConfigWrapper,
                 dimensionCalculator: DimensionCalculator,
@@ -39,6 +52,7 @@ export class WindRoseRendererCenterCalm {
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
+        this.doAnimation = !config.disableAnimations;
         this.centerRadius = GlobalConfig.defaultCenterCalmPercenteCircleSize;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
@@ -48,39 +62,86 @@ export class WindRoseRendererCenterCalm {
         this.degreesCalculator = degreesCalculator;
         this.roseCenter = this.dimensionCalculator.roseCenter();
         this.leaveArc = this.windRoseRenderUtil.calcLeaveArc(config.windDirectionCount);
+        this.backgroundDrawn = false;
+        this.roseDrawn = false;
+    }
+
+    drawEmptyWindrose() {
+        if (this.backgroundDrawn) {
+            this.log.method('drawEmptyWindrose',  'Already done');
+            return;
+        }
+        this.log.method('drawEmptyWindrose');
+        this.backgroundDrawn = true;
+        this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
+        const cross = this.windRoseRenderUtil.drawBackgroundCross();
+        const defaultCircles = this.windRoseRenderUtil.drawInnerOuterCircle(true);
+        this.windDirectionTextGroup = this.windRoseRenderUtil.drawWindDirectionText();
+
+        this.roseGroup = this.svg.group()
+            .add(cross)
+            .add(defaultCircles)
+            .add(this.windDirectionTextGroup);
     }
 
     drawWindRose(windRoseData: WindRoseData): void {
         if (windRoseData === undefined) {
-            Log.error("drawWindRose(): Can't draw, no windrose data.");
+            this.log.error('drawWindRose()', 'Can\'t draw, no windrose data.');
             return;
         }
-        Log.trace('drawWindRose()', windRoseData);
-
-        this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
-
+        this.log.method('drawWindRose', 'windRoseData', windRoseData);
+        this.roseDrawn = true;
         this.windRoseData = windRoseData;
         this.speedRanges = this.speedRangeService.getSpeedRanges();
 
-        const background = this.windRoseRenderUtil.drawBackground(windRoseData, true);
-        this.windDirectionTextGroup = this.windRoseRenderUtil.drawWindDirectionText();
-        const windDirections = this.drawWindDirections();
+        this.roseCircles = this.windRoseRenderUtil.drawCirlces(windRoseData, true);
+        this.leavesGroup = this.drawWindDirections();
 
-        //Rotate
-        this.roseGroup = this.svg.group()
-            .add(background)
-            .add(this.windDirectionTextGroup)
-            .add(windDirections);
-        this.roseGroup.rotate(this.degreesCalculator.getRoseRenderDegrees(), this.roseCenter.x, this.roseCenter.y);
+        this.roseGroup.add(this.leavesGroup).add(this.roseCircles);
 
-        this.drawCircleLegend();
-        this.drawCenterZeroSpeed();
+        this.circleLegend = this.drawCircleLegend();
+        this.centerZeroSpeedGroup = this.drawCenterZeroSpeed();
+
+        //Animate show graph
+        if (this.doAnimation) {
+            this.leavesGroup.scale(0.1, 0.1, this.roseCenter.x, this.roseCenter.y);
+            this.leavesGroup.animate(300, 0, 'now')
+                .scale(10, 10, this.roseCenter.x, this.roseCenter.y)
+                .ease('<');
+        }
+    }
+
+    animateRemoveGraphs(): boolean {
+        if (this.leavesGroup === undefined || !this.doAnimation) {
+            this.log.method('animateRemoveGraphs', 'not rendered yet or anmiation disabled');
+            return false
+        }
+        this.log.method('animateRemoveGraphs');
+        this.leavesGroup.animate(300, 0, 'now')
+            .scale(0.1, 0.1, this.roseCenter.x, this.roseCenter.y)
+            .ease('<');
+        return true;
+    }
+
+    removeGraphs(): void {
+        if (!this.roseDrawn) {
+            this.log.method('removeGraphs', 'not drawn yet');
+            return;
+        }
+        this.log.method('removeGraphs');
+        this.leavesGroup.remove();
+        this.roseCircles.remove();
+        this.circleLegend.remove();
+        this.centerZeroSpeedGroup.remove();
+        this.roseDrawn = false;
     }
 
     rotateWindRose() {
         if (this.roseGroup === undefined) {
+            this.log.method('rotateWindRose', 'not rendered yet');
             return;
         }
+        this.log.method('rotateWindRose');
         const deg = this.degreesCalculator.getRoseRenderDegrees();
 
         this.roseGroup.animate(700, 0, 'now')
@@ -162,22 +223,27 @@ export class WindRoseRendererCenterCalm {
         return circleLegendGroup;
     }
 
-    private drawCenterZeroSpeed(): void {
+    private drawCenterZeroSpeed(): SVG.G {
         const center = this.dimensionCalculator.roseCenter();
+
+        const centerZeroSpeedGroup = this.svg.group();
         const centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
             this.centerRadius));
         centerCircle.attr({
             fill: this.speedRanges[0].color
         });
+        centerZeroSpeedGroup.add(centerCircle);
 
         let textColor = this.cardColors.roseCenterPercentage;
         if (textColor === 'auto') {
              textColor = ColorUtil.getTextColorBasedOnBackground(this.speedRanges[0].color);
         }
         if (!isNaN(this.windRoseData.speedRangePercentages[0])) {
-            this.svgUtil.drawText2(center.x, center.y, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
+            const centerText = this.svgUtil.drawText2(center.x, center.y, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
                 TextAttributes.windBarAttribute(textColor, 40, "middle", "middle"));
+            centerZeroSpeedGroup.add(centerText);
         }
+        return centerZeroSpeedGroup;
     }
 
 }

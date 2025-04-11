@@ -35,6 +35,7 @@ export class CardConfigWrapper {
     backgroundImage: string | undefined;
     actions: CardConfigActions | undefined;
     cardWidth: number;
+    disableAnimations: boolean;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -97,7 +98,7 @@ export class CardConfigWrapper {
         this.windRoseDrawNorthOffset = this.checkWindRoseDrawNorthOffset();
         this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
         this.currentDirection = this.checkCurrentDirection()
-
+        this.disableAnimations = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.disable_animations);
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
         this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels, cardConfig.cardinal_direction_letters);
         this.windDirectionCount = this.checkWindDirectionCount();

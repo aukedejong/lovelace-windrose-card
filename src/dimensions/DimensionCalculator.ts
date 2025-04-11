@@ -30,6 +30,10 @@ export interface DimensionCalculator {
 
     barSpeedLabelY(positionIndex: number): number;
 
+    barPercLabelX(positionIndex: number): number;
+
+    barPercLabelY(positionIndex: number): number;
+
     touchFaceBar(positionIndex: number): RectCoordinates;
 
     viewBox(): string;

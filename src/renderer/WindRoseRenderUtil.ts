@@ -50,8 +50,7 @@ export class WindRoseRenderUtil {
         return (360 - (windDirectionCount * spaceArc)) / windDirectionCount;
     }
 
-    public drawBackground(windRoseData: WindRoseData, centerCalm: boolean): SVG.G {
-
+    public drawBackgroundCross(): SVG.G {
         var roseLinesGroup = this.svg.group();
 
         // Cross
@@ -66,6 +65,30 @@ export class WindRoseRenderUtil {
             roseLinesGroup.add(cross.clone().transform({ rotate: 22.5, originX: this.roseCenter.x, originY: this.roseCenter.y}));
             roseLinesGroup.add(cross.clone().transform({ rotate: -22.5, originX: this.roseCenter.x, originY: this.roseCenter.y}));
         }
+        roseLinesGroup.attr({
+            stroke: this.cardColors.roseLines,
+            strokeWidth: 1,
+            fill: "none",
+        });
+        return roseLinesGroup;
+    }
+
+    public drawInnerOuterCircle(centerCalm: boolean): SVG.G {
+        const defaultCircles = this.svg.group();
+        if (centerCalm) {
+            defaultCircles.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(this.centerRadius)));
+        }
+        defaultCircles.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(500)));
+        defaultCircles.attr({
+            stroke: this.cardColors.roseLines,
+            strokeWidth: 1,
+            fill: "none",
+        });
+        return defaultCircles;
+    }
+
+    public drawCirlces(windRoseData: WindRoseData, centerCalm: boolean): SVG.G {
+        var roseLinesGroup = this.svg.group();
 
         // Circles
         let centerRadius = this.centerRadius;
@@ -75,7 +98,7 @@ export class WindRoseRenderUtil {
         const circleCount = windRoseData.circleCount;
         const radiusStep = (this.dimensionCalculator.roseRadius - centerRadius) / circleCount;
         let circleRadius = centerRadius + radiusStep;
-        for (let i = 1; i <= circleCount; i++) {
+        for (let i = 1; i <= circleCount - 1; i++) {
             roseLinesGroup.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(circleRadius)));
             circleRadius += radiusStep;
         }
@@ -87,7 +110,7 @@ export class WindRoseRenderUtil {
         return roseLinesGroup;
     }
 
-    public  drawWindDirectionText(): SVG.G {
+    public drawWindDirectionText(): SVG.G {
         // Wind direction text
         const roseRenderDegrees = this.degreesCalculator.getRoseRenderDegrees();
         const group = this.svg.group();

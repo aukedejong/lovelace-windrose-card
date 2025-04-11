@@ -10,6 +10,10 @@ export class SvgUtil {
     constructor(public readonly svg: Svg) {
     }
 
+    public createGroup() {
+        return this.svg.group();
+    }
+
     public drawLine(lineCoordinates: LineCoordinates): SVG.Line {
         return this.svg.line(lineCoordinates.startPoint.x, lineCoordinates.startPoint.y, lineCoordinates.endPoint.x,
             lineCoordinates.endPoint.y);

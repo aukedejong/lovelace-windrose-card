@@ -1,6 +1,12 @@
 export class Log2 {
 
     static level = 0;
+    static method = false;
+
+    static setMethod(method: boolean) {
+        this.method = method;
+    }
+
     static setLevel(level: string) {
         switch(level) {
             case 'NONE': this.level = 0; break;
@@ -61,6 +67,12 @@ export class Log2 {
     public trace(message: any, ...optionalParams: any[]): void {
         if (Log2.level === 5) {
            this.log('TRACE', message, optionalParams);
+        }
+    }
+
+    public method(methodName: string, ...optionalParams: any[]): void {
+        if (Log2.method) {
+            this.log('METHOD', methodName + '()', optionalParams);
         }
     }
 

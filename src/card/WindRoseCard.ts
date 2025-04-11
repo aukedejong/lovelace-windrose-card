@@ -69,7 +69,8 @@ export class WindRoseCard extends LitElement {
 
         Log.setLevel(this.cardConfig.logLevel);
         Log2.setLevel(this.cardConfig.logLevel);
-        this.log.debug('setConfig(): ', config, this._hass);
+        Log2.setMethod(false);
+        this.log.method('setConfig(): ', config, this._hass);
 
         if (this._hass) { //Later config changes, also refresh.
             this.refreshCardConfig();
@@ -79,8 +80,8 @@ export class WindRoseCard extends LitElement {
     }
 
     set hass(hass: HomeAssistant) {
+        this.log.method('hass', this.refreshCardConfigOnHass);
         if (this.refreshCardConfigOnHass) {
-            Log.debug("hass(), refreshCardConfigOnHass");
             this.refreshCardConfigOnHass = false;
             this._hass = hass;
             this.refreshCardConfig();
@@ -88,17 +89,17 @@ export class WindRoseCard extends LitElement {
         this._hass = hass;
         this.entityStateProcessor.updateHass(hass);
         if (this.entityStateProcessor.hasUpdates()) {
-            this.windRoseDirigent.updateRender();
+            this.windRoseDirigent.updateStateRender();
         }
     }
 
     sendEvent(event: CustomEvent): void {
-        this.log.debug("sendEvent()", event);
+        this.log.method('sendEvent', event);
         this.dispatchEvent(event);
     }
 
     refreshCardConfig() {
-        this.log.debug("refreshCardConfig()");
+        this.log.method('refreshCardConfig');
         try {
             this.entityChecker.checkEntities(this.cardConfig, this._hass);
             this.measurementProvider = new HAMeasurementProvider(new HAWebservice(this._hass), this.cardConfig);
@@ -114,7 +115,7 @@ export class WindRoseCard extends LitElement {
 
     render(): TemplateResult {
         super.render();
-        this.log.debug('card render()');
+        this.log.method('render');
         return html`
             <ha-card header="${this.cardConfig?.title}">
                 <div class="card-content">
@@ -128,6 +129,7 @@ export class WindRoseCard extends LitElement {
     }
 
     renderPeriodSelector(periodSelector: PeriodSelector | undefined, location: string): TemplateResult {
+        this.log.method('renderPeriodSelector', periodSelector, location);
         if (periodSelector === undefined || periodSelector.location !== location) {
             return html``;
         }
@@ -145,19 +147,19 @@ export class WindRoseCard extends LitElement {
     }
 
     firstUpdated(): void {
-        this.log.debug('firstUpdated()');
-        this.log.debug('SVG container found: ', this.svgContainer, this.measurementProvider);
+        this.log.method('firstUpdated', this.svgContainer);
         this.svg.addTo(this.svgContainer);
+        this.windRoseDirigent.renderBackground();
+       // this.windRoseDirigent.renderGraphs();
     }
 
     update(changedProperties: PropertyValues): void {
-        this.log.debug('update()');
+        this.log.method('update', changedProperties);
         super.update(changedProperties);
-        this.windRoseDirigent.render();
     }
 
     private initInterval() {
-        this.log.debug('initInterval()');
+        this.log.method('initInterval', this.updateInterval);
         if (this.cardConfig && this.updateInterval === undefined) {
 
             this.updateInterval = setInterval(
@@ -208,32 +210,34 @@ export class WindRoseCard extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this.log.debug('connectedCallBack()');
+        this.log.method('connectedCallBack');
         this.initInterval();
 
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        this.log.debug('disconnectedCallback()');
+        this.log.method('disconnectedCallback');
         clearInterval(this.updateInterval);
 
     }
 
     getCardSize(): number {
-        this.log.debug('getCardSize()');
+        this.log.method('getCardSize');
         return 9;
     }
 
     public getLayoutOptions() {
-        this.log.debug('getLayoutOptions()');
+        this.log.method('getLayoutOptions');
         return {
             grid_columns: this.cardConfig.cardWidth
         };
     }
 
     updatePeriodFunc(period: Button): () => void {
+        this.log.method('updatePeriodFunc', period);
         return () => {
+            this.log.method('updatePeriod', period);
             this.cardConfig.dataPeriod.periodSelector?.buttons.forEach((period) => period.active = false);
             period.active = true;
             this.cardConfig.dataPeriod.hourstoShow = period.hours;
@@ -242,9 +246,12 @@ export class WindRoseCard extends LitElement {
     }
 
     refreshMeasurements(): void {
+        this.log.method('refreshMeasurements');
         this.windRoseDirigent.refreshData().then((refresh: boolean) => {
             this.log.debug('refreshData() ready, requesting update.');
             if (refresh) {
+                this.windRoseDirigent.renderGraphs();
+                this.windRoseDirigent.updateStateRender();
                 this.requestUpdate();
             }
         });

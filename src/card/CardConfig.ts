@@ -19,6 +19,7 @@ export interface CardConfig {
     refresh_interval: number;
     wind_direction_entity: CardConfigWindDirectionEntity;
     windspeed_entities: CardConfigWindSpeedEntity[];
+    disable_animations: boolean
     //Deprecated
     output_speed_unit: string;
     output_speed_unit_label: string;

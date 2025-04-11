@@ -76,7 +76,7 @@ export class WindRoseDirigent {
          measurementProvider: HAMeasurementProvider,
          entityStatesProcessor: EntityStatesProcessor): void {
 
-        this.log.debug("init()");
+        this.log.method("init");
         this.initReady = true;
         this.measurementsReady = false;
         this.cardConfig = cardConfig;
@@ -106,7 +106,7 @@ export class WindRoseDirigent {
         this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate,
             cardConfig.compassConfig.asHeading, cardConfig.currentDirection.hideDirectionBelowSpeed);
 
-        this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionCalculator, this.sendEvent, this.svg);
+        this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionCalculator, this.sendEvent, this.svgUtil);
 
         if (this.cardConfig.centerCalmPercentage) {
             this.percentageCalculator = new PercentageCalculatorCenterCalm();
@@ -125,7 +125,7 @@ export class WindRoseDirigent {
         this.windBarRenderers = [];
         if (!cardConfig.hideWindspeedBar) {
             for (let i = 0; i < cardConfig.windBarCount(); i++) {
-                this.windBarRenderers.push(new WindBarRenderer(this.cardConfig, this.dimensionCalculator, this.outputSpeedUnits[i], this.speedRangeServices[i], i, this.svg));
+                this.windBarRenderers.push(new WindBarRenderer(this.cardConfig, this.dimensionCalculator, this.outputSpeedUnits[i], this.speedRangeServices[i], i, this.svgUtil));
                 if (cardConfig.windspeedEntities[i].currentSpeedArrow) {
                     this.currentSpeedRenderers.push(new CurrentSpeedRenderer(cardConfig, cardConfig.windspeedEntities[i], this.dimensionCalculator, this.speedRangeServices[i], i, this.svg));
                 }
@@ -136,37 +136,56 @@ export class WindRoseDirigent {
     }
 
     refreshData(): Promise<boolean> {
-        if (this.initReady) {
-            this.log.debug('refreshData()');
-            return this.measurementProvider.getMeasurements().then((measurementHolder: MeasurementHolder) => {
-                this.windRoseData = [];
-                const matchedGroups = this.measurementMatcher.match(measurementHolder);
-                for (let i = 0; i < matchedGroups.length; i++) {
-                    this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit, matchedGroups[i].getAverageSpeed());
-                    for (const measurement of matchedGroups[i].getMeasurements()) {
-                        this.measurementCounters[i].addWindMeasurements(measurement.direction, measurement.speed, measurement.seconds);
-                    }
-                    const windCounts = this.measurementCounters[i].getMeasurementCounts();
-                    this.windRoseData.push(this.percentageCalculator.calculate(windCounts));
-                }
-                this.dimensionCalculator.updateLabelLengths(this.windRoseData);
-                this.measurementsReady = true;
-
-                if (this.cardConfig.dataPeriod.logMeasurementCounts) {
-                    console.log(`Measurements:\n${measurementHolder.getInfoText()}${matchedGroups[0].getInfo()} - strategy: ${this.cardConfig.matchingStrategy}`);
-                }
-                return Promise.resolve(true);
-            });
-        } else {
-            this.log.debug('refreshData() ignored, not inited yet');
+        if (!this.initReady) {
+            this.log.method('refreshData', 'not inited yet');
             return Promise.resolve(false);
+        }
+        this.log.method('refreshData', 'initReady', this.initReady);
+
+        return this.measurementProvider.getMeasurements().then((measurementHolder: MeasurementHolder) => {
+            this.windRoseData = [];
+            const matchedGroups = this.measurementMatcher.match(measurementHolder);
+            for (let i = 0; i < matchedGroups.length; i++) {
+                this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit, matchedGroups[i].getAverageSpeed());
+                for (const measurement of matchedGroups[i].getMeasurements()) {
+                    this.measurementCounters[i].addWindMeasurements(measurement.direction, measurement.speed, measurement.seconds);
+                }
+                const windCounts = this.measurementCounters[i].getMeasurementCounts();
+                this.windRoseData.push(this.percentageCalculator.calculate(windCounts));
+            }
+            this.dimensionCalculator.updateLabelLengths(this.windRoseData);
+            this.measurementsReady = true;
+
+            if (this.cardConfig.dataPeriod.logMeasurementCounts) {
+                console.log(`Measurements:\n${measurementHolder.getInfoText()}${matchedGroups[0].getInfo()} - strategy: ${this.cardConfig.matchingStrategy}`);
+            }
+            return Promise.resolve(true);
+        });
+    }
+
+    renderBackground() {
+        this.log.method('renderBackground');
+        if (this.initReady) {
+            this.windRoseRenderer.drawEmptyWindrose();
+            this.infoCornersRendeerer?.drawCornerLabel();
+            this.touchFacesRenderer.renderTouchFaces();
         }
     }
 
-    render(): void {
-        this.svg.clear();
-        if (this.initReady && this.measurementsReady) {
-            this.log.debug('render()', this.svg, this.windRoseData, this.windBarRenderers);
+    renderGraphs(): void {
+        if (!this.initReady || !this.measurementsReady) {
+            this.log.method("renderGraphs', 'Not ready yet " + this.initReady + " - "  + this.measurementsReady);
+        }
+        this.log.method('renderGraphs');
+
+        const waitForRemoveAnimation = this.windRoseRenderer.animateRemoveGraphs();
+        const animdationDelay = waitForRemoveAnimation ? 300 : 0;
+        for (let i = 0; i < this.windBarRenderers.length; i++) {
+            this.windBarRenderers[i].animateRemoveGraph();
+        }
+        setTimeout(() => {
+            this.windRoseRenderer.removeGraphs();
+            this.log.debug('renderGraphs()', this.svg, this.windRoseData, this.windBarRenderers);
             this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
@@ -174,41 +193,42 @@ export class WindRoseDirigent {
             for(const currentSpeedRenderer of this.currentSpeedRenderers) {
                 const barIndex = currentSpeedRenderer.getBarIndex();
                 currentSpeedRenderer.initScale(this.windRoseData[barIndex]);
-                currentSpeedRenderer.drawCurrentSpeed(this.entityStatesProcessor.getWindSpeed(barIndex), true);
+                currentSpeedRenderer.drawCurrentSpeed(this.entityStatesProcessor.getWindSpeed(barIndex));
             }
-            this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), true);
-            this.infoCornersRendeerer?.drawCornerLabel();
+            this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
             this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
-            this.touchFacesRenderer.renderTouchFaces();
+
             if (this.cardConfig.backgroundImage !== undefined) {
                 this.backgroundElement = this.svg.image(this.cardConfig.backgroundImage)
                     .size(1000, 1000)
                     .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
                     .back();
             }
-        } else {
-            this.log.debug("render(): Could not render, init or measurements not ready yet " + this.initReady + " - "  + this.measurementsReady);
-        }
+        }, animdationDelay);
     }
 
-    updateRender(): void {
+    updateStateRender(): void {
+        if (!this.initReady || !this.measurementsReady) {
+            this.log.method("updateStateRender', 'Not ready yet " + this.initReady + " - " + this.measurementsReady);
+        }
+        this.log.method('updateStateRender', this.initReady);
         for (const currentSpeedRenderer of this.currentSpeedRenderers) {
             if (this.entityStatesProcessor.hasWindSpeedUpdate(currentSpeedRenderer.getBarIndex())) {
-                currentSpeedRenderer.drawCurrentSpeed(this.entityStatesProcessor.getWindSpeed(currentSpeedRenderer.getBarIndex()), false);
+                currentSpeedRenderer.drawCurrentSpeed(this.entityStatesProcessor.getWindSpeed(currentSpeedRenderer.getBarIndex()));
             }
         }
         if (this.entityStatesProcessor.hasWindDirectionUpdate() || this.entityStatesProcessor.hasWindSpeedUpdate(0)) {
             this.degreesCalculator.setWindDirectionDegrees(this.entityStatesProcessor.getWindDirection());
             this.degreesCalculator.setWindSpeed(this.entityStatesProcessor.getWindSpeed(0));
-            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
+            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
         }
         if (this.entityStatesProcessor.hasCompassDirectionUpdate()) {
             this.degreesCalculator.setCompassDegrees(this.entityStatesProcessor.getCompassDirection());
-            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees(), false);
+            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
             this.windRoseRenderer.rotateWindRose();
         }
         if (this.entityStatesProcessor.hasCornerInfoUpdates()) {
-            this.infoCornersRendeerer.updateCornerValues(this.entityStatesProcessor.getCornerInfoStates());
+            this.infoCornersRendeerer.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
         }
         this.backgroundElement?.back();
     }

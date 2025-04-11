@@ -35,6 +35,14 @@ export class DimensionCalculatorBarHidden extends DimensionCalculatorWindRose im
         throw new Error("NOOP");
     }
 
+    barPercLabelX(positionIndex: number): number {
+        throw new Error("NOOP");
+    }
+
+    barPercLabelY(positionIndex: number): number {
+        throw new Error("NOOP");
+    }
+
     touchFaceBar(): RectCoordinates {
         throw new Error("NOOP");
     }

@@ -98,6 +98,10 @@ export class InfoCornersRenderer {
     }
 
     drawCornerValues(entityStates: EntityState[]) {
+        this.leftTopValue?.remove();
+        this.rightTopValue?.remove();
+        this.leftBottomValue?.remove();
+        this.rightBottomValue?.remove();
         if (this.leftTopConfig.show && entityStates[0].active) {
             this.leftTopValue = this.svgUtil.drawText(this.leftTopCoor,
                 this.getText(entityStates[0], this.leftTopConfig, this.leftTopConverter),
@@ -106,7 +110,7 @@ export class InfoCornersRenderer {
             this.leftTopValue.addClass("corner-value-left-top");
             this.leftTopValue.back();
         }
-        if (entityStates[1].active) {
+        if (this.rightTopConfig.show && entityStates[1].active) {
             this.rightTopValue = this.svgUtil.drawText(this.rightTopCoor,
                 this.getText(entityStates[1], this.rightTopConfig, this.rightTopConverter),
                 TextAttributes.infoCornerAttribute(this.rightTopConfig.color, this.rightTopConfig.valueTextSize));
@@ -114,7 +118,7 @@ export class InfoCornersRenderer {
             this.rightTopValue.addClass("corner-value-right-top");
             this.rightTopValue.back();
         }
-        if (entityStates[2].active) {
+        if (this.leftBottomConfig.show && entityStates[2].active) {
             this.leftBottomValue = this.svgUtil.drawText(this.leftBottomCoor,
                 this.getText(entityStates[2], this.leftBottomConfig, this.leftBottomConverter),
                 TextAttributes.infoCornerAttribute(this.leftBottomConfig.color, this.leftBottomConfig.valueTextSize));
@@ -122,7 +126,7 @@ export class InfoCornersRenderer {
             this.leftBottomValue.addClass("corner-value-left-bottom");
             this.leftBottomValue.back();
         }
-        if (entityStates[3].active) {
+        if (this.rightBottomConfig.show && entityStates[3].active) {
             this.rightBottomValue = this.svgUtil.drawText(this.rightBottomCoor,
                 this.getText(entityStates[3], this.rightBottomConfig, this.rightBottomConverter),
                 TextAttributes.infoCornerAttribute(this.rightBottomConfig.color, this.rightBottomConfig.valueTextSize));
@@ -130,14 +134,6 @@ export class InfoCornersRenderer {
             this.rightBottomValue.addClass("corner-value-right-bottom");
             this.rightBottomValue.back();
         }
-    }
-
-    updateCornerValues(entityStates: EntityState[]) {
-        this.leftTopValue?.remove();
-        this.rightTopValue?.remove();
-        this.leftBottomValue?.remove();
-        this.rightBottomValue?.remove();
-        this.drawCornerValues(entityStates);
     }
 
     private getText(entityState: EntityState, config: CornerInfo, converter: (input: any) => any): string {
