@@ -204,6 +204,7 @@ export class WindRoseDirigent {
                     .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
                     .back();
             }
+            this.windRoseRenderer.rotateWindRose();
         }, animdationDelay);
     }
 

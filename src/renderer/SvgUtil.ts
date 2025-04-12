@@ -72,10 +72,8 @@ export class SvgUtil {
         return this.svg.path(new PathArray(`M ${x} ${y} l ${dx1} ${dy1} l ${dx2} ${dy2} l ${dx3} ${dy3} Z`));
     }
 
-    public drawWindDirectionText(coord: Coordinate, text: string, rotateDegrees: number, color: string, size: number): SVG.Text {
-        var textElement = this.drawText2(coord.x, coord.y, text,  TextAttributes.windBarAttribute(color, size, "central", "middle"));
-        this.rotate(textElement, rotateDegrees, coord);
-        return textElement;
+    public drawWindDirectionText(coord: Coordinate, text: string, color: string, size: number): SVG.Text {
+        return this.drawText2(coord.x, coord.y, text,  TextAttributes.windBarAttribute(color, size, "central", "middle"));
     }
 
     public getLengthLongest(texts: string[], size: number): number {
@@ -100,10 +98,6 @@ export class SvgUtil {
         const textWidth = element.bbox().width;
         element.remove();
         return textWidth;
-    }
-
-    public rotate(element: SVG.Element, degrees: number, center: Coordinate) {
-        element.rotate(degrees, center.x, center.y);
     }
 
     public drawCircle(circleCoridnate: CircleCoordinate): SVG.Circle{

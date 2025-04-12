@@ -8,7 +8,7 @@ export class DegreesCalculator {
     private roseRenderDegrees = 0;
     private windDirectionRenderDegrees: number | undefined;
 
-    constructor(private readonly northOfffset: number,
+    constructor(private readonly northOffset: number,
                 private readonly autoRotate: boolean,
                 private readonly asHeading: boolean,
                 private readonly hideDirectionBelowSpeed: number | undefined) {
@@ -19,28 +19,28 @@ export class DegreesCalculator {
     private updateRenderDegrees() {
         if (this.autoRotate) {
             if (this.asHeading) {
-                this.roseRenderDegrees = +this.northOfffset + (360 - this.compassDegrees);
+                this.roseRenderDegrees = +this.northOffset + (360 - this.compassDegrees);
             } else {
-                this.roseRenderDegrees = +this.northOfffset + this.compassDegrees;
+                this.roseRenderDegrees = +this.northOffset + this.compassDegrees;
             }
 
             if (this.windDirectionDegrees === undefined) {
                 this.windDirectionRenderDegrees = undefined;
             } else {
                 if (this.asHeading) {
-                    this.windDirectionRenderDegrees = this.northOfffset + (360 - this.compassDegrees) + this.windDirectionDegrees;
+                    this.windDirectionRenderDegrees = this.northOffset + (360 - this.compassDegrees) + this.windDirectionDegrees;
                 } else {
-                    this.windDirectionRenderDegrees = this.northOfffset + this.compassDegrees + this.windDirectionDegrees;
+                    this.windDirectionRenderDegrees = this.northOffset + this.compassDegrees + this.windDirectionDegrees;
                 }
             }
 
         } else {
 
-            this.roseRenderDegrees = this.northOfffset;
+            this.roseRenderDegrees = this.northOffset;
             if (this.windDirectionDegrees === undefined) {
                 this.windDirectionRenderDegrees = undefined;
             } else {
-                this.windDirectionRenderDegrees = this.northOfffset + this.windDirectionDegrees;
+                this.windDirectionRenderDegrees = this.northOffset + this.windDirectionDegrees;
             }
 
         }

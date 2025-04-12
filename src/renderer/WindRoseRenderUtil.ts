@@ -88,7 +88,7 @@ export class WindRoseRenderUtil {
     }
 
     public drawCirlces(windRoseData: WindRoseData, centerCalm: boolean): SVG.G {
-        var roseLinesGroup = this.svg.group();
+        var roseCircles = this.svg.group();
 
         // Circles
         let centerRadius = this.centerRadius;
@@ -99,41 +99,35 @@ export class WindRoseRenderUtil {
         const radiusStep = (this.dimensionCalculator.roseRadius - centerRadius) / circleCount;
         let circleRadius = centerRadius + radiusStep;
         for (let i = 1; i <= circleCount - 1; i++) {
-            roseLinesGroup.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(circleRadius)));
+            roseCircles.add(this.svgUtil.drawCircle(this.dimensionCalculator.roseCircle(circleRadius)));
             circleRadius += radiusStep;
         }
-        roseLinesGroup.attr({
+        roseCircles.attr({
             stroke: this.cardColors.roseLines,
             strokeWidth: 1,
             fill: "none",
         });
-        return roseLinesGroup;
+        return roseCircles;
     }
 
     public drawWindDirectionText(): SVG.G {
-        // Wind direction text
-        const roseRenderDegrees = this.degreesCalculator.getRoseRenderDegrees();
         const group = this.svg.group();
 
         if (this.showCardinalDirections) {
             const northText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.north(),
                 this.customLabels.n!,
-                -roseRenderDegrees,
                 this.cardColors.roseCardinalDirectionLabels,
                 this.directionLabelConfig.cardinalLabelSize);
             const eastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.east(),
                 this.customLabels.e!,
-                -roseRenderDegrees,
                 this.cardColors.roseCardinalDirectionLabels,
                 this.directionLabelConfig.cardinalLabelSize);
             const southText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.south(),
                 this.customLabels.s!,
-                -roseRenderDegrees,
                 this.cardColors.roseCardinalDirectionLabels,
                 this.directionLabelConfig.cardinalLabelSize);
             const westText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.west(),
                 this.customLabels.w!,
-                -roseRenderDegrees,
                 this.cardColors.roseCardinalDirectionLabels,
                 this.directionLabelConfig.cardinalLabelSize);
 
@@ -143,22 +137,18 @@ export class WindRoseRenderUtil {
         if (this.showIntercardinalDirections) {
             const northEastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.northEast(),
                 this.customLabels.ne!,
-                -roseRenderDegrees,
                 this.cardColors.roseIntercardinalDirectionLabels,
                 this.directionLabelConfig.intercardinalLabelSize);
             const northWestText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.northWest(),
                 this.customLabels.nw!,
-                -roseRenderDegrees,
                 this.cardColors.roseIntercardinalDirectionLabels,
                 this.directionLabelConfig.intercardinalLabelSize);
             const southEastText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.southEast(),
                 this.customLabels.se!,
-                -roseRenderDegrees,
                 this.cardColors.roseIntercardinalDirectionLabels,
                 this.directionLabelConfig.intercardinalLabelSize);
             const southWestText = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.southWest(),
                 this.customLabels.sw!,
-                -roseRenderDegrees,
                 this.cardColors.roseIntercardinalDirectionLabels,
                 this.directionLabelConfig.intercardinalLabelSize);
 
@@ -168,43 +158,35 @@ export class WindRoseRenderUtil {
         if (this.showSecondaryIntercardinalDirections) {
             const northNorthEast = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.northNorthEast(),
                 this.customLabels.nne!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
             const eastNorthEast = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.eastNorthEast(),
                 this.customLabels.ene!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
             const eastSouthEast = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.eastSouthEast(),
                 this.customLabels.ese!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
             const southSouthEast = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.southSouthEast(),
                 this.customLabels.sse!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
 
             const northNorthWest = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.northNorthWest(),
                 this.customLabels.nnw!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
             const westNorthWest = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.westNorthWest(),
                 this.customLabels.wnw!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
             const westSouthWest = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.westSouthWest(),
                 this.customLabels.wsw!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
             const southSouthWest = this.svgUtil.drawWindDirectionText(this.dimensionCalculator.southSouthWest(),
                 this.customLabels.ssw!,
-                -roseRenderDegrees,
                 this.cardColors.roseSubIntercardinalDirectionLabels,
                 this.directionLabelConfig.secondaryIntercardinalLabelSize);
 
