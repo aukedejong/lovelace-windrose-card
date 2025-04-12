@@ -91,7 +91,7 @@ export class WindRoseDirigent {
             this.outputSpeedUnits.push(outputSpeedUnit);
             this.speedRangeServices.push(speedRangeService);
 
-            const windSpeedConverter = new WindSpeedConverter(outputSpeedUnit);
+            const windSpeedConverter = new WindSpeedConverter(outputSpeedUnit, windSpeedEntity.compensationFactor, windSpeedEntity.compensationAbsolute);
             this.measurementCounters.push(new MeasurementCounter(cardConfig, windSpeedConverter, speedRangeService));
         }
 

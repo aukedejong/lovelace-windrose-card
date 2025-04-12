@@ -29,7 +29,9 @@ export class WindSpeedEntity implements HARequestData {
         public readonly currentSpeedArrowLocation: string,
         public readonly barLabelTextSize: number,
         public readonly barSpeedTextSize: number,
-        public readonly barPercentageTextSize: number
+        public readonly barPercentageTextSize: number,
+        public readonly compensationFactor: number,
+        public readonly compensationAbsolute: number
     ) {}
 
     static fromConfig(entityConfig: CardConfigWindSpeedEntity,
@@ -48,6 +50,8 @@ export class WindSpeedEntity implements HARequestData {
         const barLabelTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_label_text_size, 40);
         const barSpeedTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_speed_text_size, 40);
         const barPercentageTextSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.bar_percentage_text_size, 40);
+        const compensationFactor = ConfigCheckUtils.checkNummerOrDefault(entityConfig.speed_compensation_factor, 1);
+        const compensationAbsolute = ConfigCheckUtils.checkNummerOrDefault(entityConfig.speed_compensation_absolute, 0);
 
         let windspeedBarFull;
         if (entityConfig.windspeed_bar_full === undefined) {
@@ -98,7 +102,8 @@ export class WindSpeedEntity implements HARequestData {
         return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, renderRelativeScale,
             windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
             speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow, currentSpeedArrowSize,
-            currentSpeedArrowLocation, barLabelTextSize, barSpeedTextSize, barPercentageTextSize);
+            currentSpeedArrowLocation, barLabelTextSize, barSpeedTextSize, barPercentageTextSize, compensationFactor,
+            compensationAbsolute);
     }
 
     private static checkInputSpeedUnit(inputSpeedUnit: string): string {

@@ -25,4 +25,7 @@ export interface CardConfigWindSpeedEntity {
     bar_label_text_size: number;
     bar_speed_text_size: number;
     bar_percentage_text_size: number;
+
+    speed_compensation_factor: number;
+    speed_compensation_absolute: number;
 }
