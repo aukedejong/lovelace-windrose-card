@@ -12,6 +12,9 @@ export class WindSpeedConverter {
         if (this.compensationFactor !== 1 || this.compensationAbsolute !== 0) {
             const compensationFunc = (speed: number) => {
                 let newSpeed = speed + this.compensationAbsolute;
+                if (newSpeed < 0) {
+                    return 0;
+                }
                 newSpeed *= this.compensationFactor;
                 return newSpeed;
             }
