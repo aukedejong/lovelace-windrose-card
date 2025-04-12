@@ -36,6 +36,7 @@ export class CardConfigWrapper {
     actions: CardConfigActions | undefined;
     cardWidth: number;
     disableAnimations: boolean;
+    circleLegendTextSize: number;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -109,6 +110,7 @@ export class CardConfigWrapper {
         this.compassConfig = CompassConfig.fromConfig(cardConfig.compass_direction);
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
         this.backgroundImage = ConfigCheckUtils.checkString(cardConfig.background_image);
+        this.circleLegendTextSize = ConfigCheckUtils.checkNummerOrDefault(cardConfig.circle_legend_text_size, 30);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
         this.actions = cardConfig.actions;
         Log.info('Config check OK');

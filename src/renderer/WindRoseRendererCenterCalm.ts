@@ -34,6 +34,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
     private readonly roseCenter: Coordinate;
+    private readonly circleLegendTextSize: number;
 
     private backgroundDrawn: boolean;
     private roseDrawn: boolean;
@@ -53,6 +54,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
         this.doAnimation = !config.disableAnimations;
+        this.circleLegendTextSize = config.circleLegendTextSize;
         this.centerRadius = GlobalConfig.defaultCenterCalmPercenteCircleSize;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
@@ -217,7 +219,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
                 centerXY + (xy * i) + center.x,
                 centerXY + (xy * i) + center.y,
                 (this.windRoseData.percentagePerCircle * i) + "%",
-                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages));
+                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages, this.circleLegendTextSize));
             circleLegendGroup.add(text);
         }
         return circleLegendGroup;

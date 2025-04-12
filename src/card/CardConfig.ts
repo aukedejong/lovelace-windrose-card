@@ -41,6 +41,8 @@ export interface CardConfig {
     wind_direction_count: number;
     matching_strategy: string;
     background_image: string;
+    circle_legend_text_size: number;
+
     log_level: string;
     corner_info: CardConfigCorners;
     actions: CardConfigActions;

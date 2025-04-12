@@ -19,6 +19,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
     private readonly log = new Log2("WindRoseRendererStandaard");
     
     private readonly cardColors: CardColors;
+    private readonly legendTextSize: number;
     private speedRanges: SpeedRange[] = [];
     private readonly svg: Svg;
     private readonly dimensionCalculator: DimensionCalculator;
@@ -47,6 +48,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
         this.doAnimation = !config.disableAnimations;
+        this.legendTextSize = config.circleLegendTextSize;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.degreesCalculator = degreesCalculator;
@@ -219,7 +221,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
                 center.x + (xy * i),
                 center.y + (xy * i),
                 (this.windRoseData.percentagePerCircle * i) + "%",
-                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages));
+                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages, this.legendTextSize));
             circleLegendGroup.add(text);
         }
         return circleLegendGroup;
