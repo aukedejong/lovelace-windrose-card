@@ -36,7 +36,7 @@ export class DimensionCalculatorBarRight extends DimensionCalculatorWindRose imp
         this.windspeedEntities.forEach((config: WindSpeedEntity) => {
             this.barWidths.push(svgUtil.getTextLength('99%', config.barPercentageTextSize) + 6);
             this.barNameLabelSpace.push(config.barLabelTextSize);
-            this.barSpeedLabelSpace.push(svgUtil.getTextLength('10', config.barPercentageTextSize));
+            this.barSpeedLabelSpace.push(svgUtil.getTextLength('100', config.barSpeedTextSize));
         });
     }
 
