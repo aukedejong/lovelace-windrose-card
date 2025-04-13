@@ -36,9 +36,6 @@ export class DimensionCalculatorBarBottom extends DimensionCalculatorWindRose im
         this.barWidth2 = this.roseCompleteWidth - (this.barMarginLeft + this.barMarginRight);
     }
 
-    updateLabelLengths(): void {
-    }
-
     barLength(): number {
         return this.barWidth2;
     }

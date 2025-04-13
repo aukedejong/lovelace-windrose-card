@@ -17,17 +17,23 @@ export class SpeedRangeService {
         this.windSpeedEntity = windSpeedEntity;
         this.dynamicSpeedRangeConfig = windSpeedEntity.dynamicSpeedRanges;
         this.speedRanges = [];
+        this.generateRanges();
     }
 
-    generateRanges(averageSpeed: number): void {
+    generateRanges(averageSpeed?: number): void {
         Log.info(`Generate speed ranges, average: ${averageSpeed}, config: `, this.dynamicSpeedRangeConfig);
         if (this.dynamicSpeedRangeConfig.length > 0) {
-            for (let i = this.dynamicSpeedRangeConfig.length - 1; i >= 0; i--) {
-                const config = this.dynamicSpeedRangeConfig[i];
-                if (averageSpeed >= config.average_above) {
-                    this.speedRanges = SpeedRangeFactory.generateStepMax(config.step, config.max);
-                    break;
+            if (averageSpeed) {
+                for (let i = this.dynamicSpeedRangeConfig.length - 1; i >= 0; i--) {
+                    const config = this.dynamicSpeedRangeConfig[i];
+                    if (averageSpeed >= config.average_above) {
+                        this.speedRanges = SpeedRangeFactory.generateStepMax(config.step, config.max);
+                        break;
+                    }
                 }
+            } else { //Before winddata is available
+                const maxConfig = this.dynamicSpeedRangeConfig[this.dynamicSpeedRangeConfig.length - 1];
+                this.speedRanges = SpeedRangeFactory.generateStepMax(maxConfig.step, maxConfig.max);
             }
             Log.info("Dynamic speed ranges determined: ", this.speedRanges);
         } else {

@@ -68,7 +68,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         }
         this.log.method('drawEmptyWindrose');
         this.backgroundDrawn = true;
-        this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
+        this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" });
         const cross = this.windRoseRenderUtil.drawBackgroundCross();
         const defaultCircles = this.windRoseRenderUtil.drawInnerOuterCircle(false);
         this.windDirectionTextGroup = this.windRoseRenderUtil.drawWindDirectionText();

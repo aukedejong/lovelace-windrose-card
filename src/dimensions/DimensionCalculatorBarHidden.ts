@@ -4,9 +4,6 @@ import {RectCoordinates} from "../renderer/RectCoordinates";
 
 export class DimensionCalculatorBarHidden extends DimensionCalculatorWindRose implements DimensionCalculator {
 
-    updateLabelLengths(): void {
-    }
-
     viewBox(): string {
         return "0 0 " + this.roseCompleteWidth + " " + this.roseCompleteHeight;
     }

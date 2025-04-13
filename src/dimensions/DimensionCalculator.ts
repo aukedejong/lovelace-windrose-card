@@ -2,13 +2,10 @@ import {RectCoordinates} from "../renderer/RectCoordinates";
 import {Coordinate} from "../renderer/Coordinate";
 import {LineCoordinates} from "../renderer/LineCoordinates";
 import {CircleCoordinate} from "../renderer/CircleCoordinate";
-import {WindRoseData} from "../renderer/WindRoseData";
 
 export interface DimensionCalculator {
 
     readonly roseRadius: number;
-
-    updateLabelLengths(windRoseData: WindRoseData[]): void;
 
     barStart(): number;
 

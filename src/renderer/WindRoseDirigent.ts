@@ -153,7 +153,6 @@ export class WindRoseDirigent {
                 const windCounts = this.measurementCounters[i].getMeasurementCounts();
                 this.windRoseData.push(this.percentageCalculator.calculate(windCounts));
             }
-            this.dimensionCalculator.updateLabelLengths(this.windRoseData);
             this.measurementsReady = true;
 
             if (this.cardConfig.dataPeriod.logMeasurementCounts) {

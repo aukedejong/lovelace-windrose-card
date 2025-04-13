@@ -12,7 +12,7 @@ export abstract class DimensionCalculatorWindRose {
     readonly roseMarginLeft = 0;
     readonly roseMarginRight = 0;
     readonly roseMarginTop = 0;
-    readonly roseMarginBottom = 0;
+    readonly roseMarginBottom = 10;
     readonly roseLetterSpacing = 45;
     
     //Calculated

@@ -91,7 +91,6 @@ export class WindBarRenderer {
             segmentPositions = WindBarRangeCalcUtil.calcFixedSizeSegments(this.speedRanges, barStart, barLength, positionMinus, segmentCount);
         }
 
-        console.log('PP First Draw', this.windBarGroup);
         if (this.windBarGroup) {
             this.windBarGroup.remove();
         }
