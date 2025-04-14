@@ -28,6 +28,10 @@ export class TouchFacesRenderer {
         this.actionsConfig = this.cardConfig.actions;
     }
 
+    moveToFront() {
+        this.touchFacesGroup.front();
+    }
+
     renderTouchFaces() {
         if (this.actionsConfig === undefined) {
             return;

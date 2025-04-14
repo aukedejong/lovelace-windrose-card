@@ -204,6 +204,7 @@ export class WindRoseDirigent {
                     .back();
             }
             this.windRoseRenderer.rotateWindRose();
+            this.touchFacesRenderer.moveToFront();
         }, animdationDelay);
     }
 
