@@ -49,7 +49,7 @@ export class CurrentDirectionRenderer {
 
     private drawArrow() {
         const x = this.roseCenter.x;
-        const y = this.roseCenter.y - this.dimensionCalculator.roseRadius + (this.config.currentDirection.arrowSize! / 2);
+        const y = this.roseCenter.y - this.dimensionCalculator.roseRadius - 1;
 
         this.arrowElement = this.svgUtil.drawArrowDown(x, y, this.config.currentDirection.arrowSize!);
         this.arrowElement.attr({

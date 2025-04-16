@@ -29,7 +29,9 @@ export class TouchFacesRenderer {
     }
 
     moveToFront() {
-        this.touchFacesGroup.front();
+        if (this.touchFacesGroup) {
+            this.touchFacesGroup.front();
+        }
     }
 
     renderTouchFaces() {
