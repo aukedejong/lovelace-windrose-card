@@ -15,7 +15,7 @@ export class CardColors {
     barPercentages: string;
 
     constructor() {
-        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-text-color');
+        const primaryColor = 'var(--primary-text-color)';
         this.roseLines = 'rgb(160, 160, 160)';
         this.roseCardinalDirectionLabels = primaryColor;
         this.roseIntercardinalDirectionLabels = primaryColor;

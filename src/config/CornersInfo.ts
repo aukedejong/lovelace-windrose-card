@@ -52,7 +52,7 @@ export class CornersInfo {
     }
 
     private static checkCornerInfo(cornerInfoConfig: CardConfigCornerInfo | undefined): CornerInfo {
-        const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-text-color');
+        const defaultColor = 'var(--primary-text-color)';
         const info = new CornerInfo();
         if (cornerInfoConfig === undefined || cornerInfoConfig === null) {
             return info;
