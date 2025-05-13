@@ -203,6 +203,7 @@ export class WindRoseDirigent {
                     .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
                     .back();
             }
+            this.currentDirectionRenderer?.moveToFront();
             this.windRoseRenderer.rotateWindRose();
             this.touchFacesRenderer.moveToFront();
         }, animdationDelay);
@@ -215,17 +216,17 @@ export class WindRoseDirigent {
         this.log.method('updateStateRender', this.initReady);
         for (const currentSpeedRenderer of this.currentSpeedRenderers) {
             if (this.entityStatesProcessor.hasWindSpeedUpdate(currentSpeedRenderer.getBarIndex())) {
-                currentSpeedRenderer.drawCurrentSpeed(this.entityStatesProcessor.getWindSpeed(currentSpeedRenderer.getBarIndex()));
+                currentSpeedRenderer.drawCurrentSpeed(this.entityStatesProcessor.getWindSpeed(currentSpeedRenderer.getBarIndex(), false));
             }
         }
         if (this.entityStatesProcessor.hasWindDirectionUpdate() || this.entityStatesProcessor.hasWindSpeedUpdate(0)) {
             this.degreesCalculator.setWindDirectionDegrees(this.entityStatesProcessor.getWindDirection());
             this.degreesCalculator.setWindSpeed(this.entityStatesProcessor.getWindSpeed(0));
-            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
+            this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
         }
         if (this.entityStatesProcessor.hasCompassDirectionUpdate()) {
             this.degreesCalculator.setCompassDegrees(this.entityStatesProcessor.getCompassDirection());
-            this.currentDirectionRenderer.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
+            this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
             this.windRoseRenderer.rotateWindRose();
         }
         if (this.entityStatesProcessor.hasCornerInfoUpdates()) {

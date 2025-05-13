@@ -24,7 +24,7 @@ import {PeriodSelector} from "../config/PeriodSelector";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.23.4 `,
+    `%c  WINROSE-CARD  %c Version 1.23.5 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -80,7 +80,7 @@ export class WindRoseCard extends LitElement {
     }
 
     set hass(hass: HomeAssistant) {
-        this.log.method('hass', this.refreshCardConfigOnHass);
+        this.log.method('hass', 'refreshCardConfigOnHass', this.refreshCardConfigOnHass, 'connected', this._hass?.connection.connected);
         if (this.refreshCardConfigOnHass) {
             this.refreshCardConfigOnHass = false;
             this._hass = hass;
@@ -150,7 +150,6 @@ export class WindRoseCard extends LitElement {
         this.log.method('firstUpdated', this.svgContainer);
         this.svg.addTo(this.svgContainer);
         this.windRoseDirigent.renderBackground();
-       // this.windRoseDirigent.renderGraphs();
     }
 
     update(changedProperties: PropertyValues): void {
@@ -219,7 +218,6 @@ export class WindRoseCard extends LitElement {
         super.disconnectedCallback();
         this.log.method('disconnectedCallback');
         clearInterval(this.updateInterval);
-
     }
 
     getCardSize(): number {
@@ -241,18 +239,20 @@ export class WindRoseCard extends LitElement {
             this.cardConfig.dataPeriod.periodSelector?.buttons.forEach((period) => period.active = false);
             period.active = true;
             this.cardConfig.dataPeriod.hourstoShow = period.hours;
-            this.refreshMeasurements();
+            this.refreshMeasurements(true);
         }
     }
 
-    refreshMeasurements(): void {
+    refreshMeasurements(requestUpdate: boolean = false): void {
         this.log.method('refreshMeasurements');
         this.windRoseDirigent.refreshData().then((refresh: boolean) => {
             this.log.debug('refreshData() ready, requesting update.');
             if (refresh) {
                 this.windRoseDirigent.renderGraphs();
                 this.windRoseDirigent.updateStateRender();
-                this.requestUpdate();
+                if (requestUpdate) {
+                    this.requestUpdate();
+                }
             }
         });
     }

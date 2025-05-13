@@ -47,6 +47,10 @@ export class CurrentDirectionRenderer {
         }
     }
 
+    moveToFront() {
+        this.centerElement?.front()
+    }
+
     private drawArrow() {
         const x = this.roseCenter.x;
         const y = this.roseCenter.y - this.dimensionCalculator.roseRadius - 1;

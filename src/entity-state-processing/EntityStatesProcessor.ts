@@ -107,7 +107,7 @@ export class EntityStatesProcessor {
         return this.windSpeedStates[index].updated;
     }
 
-    getWindSpeed(index: number): number | undefined {
+    getWindSpeed(index: number, resetUpdated: boolean = true): number | undefined {
         if (this.windSpeedStates[index].state === undefined) {
             return undefined;
         }
@@ -116,7 +116,9 @@ export class EntityStatesProcessor {
         if (converted === undefined) {
             return undefined;
         }
-        this.windSpeedStates[index].updated = false;
+        if (resetUpdated) {
+            this.windSpeedStates[index].updated = false;
+        }
         return converted;
     }
 
