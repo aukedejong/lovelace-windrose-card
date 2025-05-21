@@ -24,7 +24,7 @@ import {PeriodSelector} from "../config/PeriodSelector";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.23.5 `,
+    `%c  WINROSE-CARD  %c Version 1.24.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -133,7 +133,13 @@ export class WindRoseCard extends LitElement {
         if (periodSelector === undefined || periodSelector.location !== location) {
             return html``;
         }
+        const blendMode = this.cardConfig.cardColor.rosePercentages === 'auto' ? 'difference': 'normal';
         return html`
+            <style>
+                .rose-legend-text {
+                    mix-blend-mode: ${blendMode};
+                }
+            </style>
             <div id="period-selector" class="${location}">
                 ${repeat(periodSelector.buttons, (button) => button.hours, (button, index) =>
                         html`<div id="period-${index}" 
@@ -204,6 +210,7 @@ export class WindRoseCard extends LitElement {
             #period-selector > div.active {
                 color: red;
             }
+
         `
     }
 

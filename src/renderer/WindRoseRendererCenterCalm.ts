@@ -99,7 +99,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         this.roseCircles = this.windRoseRenderUtil.drawCirlces(windRoseData, true);
         this.leavesGroup = this.drawWindDirections();
 
-        this.roseGroup.add(this.leavesGroup).add(this.roseCircles);
+        this.roseGroup.add(this.roseCircles).add(this.leavesGroup);
 
         this.circleLegend = this.drawCircleLegend();
         this.centerZeroSpeedGroup = this.drawCenterZeroSpeed();
@@ -215,11 +215,17 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
 
         for (let i = 1; i <= this.windRoseData.circleCount; i++) {
-            const text = this.svgUtil.drawText2(
-                centerXY + (xy * i) + center.x,
-                centerXY + (xy * i) + center.y,
-                (this.windRoseData.percentagePerCircle * i) + "%",
+            const x = centerXY + (xy * i) + center.x;
+            const y = centerXY + (xy * i) + center.y;
+            const percentage = (this.windRoseData.percentagePerCircle * i) + "%";
+            const text = this.svgUtil.drawText2(x, y, percentage,
                 TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages, this.circleLegendTextSize));
+
+            // const length = this.svgUtil.getTextLength((this.windRoseData.percentagePerCircle * i) + "%", this.circleLegendTextSize) + 10;
+            // const rect = this.svgUtil.drawRect(new RectCoordinates(x - (length / 2), y - ((this.circleLegendTextSize / 2) * 1.3), length, (this.circleLegendTextSize * 1.1)));
+            // rect.radius(15);
+            // rect.attr({ "fill": "var(--card-background-color", });
+
             circleLegendGroup.add(text);
         }
         return circleLegendGroup;

@@ -92,7 +92,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         this.roseCircles = this.windRoseRenderUtil.drawCirlces(windRoseData, false);
         this.leavesGroup = this.drawWindDirections();
 
-        this.roseGroup.add(this.leavesGroup).add(this.roseCircles);
+        this.roseGroup.add(this.roseCircles).add(this.leavesGroup);
 
         this.circleLegend = this.drawCircleLegend();
 
@@ -217,14 +217,19 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         const center = this.dimensionCalculator.roseCenter();
 
         for (let i = 1; i <= this.windRoseData.circleCount; i++) {
-            const text = this.svgUtil.drawText2(
-                center.x + (xy * i),
-                center.y + (xy * i),
-                (this.windRoseData.percentagePerCircle * i) + "%",
+            const x = center.x + (xy * i);
+            const y = center.y + (xy * i);
+            const percentage = (this.windRoseData.percentagePerCircle * i) + "%";
+            const text = this.svgUtil.drawText2(x, y, percentage,
                 TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages, this.legendTextSize));
+
+            // const length = this.svgUtil.getTextLength((this.windRoseData.percentagePerCircle * i) + "%", this.legendTextSize) + 10;
+            // const rect = this.svgUtil.drawRect(new RectCoordinates(x - (length / 2), y - ((this.legendTextSize / 2) * 1.3), length, (this.legendTextSize * 1.1)));
+            // rect.radius(15);
+            // rect.attr({ "fill": "var(--card-background-color", });
+
             circleLegendGroup.add(text);
         }
         return circleLegendGroup;
     }
-
 }

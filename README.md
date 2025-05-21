@@ -629,7 +629,7 @@ CSS color values are allowed.
 | rose_intercardinal_direction_labels           | string | --primary-text-color |          | Intercardinal direction labels color                                                   |
 | rose_secondary_intercardinal_direction_labels | string | --primary-text-color |          | Secondary intercardinal direction labels color                                         |
 | rose_center_percentage                        | string |         auto         |          | Center calm percentage color. Auto means black or white depending on background color. |
-| rose_percentages                              | string | --primary-text-color |          | Percentage legend color                                                                |
+| rose_percentages                              | string |         auto         |          | Percentage legend color. Auto means using browsers css mix-blend-mode option.          |
 | rose_current_direction_arrow                  | string |         red          |          | Current direction arrow color                                                          |
 | bar_border                                    | string |  rgb(160, 160, 160)  |          | Bar border color                                                                       |
 | bar_unit_name                                 | string | --primary-text-color |          | Unit name color                                                                        |

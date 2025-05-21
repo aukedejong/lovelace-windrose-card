@@ -25,7 +25,7 @@ export class TextAttributes {
     static roseLegendAttribute(color: string, text_size: number) {
         return {
             "class": "rose-legend-text",
-            "fill": color,
+            "fill": color === 'auto' ? 'white' : color,
             "font-size": text_size,
             "font-family": "arial",
             "text-anchor": "middle",

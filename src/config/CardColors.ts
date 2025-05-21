@@ -21,7 +21,7 @@ export class CardColors {
         this.roseIntercardinalDirectionLabels = primaryColor;
         this.roseSubIntercardinalDirectionLabels = primaryColor;
         this.roseCenterPercentage = 'auto';
-        this.rosePercentages = primaryColor;
+        this.rosePercentages = 'auto';
         this.roseCurrentDirectionArrow = 'red';
         this.barBorder = 'rgb(160, 160, 160)';
         this.barUnitName = primaryColor;
