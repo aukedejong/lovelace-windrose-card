@@ -91,6 +91,9 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
             this.log.error('drawWindRose()', 'Can\'t draw, no windrose data.');
             return;
         }
+        if (!this.backgroundDrawn) {
+            this.drawEmptyWindrose();
+        }
         this.log.method('drawWindRose', 'windRoseData', windRoseData);
         this.roseDrawn = true;
         this.windRoseData = windRoseData;
