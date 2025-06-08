@@ -8,6 +8,7 @@ import {CardConfigCurrentDirection} from "./CardConfigCurrentDirection";
 import {CardConfigCorners} from "./CardConfigCorners";
 import {CardConfigActions} from "./CardConfigActions";
 import {CardConfigDirectionLabels} from "./CardConfigDirectionLabels";
+import {CardConfigTextBlocks} from "./CardConfigTextBlocks";
 
 export interface CardConfig {
     type: string;
@@ -45,6 +46,7 @@ export interface CardConfig {
 
     log_level: string;
     corner_info: CardConfigCorners;
+    text_blocks: CardConfigTextBlocks;
     actions: CardConfigActions;
 
     colors: CardConfigColors;

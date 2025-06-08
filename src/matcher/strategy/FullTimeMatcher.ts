@@ -59,7 +59,7 @@ export class FullTimeMatcher implements MatchStrategy {
             mergedList.shift();
         }
         const matchedMeasurements = new MatchedMeasurements();
-        mergedList.forEach((tds) => matchedMeasurements.add(tds.direction!, tds.speed!, tds.seconds));
+        mergedList.forEach((tds) => matchedMeasurements.add(tds.direction!, tds.speed!, tds.time, tds.seconds));
         return matchedMeasurements;
     }
 }

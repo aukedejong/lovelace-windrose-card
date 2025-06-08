@@ -19,7 +19,7 @@ export class MeasurementHolder {
         const directionCount = this.directionMeasurements.length;
         const first = this.directionMeasurements[0].startTime;
         const last = this.directionMeasurements[this.directionMeasurements.length - 1].startTime;
-        let info = `Directions: ${directionCount} - ${MatchUtils.cleanDate(first)} - ${MatchUtils.cleanDate(last)}\n`;
+        let info = `Directions: ${directionCount} - ${MatchUtils.cleanDateTime(first)} - ${MatchUtils.cleanDateTime(last)}\n`;
         for (const speed of this.speedMeasurements) {
             info += this.getSpeedInfo(speed);
         }
@@ -33,7 +33,7 @@ export class MeasurementHolder {
         }
         const first = speedMeasurements[0].startTime;
         const last = speedMeasurements[speedMeasurements.length - 1].startTime;
-        return `Speed:      ${speedCount} - ${MatchUtils.cleanDate(first)} - ${MatchUtils.cleanDate(last)}\n`;
+        return `Speed:      ${speedCount} - ${MatchUtils.cleanDateTime(first)} - ${MatchUtils.cleanDateTime(last)}\n`;
     }
 
 }

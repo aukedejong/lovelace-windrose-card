@@ -12,6 +12,7 @@ import {ConfigCheckUtils} from "./ConfigCheckUtils";
 import {CardConfigWindSpeedEntity} from "../card/CardConfigWindSpeedEntity";
 import {CardConfigActions} from "../card/CardConfigActions";
 import {DirectionLabels} from "./DirectionLabels";
+import {TextBlocks} from "./TextBlocks";
 
 
 export class CardConfigWrapper {
@@ -32,6 +33,7 @@ export class CardConfigWrapper {
     cardColor: CardColors;
     compassConfig: CompassConfig;
     cornersInfo: CornersInfo;
+    textBlocks: TextBlocks;
     backgroundImage: string | undefined;
     actions: CardConfigActions | undefined;
     cardWidth: number;
@@ -109,6 +111,7 @@ export class CardConfigWrapper {
         this.cardColor = CardColors.fromConfig(cardConfig.colors);
         this.compassConfig = CompassConfig.fromConfig(cardConfig.compass_direction);
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
+        this.textBlocks = TextBlocks.fromConfig(cardConfig.text_blocks);
         this.backgroundImage = ConfigCheckUtils.checkString(cardConfig.background_image);
         this.circleLegendTextSize = ConfigCheckUtils.checkNummerOrDefault(cardConfig.circle_legend_text_size, 30);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);

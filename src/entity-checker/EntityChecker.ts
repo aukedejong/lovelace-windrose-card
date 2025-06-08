@@ -4,6 +4,8 @@ import {HomeAssistant} from "../util/HomeAssistant";
 import {WindSpeedEntity} from "../config/WindSpeedEntity";
 import {WindSpeedConvertFunctionFactory} from "../converter/WindSpeedConvertFunctionFactory";
 import {Log} from "../util/Log";
+import {TextBlock} from "../config/TextBlock";
+import {TemplateParser} from "../textblocks/TemplateParser";
 
 export class EntityChecker {
 
@@ -27,6 +29,9 @@ export class EntityChecker {
         this.checkCornerInfo(cardConfig.cornersInfo.topRightInfo, hass);
         this.checkCornerInfo(cardConfig.cornersInfo.bottomLeftInfo, hass);
         this.checkCornerInfo(cardConfig.cornersInfo.bottomRightInfo, hass);
+
+        this.checkTextBlock(cardConfig?.textBlocks?.top, hass);
+        this.checkTextBlock(cardConfig?.textBlocks?.bottom, hass);
     }
 
     private determineAutoSppedUnit(entity: WindSpeedEntity, hass: HomeAssistant): string {
@@ -48,6 +53,16 @@ export class EntityChecker {
             if (cornerInfo.precision === undefined) {
                 cornerInfo.precision = hass.entities[cornerInfo.entity]?.display_precision;
             }
+        }
+    }
+
+    private checkTextBlock(textBlock: TextBlock | undefined, hass: HomeAssistant) {
+        if (!textBlock) {
+            return;
+        }
+        const entities = TemplateParser.findEntityPlaceholders(textBlock.text);
+        for (const entity of entities) {
+            this.checkEntity(entity.entity!, entity.attribute, false, hass);
         }
     }
 

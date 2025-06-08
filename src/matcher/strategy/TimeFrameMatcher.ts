@@ -25,7 +25,7 @@ export class TimeFrameMatcher implements MatchStrategy {
                 Log.warn("No speed found for timestamp " + MatchUtils.cleanDate(end));
             }
             if (direction && speed) {
-                matchedMeasurements.add(direction.value, +speed.value);
+                matchedMeasurements.add(direction.value, +speed.value, speed.startTime);
             }
 
             end -= this.periodSeconds;

@@ -14,6 +14,7 @@ import {HAWebservice} from "../measurement-provider/HAWebservice";
 import {repeat} from 'lit/directives/repeat.js';
 import {Button} from "../config/Button";
 import {PeriodSelector} from "../config/PeriodSelector";
+import {TextBlock} from "../config/TextBlock";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -24,7 +25,7 @@ import {PeriodSelector} from "../config/PeriodSelector";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.24.0 `,
+    `%c  WINROSE-CARD  %c Version 1.25.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -40,6 +41,8 @@ export class WindRoseCard extends LitElement {
 
     @query('#svg-container') svgContainer!: HTMLElement;
     @query('.card-content') parentDiv!: HTMLDivElement;
+    @query('#text-block-top') textBlockTop!: HTMLDivElement;
+    @query('#text-block-bottom') textBlockBottom!: HTMLDivElement;
 
     windRoseDirigent!: WindRoseDirigent;
     entityStateProcessor!: EntityStatesProcessor;
@@ -121,7 +124,11 @@ export class WindRoseCard extends LitElement {
                 <div class="card-content">
                     <div id="error-container">${this.errorMessage}</div>
                     ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'top')}
+                    ${this.renderTextBlock(this.cardConfig.textBlocks.top, 'top')}
+                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'top-below-text')}
                     <div id="svg-container"></div>
+                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'bottom-above-text')}
+                    ${this.renderTextBlock(this.cardConfig.textBlocks.bottom, 'bottom')}
                     ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'bottom')}
                 </div>
             </ha-card>
@@ -152,9 +159,17 @@ export class WindRoseCard extends LitElement {
         `;
     }
 
+    renderTextBlock(textBlock: TextBlock | undefined, location: string): TemplateResult {
+        if (textBlock === undefined || textBlock.text === '') {
+            return html``;
+        }
+        return html`<div id="text-block-${location}" class="text-block" style="color: ${textBlock.textColor}; font-size: ${textBlock.textSize}px"></div>`;
+    }
+
     firstUpdated(): void {
         this.log.method('firstUpdated', this.svgContainer);
         this.svg.addTo(this.svgContainer);
+        this.windRoseDirigent.setTextBlocks(this.textBlockTop, this.textBlockBottom);
         this.windRoseDirigent.renderBackground();
     }
 
@@ -207,10 +222,23 @@ export class WindRoseCard extends LitElement {
                 padding: 4px;
                 white-space: nowrap;
             }
+            #period-selector.bottom-above-text {
+                margin: 10px 0 10px 0;
+            }
+            #period-selector.top-below-text {
+                margin-bottom: 10px;
+            }
             #period-selector > div.active {
                 color: red;
             }
-
+            .text-block {
+                display: block;
+                line-height: normal;
+                margin-bottom: 10px;
+            }
+            .text-block > table {
+                width: 100%;
+            }
         `
     }
 

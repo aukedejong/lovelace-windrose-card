@@ -6,6 +6,7 @@ import {EntityState} from "./EntityState";
 import {HomeAssistant} from "../util/HomeAssistant";
 import {WindSpeedConverter} from "../converter/WindSpeedConverter";
 import {SpeedUnits} from "../converter/SpeedUnits";
+import {TemplateParser} from "../textblocks/TemplateParser";
 
 export class EntityStatesProcessor {
 
@@ -25,6 +26,7 @@ export class EntityStatesProcessor {
 
     private entityStates: EntityState[] = [];
     private cornerInfoStates: EntityState[] = [];
+    private textBlockStates: EntityState[] = [];
 
     init(cardConfig: CardConfigWrapper) {
         this.cardConfig = cardConfig;
@@ -49,10 +51,12 @@ export class EntityStatesProcessor {
         this.cornerBottomLeftState = new EntityState(cornerInfo.bottomLeftInfo.show, cornerInfo.bottomLeftInfo.entity, cornerInfo.bottomLeftInfo.attribute);
         this.cornerBottomRightState = new EntityState(cornerInfo.bottomRightInfo.show, cornerInfo.bottomRightInfo.entity, cornerInfo.bottomRightInfo.attribute);
 
+        const entitiesTop = TemplateParser.findEntityPlaceholders(cardConfig.textBlocks?.top?.text);
+        const entitiesBottom = TemplateParser.findEntityPlaceholders(cardConfig.textBlocks?.bottom?.text);
+        this.textBlockStates = entitiesTop.concat(entitiesBottom);
+
         this.cornerInfoStates = [this.cornerTopLeftState, this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
-        this.entityStates = [this.windDirectionState, this.compassDirectionState, this.cornerTopLeftState,
-                this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
-        this.entityStates = this.entityStates.concat(this.windSpeedStates);
+        this.entityStates = [this.windDirectionState, this.compassDirectionState].concat(this.windSpeedStates).concat(this.cornerInfoStates).concat(this.textBlockStates);
         this.initReady = true;
     }
 
@@ -141,7 +145,15 @@ export class EntityStatesProcessor {
     }
 
     getCornerInfoStates(): EntityState[] {
-        return [this.cornerTopLeftState, this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
+        return this.cornerInfoStates;
+    }
+
+    hasTextBlockUpdates(): boolean {
+        return this.textBlockStates.some((state) => state.updated);
+    }
+
+    getTextBlockStates(): EntityState[] {
+        return this.textBlockStates;
     }
 
 }

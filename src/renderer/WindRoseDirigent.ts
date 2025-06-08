@@ -27,6 +27,8 @@ import {DimensionCalculatorBarHidden} from "../dimensions/DimensionCalculatorBar
 import {SvgUtil} from "./SvgUtil";
 import {DimensionCalculatorBarRight} from "../dimensions/DimensionCalculatorBarRight";
 import {DimensionCalculatorBarBottom} from "../dimensions/DimensionCalculatorBarBottom";
+import {TemplateParser} from "../textblocks/TemplateParser";
+import {HtmlRenderer} from "../html-renderer/HtmlRenderer";
 
 export class WindRoseDirigent {
     //Util
@@ -56,6 +58,8 @@ export class WindRoseDirigent {
     private currentSpeedRenderers: CurrentSpeedRenderer[] = [];
     private infoCornersRendeerer!: InfoCornersRenderer;
     private touchFacesRenderer!: TouchFacesRenderer;
+    private templateParser!: TemplateParser;
+    private htmlRenderer!: HtmlRenderer;
 
     //Calculated data
     private windRoseData: WindRoseData[] = [];
@@ -84,6 +88,8 @@ export class WindRoseDirigent {
         this.measurementMatcher = new MeasurementMatcher(cardConfig);
         this.svgUtil = new SvgUtil(this.svg);
         this.entityStatesProcessor = entityStatesProcessor;
+        this.templateParser = new TemplateParser(entityStatesProcessor);
+        this.htmlRenderer = new HtmlRenderer(cardConfig, this.templateParser);
 
         for (const windSpeedEntity of this.cardConfig.windspeedEntities) {
             const outputSpeedUnit = SpeedUnits.getSpeedUnit(windSpeedEntity.outputSpeedUnit);
@@ -141,19 +147,24 @@ export class WindRoseDirigent {
             return Promise.resolve(false);
         }
         this.log.method('refreshData', 'initReady', this.initReady);
+        this.templateParser.clearValues();
 
         return this.measurementProvider.getMeasurements().then((measurementHolder: MeasurementHolder) => {
             this.windRoseData = [];
             const matchedGroups = this.measurementMatcher.match(measurementHolder);
+            this.templateParser.addMatchedValues(matchedGroups[0]);
             for (let i = 0; i < matchedGroups.length; i++) {
                 this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit, matchedGroups[i].getAverageSpeed());
                 for (const measurement of matchedGroups[i].getMeasurements()) {
                     this.measurementCounters[i].addWindMeasurements(measurement.direction, measurement.speed, measurement.seconds);
                 }
                 const windCounts = this.measurementCounters[i].getMeasurementCounts();
-                this.windRoseData.push(this.percentageCalculator.calculate(windCounts));
+                const windRoseData = this.percentageCalculator.calculate(windCounts);
+                this.windRoseData.push(windRoseData);
             }
             this.measurementsReady = true;
+            this.templateParser.addWindRoseDataValues(this.windRoseData[0]);
+            this.templateParser.addMeasurementValues(measurementHolder);
 
             if (this.cardConfig.dataPeriod.logMeasurementCounts) {
                 console.log(`Measurements:\n${measurementHolder.getInfoText()}${matchedGroups[0].getInfo()} - strategy: ${this.cardConfig.matchingStrategy}`);
@@ -168,6 +179,7 @@ export class WindRoseDirigent {
             this.windRoseRenderer.drawEmptyWindrose();
             this.infoCornersRendeerer?.drawCornerLabel();
             this.touchFacesRenderer.renderTouchFaces();
+            this.htmlRenderer.renderTextBlocks();
         }
     }
 
@@ -206,6 +218,7 @@ export class WindRoseDirigent {
             this.currentDirectionRenderer?.moveToFront();
             this.windRoseRenderer.rotateWindRose();
             this.touchFacesRenderer.moveToFront();
+            this.htmlRenderer.renderTextBlocks();
         }, animdationDelay);
     }
 
@@ -232,6 +245,15 @@ export class WindRoseDirigent {
         if (this.entityStatesProcessor.hasCornerInfoUpdates()) {
             this.infoCornersRendeerer.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
         }
+        if (this.entityStatesProcessor.hasTextBlockUpdates()) {
+            this.templateParser.addEntityStates(this.entityStatesProcessor.getTextBlockStates());
+            this.htmlRenderer.renderTextBlocks();
+        }
         this.backgroundElement?.back();
     }
+
+    setTextBlocks(textBlockTop: HTMLDivElement, textBlockBottom: HTMLDivElement): void {
+        this.htmlRenderer.setHtmlElements(textBlockTop, textBlockBottom);
+    }
+
 }

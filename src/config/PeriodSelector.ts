@@ -29,8 +29,8 @@ export class PeriodSelector {
 
     private static checkLocation(location: string | undefined) {
         if (location) {
-            if (location !== 'top' && location !== 'bottom') {
-                throw new Error('WindRoseCard: Period selector location should be top or bottom, not ' + location);
+            if (location !== 'top' && location !== 'bottom' && location !== 'top-below-text' && location !== 'bottom-above-text') {
+                throw new Error('WindRoseCard: Period selector location should be top, top-below-text, bottom or bottom-above-text, not ' + location);
             }
             return location;
         }

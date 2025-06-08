@@ -12,7 +12,7 @@ export class SpeedFirstMatcher implements MatchStrategy {
         for (const speed of speedMeasurements) {
             const direction = MatchUtils.findMeasurementAtTime(speed.startTime, directionMeasurements);
             if (direction) {
-                matchedMeasurements.add(direction.value, +speed.value);
+                matchedMeasurements.add(direction.value, +speed.value, speed.startTime);
             } else {
                 Log.debug('No matching direction found for speed ' + speed.value + " at timestamp " + speed.startTime);
             }

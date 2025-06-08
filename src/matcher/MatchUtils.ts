@@ -7,6 +7,14 @@ export class MatchUtils {
     }
 
     public static cleanDate(date: number) {
+        return new Date(date * 1000).toLocaleDateString();
+    }
+
+    public static cleanTime(date: number) {
+        return new Date(date * 1000).toLocaleTimeString();
+    }
+
+    public static cleanDateTime(date: number) {
         return new Date(date * 1000).toLocaleString();
     }
 }
