@@ -25,7 +25,7 @@ import {TextBlock} from "../config/TextBlock";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.25.0 `,
+    `%c  WINROSE-CARD  %c Version 1.25.1 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );

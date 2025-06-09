@@ -209,7 +209,7 @@ export class WindRoseDirigent {
             this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
             this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
 
-            if (this.cardConfig.backgroundImage !== undefined) {
+            if (this.cardConfig.backgroundImage !== undefined && this.backgroundElement === undefined) {
                 this.backgroundElement = this.svg.image(this.cardConfig.backgroundImage)
                     .size(1000, 1000)
                     .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
