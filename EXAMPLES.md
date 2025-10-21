@@ -5,48 +5,19 @@
 
 ```yaml
 type: custom:windrose-card
-title: Wind direction
+title: Minimal configuration
+windspeed_bar_location: right
 data_period:
-  hours_to_show: 400
-refresh_interval: 300
-windspeed_bar_location: bottom
-windspeed_bar_full: true
-hide_windspeed_bar: true
-wind_direction_count: 32
+  hours_to_show: 200
 wind_direction_entity:
   entity: sensor.wind_direction_azimuth
-  use_statistics: false
-  direction_compensation: 0
 windspeed_entities:
   - entity: sensor.wind_speed
     name: Speed
-    speed_unit: auto
-    use_statistics: false
-corner_info:
-  top_left:
-    label: Current windspeed
-    unit: " kph"
-    color: red
-    entity: sensor.wind_gust
-  top_right:
-    label: Wind direction
-    unit: °
-    entity: sensor.wind_direction_azimuth
-  bottom_left:
-    label: Compass
-    unit: °
-    entity: input_number.compass
-output_speed_unit: mps
-speed_range_beaufort: true
-windrose_draw_north_offset: 0
+    windspeed_bar_full: false
+    speed_range_beaufort: false
 current_direction:
   show_arrow: true
-  arrow_size: 70
-  center_circle_size: 39
-cardinal_direction_letters: NOZW
-matching_strategy: direction-first
-center_calm_percentage: false
-log_level: DEBUG
 ```
 
 
