@@ -2,6 +2,7 @@
 ## Configuration examples
 
 <img alt="Example for config yaml" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/minimal-right.png?raw=true" width="482"/>
+
 ```yaml
 type: custom:windrose-card
 title: Wind direction
@@ -50,6 +51,7 @@ log_level: DEBUG
 
 
 <img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/maximal-bottom-button.png?raw=true" width="482"/>
+
 ```yaml
 type: custom:windrose-card
 title: Wind direction
