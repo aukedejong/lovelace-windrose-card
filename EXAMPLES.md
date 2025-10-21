@@ -246,7 +246,7 @@ colors:
 
 ```
 
-<img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/max-colors-buttom-compass.png?raw=true" width="482"/>
+<img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/max-colors-bottom-compass.png?raw=true" width="482"/>
 
 ```yaml
 type: custom:windrose-card
