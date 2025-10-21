@@ -127,11 +127,11 @@ windspeed_bar_location: right
 circle_legend_text_size: 30
 background_image: /hacsfiles/lovelace-windrose-card/bg.png
 wind_direction_entity:
-  entity: sensor.gorredijk_wind_direction_azimuth
+  entity: sensor.wind_direction_azimuth
   use_statistics: false
   direction_compensation: 0
 windspeed_entities:
-  - entity: sensor.gorredijk_wind_speed
+  - entity: sensor.wind_speed
     name: Speed
     speed_unit: auto
     output_speed_unit: kph
@@ -151,7 +151,7 @@ windspeed_entities:
         color: orange
       - from_value: 40
         color: red
-  - entity: sensor.gorredijk_wind_gust
+  - entity: sensor.wind_gust
     name: Gust
     speed_unit: auto
     output_speed_unit: kph
@@ -191,7 +191,7 @@ text_blocks:
               <td>Temperature</td>
               <td>${weather.gorredijk.temperature} °C</td>
               <td>Wind speed</td>
-              <td>${sensor.gorredijk_wind_speed} Bft</td>
+              <td>${sensor.wind_speed} Bft</td>
           </tr>
 
           <tr>
@@ -220,12 +220,12 @@ corner_info:
   top_left:
     label: Current gust
     unit: null
-    entity: sensor.gorredijk_wind_gust
+    entity: sensor.wind_gust
   top_right:
     label: Direction
     unit: °
     color: red
-    entity: sensor.gorredijk_wind_direction_azimuth
+    entity: sensor.wind_direction_azimuth
   bottom_left:
     label: Compass
     unit: °
