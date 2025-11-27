@@ -38,8 +38,8 @@ export class TemplateParser {
 
     public addMatchedValues(matchedMeasurements: MatchedMeasurements): void {
         this.addOrUpdateValue('match-count', matchedMeasurements.getMeasurementCount());
-        this.addOrUpdateValue('min-speed', matchedMeasurements.minSpeed);
-        this.addOrUpdateValue('max-speed', matchedMeasurements.maxSpeed);
+        this.addOrUpdateValue('min-speed', Math.round(matchedMeasurements.minSpeed));
+        this.addOrUpdateValue('max-speed', Math.round(matchedMeasurements.maxSpeed));
         this.addOrUpdateValue('average-speed', Math.round(matchedMeasurements.getAverageSpeed()));
         this.addOrUpdateValue('time-first-match', MatchUtils.cleanTime(matchedMeasurements.firstDateTime));
         this.addOrUpdateValue('date-first-match', MatchUtils.cleanDate(matchedMeasurements.firstDateTime));
@@ -48,6 +48,35 @@ export class TemplateParser {
         const minutes = Math.round((matchedMeasurements.lastDateTime - matchedMeasurements.firstDateTime) / 60)
         this.addOrUpdateValue('period-hours', Math.round(minutes / 60));
         this.addOrUpdateValue('period-minutes', minutes);
+        
+        // Statistical wind measures for better weather reporting
+        const speeds = matchedMeasurements.getMeasurements().map((m: any) => m.speed).sort((a: number, b: number) => a - b);
+        const count = speeds.length;
+        
+        // Median (50th percentile)
+        const median = count % 2 === 0 
+            ? (speeds[count/2 - 1] + speeds[count/2]) / 2 
+            : speeds[Math.floor(count/2)];
+        this.addOrUpdateValue('median-speed', Math.round(median));
+        
+        // Interquartile range (25th to 75th percentile) - excludes outliers
+        const q1Index = Math.floor(count * 0.25);
+        const q3Index = Math.floor(count * 0.75);
+        const q1 = speeds[q1Index];
+        const q3 = speeds[q3Index];
+        this.addOrUpdateValue('q1-speed', Math.round(q1));
+        this.addOrUpdateValue('q3-speed', Math.round(q3));
+        this.addOrUpdateValue('iqr-range', `${Math.round(q1)}-${Math.round(q3)}`);
+        
+        // 90th percentile for gusts (excludes the highest 10% outliers)
+        const p90Index = Math.floor(count * 0.90);
+        const p90 = speeds[p90Index];
+        this.addOrUpdateValue('p90-speed', Math.round(p90));
+        
+        // Weather-style description using IQR
+        const maxSpeed = Math.round(matchedMeasurements.maxSpeed);
+        const gustText = maxSpeed > q3 * 1.3 ? ` gusts to ${maxSpeed}` : '';
+        this.addOrUpdateValue('wind-description', `${Math.round(q1)}-${Math.round(q3)}${gustText}`);
     }
 
     public addEntityStates(entityStates: EntityState[]) {

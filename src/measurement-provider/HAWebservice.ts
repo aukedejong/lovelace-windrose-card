@@ -6,11 +6,11 @@ export class HAWebservice {
     constructor(private readonly hass: HomeAssistant) {
     }
 
-    public getMeasurementData(startTime: Date, requestData: HARequestData): Promise<any> {
+    public getMeasurementData(startTime: Date, endTime: Date, requestData: HARequestData): Promise<any> {
         if (requestData.useStatistics) {
-            return this.getStatistics(startTime, [requestData.entity], requestData.statisticsPeriod!);
+            return this.getStatistics(startTime, endTime, [requestData.entity], requestData.statisticsPeriod!);
         }
-        return this.getHistory(startTime, new Date(), [requestData.entity], requestData.attribute !== undefined);
+        return this.getHistory(startTime, endTime, [requestData.entity], requestData.attribute !== undefined);
     }
 
     private getHistory(startTime: Date, endTime: Date, entities: string[], attributes: boolean): Promise<any> {
@@ -28,13 +28,14 @@ export class HAWebservice {
         return this.hass.callWS(historyMessage);
     }
 
-    private getStatistics(startTime: Date, entities: string[], period: string): Promise<any> {
+    private getStatistics(startTime: Date, endTime: Date, entities: string[], period: string): Promise<any> {
         if (entities.length === 0) {
             return Promise.resolve({});
         }
         const statisticsMessage = {
             "type": "recorder/statistics_during_period",
             "start_time": startTime,
+            "end_time": endTime,
             "period": period,
             "statistic_ids": entities,
             "types":["mean"]
