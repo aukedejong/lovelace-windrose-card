@@ -4,13 +4,12 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/aukedejonga)
 
-Attention! Version (1.0.0 and higher) has breaking configuration changes. The easiest way is to just add the card and modify the generated configuration.
-
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
 It's developed for wind data, but it's not limited to wind data only. It is also used for solar winds and lightning data.
 If you miss a feature that would make this card more useful for other use-cases, please submit an issue on GitHub and let me know.
 
+Look here for example configurations with screepcapture: [examples](EXAMPLES.md)
 
 <img alt="Peview bars right" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-right.png?raw=true" width="482"/>
 <img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-bottom.png?raw=true" width="482"/>
@@ -117,6 +116,8 @@ Only one of the first three options can be used at the same time.
 | hours_to_show          |              number               |         |    -     | Show winddata for the last number of hours. Number higher then 0.                                                                                                                                |
 | period_selector        | [object](#Object-period_selector) |         |    -     | Shows period selector buttons, button configured as active will be used as initial hours_to_show value.                                                                                          |
 | from_hour_of_day       |              number               |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used. |
+| from_hours_ago         |              number               |         |    -     | Show winddata from the configured hours ago till the to_hours_ago value.                                                                                                                         |
+| to_hours_ago           |              number               |         |    -     | Show winddata from the configured hours from the from_hours_ago value till this value.                                                                                                           |
 | time_interval          |              number               |   60    |    -     | Time interval in seconds. Only used by the time-frame matching strategy. More info at [Matching strategies](#Matching-strategies)                                                                |
 | log_measurement_counts |              boolean              |  false  |    -     | When set to true, will log measurement and match counts to the browsers console. Can be useful to check the data where the graph is based on. Example output below.                              |
 
@@ -610,6 +611,12 @@ Available values:
 | period-hours                                                                                  | Amount of hours between the first and last matched measuremetns.                                                                                    | 
 | min-speed<br/>max-speed<br/>average-speed                                                     | Wind speed statistics. The first wind speed sensor is used. The first is also used for the windrose.                                                | 
 | calm-percentage                                                                               | Percentage of matched measurements in the first speed range. Usually this is the speed range with calm windspeeds.                                  |
+| median-speed                                                                                  | Median windspeed (50th percentile)                                                                                                                  |
+| q1-speed                                                                                      | Interquartile range (25th percentile)                                                                                                               |
+| q3-speed                                                                                      | Interquartile range (75th percentile)                                                                                                               |
+| iqr-range                                                                                     | Interquartile range (25th to 75th percentile) - excludes outliers                                                                                   |
+| p90-speed                                                                                     | 90th percentile for gusts (excludes the highest 10% outliers)                                                                                       |
+| wind-description                                                                              | Weather-style description using IQR                                                                                                                 |
 
 ### Example text-blocks yaml
 
