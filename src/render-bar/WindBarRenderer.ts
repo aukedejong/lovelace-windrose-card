@@ -151,7 +151,7 @@ export class WindBarRenderer {
                 if (index === 0) {
                     align = 'start';
                 }
-                const label = this.svgUtil.drawText2(segmentPosition.start, speedLabelY, segmentPosition.minSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", align));
+                const label = this.svgUtil.drawText2(segmentPosition.start, speedLabelY, Math.round(segmentPosition.minSpeed) + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", align));
                 this.windBarGroup.add(label);
             }
 
@@ -165,7 +165,7 @@ export class WindBarRenderer {
         //Last label if needed
         const lastSegment = segmentPositions[segmentPositions.length - 1];
         if (!this.windSpeedEntityConfig.speedRangeBeaufort && lastSegment.showLastLabel) {
-            const label = this.svgUtil.drawText2(lastSegment.end, speedLabelY, lastSegment.maxSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", "end"));
+            const label = this.svgUtil.drawText2(lastSegment.end, speedLabelY, Math.round(lastSegment.maxSpeed) + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", "end"));
             this.windBarGroup.add(label);
         }
         //Unit label
@@ -205,7 +205,7 @@ export class WindBarRenderer {
                 if (index === 0) {
                     baseline = 'start';
                 }
-                const label = this.svgUtil.drawText2(speedLabelX, segmentPosition.start, segmentPosition.minSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, baseline, "left"));
+                const label = this.svgUtil.drawText2(speedLabelX, segmentPosition.start, Math.round(segmentPosition.minSpeed) + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, baseline, "left"));
                 this.windBarGroup.add(label);
             }
 
@@ -222,7 +222,7 @@ export class WindBarRenderer {
         const lastSegment = segmentPositions[segmentPositions.length - 1];
         //Last label if needed
         if (!this.windSpeedEntityConfig.speedRangeBeaufort && lastSegment.showLastLabel) {
-            const label = this.svgUtil.drawText2(speedLabelX, lastSegment.end, lastSegment.maxSpeed + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", "left"))
+            const label = this.svgUtil.drawText2(speedLabelX, lastSegment.end, Math.round(lastSegment.maxSpeed) + '', TextAttributes.windBarAttribute(this.cardColors.barUnitValues, this.barSpeedTextSize, "hanging", "left"))
             this.windBarGroup.add(label);
         }
 

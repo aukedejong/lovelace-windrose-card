@@ -21,12 +21,12 @@ export class HAMeasurementProvider {
     }
 
     getMeasurements(): Promise<MeasurementHolder> {
-        const startTime = HAMeasurementProvider.calculateStartTime(this.dataPeriod);
+        const timeRange = HAMeasurementProvider.calculateTimeRange(this.dataPeriod);
 
         const requests = [];
-        requests.push(this.haWebservice.getMeasurementData(startTime, this.cardConfig.windDirectionEntity));
+        requests.push(this.haWebservice.getMeasurementData(timeRange.startTime, timeRange.endTime, this.cardConfig.windDirectionEntity));
         for (const windspeedEntity of this.cardConfig.windspeedEntities) {
-            requests.push(this.haWebservice.getMeasurementData(startTime, windspeedEntity));
+            requests.push(this.haWebservice.getMeasurementData(timeRange.startTime, timeRange.endTime, windspeedEntity));
         }
 
         return Promise.all(requests).then(results => {
@@ -67,20 +67,36 @@ export class HAMeasurementProvider {
         });
     }
 
-    private static calculateStartTime(dataPeriod: DataPeriod): Date {
-        const startTime = new Date();
-        if (dataPeriod.hourstoShow) {
+    private static calculateTimeRange(dataPeriod: DataPeriod): { startTime: Date, endTime: Date } {
+        const now = new Date();
+        let startTime: Date;
+        let endTime: Date;
+
+        if (dataPeriod.fromHoursAgo != null && dataPeriod.toHoursAgo != null) {
+            // Time window mode: from X hours ago to Y hours ago
+            startTime = new Date(now);
+            startTime.setHours(startTime.getHours() - dataPeriod.fromHoursAgo);
+            endTime = new Date(now);
+            endTime.setHours(endTime.getHours() - dataPeriod.toHoursAgo);
+        } else if (dataPeriod.hourstoShow) {
+            // Existing mode: last X hours up to now
+            startTime = new Date(now);
             startTime.setHours(startTime.getHours() - dataPeriod.hourstoShow);
+            endTime = now;
         } else if ((dataPeriod.fromHourOfDay && dataPeriod.fromHourOfDay > 0) || dataPeriod.fromHourOfDay === 0) {
+            // Existing mode: from hour of day up to now
+            startTime = new Date(now);
             if (startTime.getHours() < dataPeriod.fromHourOfDay) {
                 startTime.setDate(startTime.getDate() - 1);
             }
             startTime.setHours(dataPeriod.fromHourOfDay, 0, 0, 0);
+            endTime = now;
         } else {
             throw new Error("No data period config option available.");
         }
-        Log.info('Using start time for data query', startTime);
-        return startTime;
+        
+        Log.info('Using time range for data query', { startTime, endTime });
+        return { startTime, endTime };
     }
 
     private static parseHistoryMeasurements(historyData: HistoryData[], entity: string, attribute: string | undefined, numeric: boolean): Measurement[] {

@@ -163,7 +163,7 @@ export class WindRoseCard extends LitElement {
         if (textBlock === undefined || textBlock.text === '') {
             return html``;
         }
-        return html`<div id="text-block-${location}" class="text-block" style="color: ${textBlock.textColor}; font-size: ${textBlock.textSize}px"></div>`;
+        return html`<div id="text-block-${location}" class="text-block" style="color: ${textBlock.textColor}; font-size: ${textBlock.textSize}px; text-align: ${textBlock.textAlign}"></div>`;
     }
 
     firstUpdated(): void {
