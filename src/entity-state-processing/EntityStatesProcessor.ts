@@ -37,7 +37,7 @@ export class EntityStatesProcessor {
 
         this.windSpeedStates = [];
         this.cardConfig.windspeedEntities.forEach((windSpeedEntity, index) => {
-            this.windSpeedStates.push(new EntityState(windSpeedEntity.currentSpeedArrow, windSpeedEntity.entity, windSpeedEntity.attribute));
+            this.windSpeedStates.push(new EntityState(windSpeedEntity.currentSpeedArrow || this.cardConfig.currentDirection.showArrow, windSpeedEntity.entity, windSpeedEntity.attribute));
             this.windSpeedConverterFuncs.push(new WindSpeedConverter(SpeedUnits.getSpeedUnit(cardConfig.windspeedEntities[index].outputSpeedUnit))
                 .getSpeedConverterFunc(cardConfig.windspeedEntities[index].speedUnit));
         });
