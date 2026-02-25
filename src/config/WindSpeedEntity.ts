@@ -4,17 +4,16 @@ import {GlobalConfig} from "./GlobalConfig";
 import {CardConfigSpeedRange} from "../card/CardConfigSpeedRange";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
 import {DynamicSpeedRange} from "./DynamicSpeedRange";
-import {HARequestData} from "../measurement-provider/HARequestData";
 
-export class WindSpeedEntity implements HARequestData {
+export class WindSpeedEntity {
 
     constructor(
-        public readonly entity: string,
+        public entity: string,
         public readonly attribute: string | undefined,
         public readonly name: string,
         public readonly useStatistics: boolean,
         public readonly statisticsPeriod: string,
-        public readonly renderRelativeScale: boolean,
+        public readonly barRenderScale: string,
         public readonly windspeedBarFull: boolean,
         public speedUnit: string,
         public readonly outputSpeedUnit: string,
@@ -31,18 +30,19 @@ export class WindSpeedEntity implements HARequestData {
         public readonly barSpeedTextSize: number,
         public readonly barPercentageTextSize: number,
         public readonly compensationFactor: number,
-        public readonly compensationAbsolute: number
-    ) {}
+        public readonly compensationAbsolute: number,
+        public useForWindRose: boolean) {}
 
     static fromConfig(entityConfig: CardConfigWindSpeedEntity,
-                      parentEntityConfig: CardConfigWindSpeedEntity,
                       windspeedBarLocation: string): WindSpeedEntity {
 
+        this.checkDeprecations(entityConfig);
         const entity = entityConfig.entity;
         const name = entityConfig.name;
         const useStatistics = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.use_statistics);
         const inputSpeedUnit = this.checkInputSpeedUnit(entityConfig.speed_unit);
-        const renderRelativeScale = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.render_relative_scale);
+
+        const barRenderScale = this.checkBarRenderScale(entityConfig.bar_render_scale);
         const statsPeriod = ConfigCheckUtils.checkStatisticsPeriod(entityConfig.statistics_period);
         const currentSpeedArrow = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.current_speed_arrow);
         const currentSpeedArrowSize = ConfigCheckUtils.checkNummerOrDefault(entityConfig.current_speed_arrow_size, 40);
@@ -53,57 +53,24 @@ export class WindSpeedEntity implements HARequestData {
         const compensationFactor = ConfigCheckUtils.checkNummerOrDefault(entityConfig.speed_compensation_factor, 1);
         const compensationAbsolute = ConfigCheckUtils.checkNummerOrDefault(entityConfig.speed_compensation_absolute, 0);
 
-        let windspeedBarFull;
-        if (entityConfig.windspeed_bar_full === undefined) {
-            windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(parentEntityConfig.windspeed_bar_full);
-        } else {
-            windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.windspeed_bar_full);
-        }
-        let outputSpeedUnit;
-        if (entityConfig.output_speed_unit) {
-            outputSpeedUnit = this.checkOutputSpeedUnit(entityConfig.output_speed_unit);
-        } else {
-            outputSpeedUnit = this.checkOutputSpeedUnit(parentEntityConfig.output_speed_unit);
-        }
-        let outputSpeedUnitLabel;
-        if (entityConfig.output_speed_unit_label) {
-            outputSpeedUnitLabel = this.checkOutputSpeedUnitLabel(entityConfig.output_speed_unit_label);
-        } else {
-            outputSpeedUnitLabel = this.checkOutputSpeedUnitLabel(parentEntityConfig.output_speed_unit_label);
-        }
-        let speedRangeBeaufort;
-        if (entityConfig.speed_range_beaufort === undefined) {
-            speedRangeBeaufort = ConfigCheckUtils.checkBooleanDefaultTrue(parentEntityConfig.speed_range_beaufort);
-        } else {
-            speedRangeBeaufort = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.speed_range_beaufort);
-        }
-        let speedRangeStep;
-        if (entityConfig.speed_range_step) {
-            speedRangeStep = this.checkSpeedRangeStep(entityConfig.speed_range_step);
-        } else {
-            speedRangeStep =  this.checkSpeedRangeStep(parentEntityConfig.speed_range_step);
-        }
-        let speedRangeMax;
-        if (entityConfig.speed_range_max) {
-            speedRangeMax = this.checkSpeedRangeMax(entityConfig.speed_range_max);
-        } else {
-            speedRangeMax = this.checkSpeedRangeMax(parentEntityConfig.speed_range_max);
-        }
-        let speedRanges;
-        if (entityConfig.speed_ranges) {
-            speedRanges = this.checkSpeedRanges(entityConfig.speed_ranges);
-        } else {
-            speedRanges = this.checkSpeedRanges(parentEntityConfig.speed_ranges);
-        }
+        const windspeedBarFull = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.windspeed_bar_full);
+        const outputSpeedUnit = this.checkOutputSpeedUnit(entityConfig.output_speed_unit);
+        const outputSpeedUnitLabel = this.checkOutputSpeedUnitLabel(entityConfig.output_speed_unit_label);
+        const speedRangeBeaufort = ConfigCheckUtils.checkBooleanDefaultTrue(entityConfig.speed_range_beaufort);
+        const speedRangeStep = this.checkSpeedRangeStep(entityConfig.speed_range_step);
+        const speedRangeMax = this.checkSpeedRangeMax(entityConfig.speed_range_max);
+        const speedRanges = this.checkSpeedRanges(entityConfig.speed_ranges);
+        const useForWindRose = ConfigCheckUtils.checkBooleanDefaultFalse(entityConfig.use_for_windrose);
+
         const dynamicSpeedRanges = this.checkDynamicSpeedRanges(entityConfig.dynamic_speed_ranges);
         this.checkSpeedRangeCombi(speedRanges, speedRangeStep, speedRangeMax, dynamicSpeedRanges, speedRangeBeaufort);
         this.checkAttribuutStatsCombi(useStatistics, entityConfig.attribute);
 
-        return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, renderRelativeScale,
+        return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, barRenderScale,
             windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
             speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow, currentSpeedArrowSize,
             currentSpeedArrowLocation, barLabelTextSize, barSpeedTextSize, barPercentageTextSize, compensationFactor,
-            compensationAbsolute);
+            compensationAbsolute, useForWindRose);
     }
 
     private static checkInputSpeedUnit(inputSpeedUnit: string): string {
@@ -256,4 +223,27 @@ export class WindSpeedEntity implements HARequestData {
         return location;
     }
 
+    private static checkBarRenderScale(barRenderScale: string | undefined): string {
+        if (!barRenderScale) {
+            return 'windspeed_relative';
+        }
+        if (barRenderScale === 'absolute' || barRenderScale === 'windspeed_relative' || barRenderScale === 'percentage_relative') {
+            return barRenderScale;
+        }
+        throw new Error('WindRoseCard: render-scale should be absolute, windspeed_relative or percentage_relative');
+    }
+
+    private static checkDeprecations(entityConfig: CardConfigWindSpeedEntity) {
+        if (ConfigCheckUtils.checkHasProperty(entityConfig, 'render_relative_scale')) {
+            throw new Error('render_relative_scale option is renamed to bar_render_scale with options: absolute, windspeed_relative and percentage_relative')
+        }
+    }
+
+    public isAbsoluteRenderScale() {
+        return this.barRenderScale === 'absolute';
+    }
+
+    public isWindspeedRelativeScale() {
+        return this.barRenderScale === 'windspeed_relative';
+    }
 }

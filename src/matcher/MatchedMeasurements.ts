@@ -19,7 +19,6 @@ export class MatchedMeasurements {
         if (speed > this.maxSpeed) {
             this.maxSpeed = speed;
         }
-        console.log('First', this.firstDateTime, this.lastDateTime, time);
         if (time < this.firstDateTime) {
             this.firstDateTime = time;
         }
@@ -34,6 +33,9 @@ export class MatchedMeasurements {
     }
 
     getAverageSpeed(): number {
+        if (this.directionSpeeds.length === 0) {
+            return 0;
+        }
         return this.total / this.directionSpeeds.length;
     }
 

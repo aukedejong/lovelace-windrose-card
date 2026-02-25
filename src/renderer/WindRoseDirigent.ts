@@ -109,16 +109,16 @@ export class WindRoseDirigent {
             this.dimensionCalculator = new DimensionCalculatorBarBottom(cardConfig.directionLabels, cardConfig.windspeedEntities, cardConfig.cornersInfo, this.svgUtil);
         }
 
-        this.degreesCalculator = new DegreesCalculator(cardConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate,
+        this.degreesCalculator = new DegreesCalculator(cardConfig.roseConfig.windRoseDrawNorthOffset, cardConfig.compassConfig.autoRotate,
             cardConfig.compassConfig.asHeading, cardConfig.currentDirection.hideDirectionBelowSpeed);
 
         this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionCalculator, this.sendEvent, this.svgUtil);
 
-        if (this.cardConfig.centerCalmPercentage) {
-            this.percentageCalculator = new PercentageCalculatorCenterCalm();
+        if (this.cardConfig.roseConfig.centerCalmPercentage) {
+            this.percentageCalculator = new PercentageCalculatorCenterCalm(this.cardConfig.roseConfig);
             this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator);
         } else {
-            this.percentageCalculator = new PercentageCalculator();
+            this.percentageCalculator = new PercentageCalculator(this.cardConfig.roseConfig);
             this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator);
         }
         if (this.cardConfig.currentDirection.showArrow) {
@@ -141,18 +141,21 @@ export class WindRoseDirigent {
         this.windRoseData = [];
     }
 
-    refreshData(): Promise<boolean> {
+    refreshData(): Promise<MeasurementHolder> {
+        const activeSpeedEntityIndex = this.getActiveSpeedEntity();
         if (!this.initReady) {
             this.log.method('refreshData', 'not inited yet');
-            return Promise.resolve(false);
+            return Promise.reject();
         }
         this.log.method('refreshData', 'initReady', this.initReady);
         this.templateParser.clearValues();
+        this.templateParser.addPeriodData(this.cardConfig.activePeriod);
+        this.windRoseData = [];
 
         return this.measurementProvider.getMeasurements().then((measurementHolder: MeasurementHolder) => {
-            this.windRoseData = [];
+
             const matchedGroups = this.measurementMatcher.match(measurementHolder);
-            this.templateParser.addMatchedValues(matchedGroups[0]);
+            this.templateParser.addMatchedValues(matchedGroups[activeSpeedEntityIndex]);
             for (let i = 0; i < matchedGroups.length; i++) {
                 this.measurementCounters[i].init(this.cardConfig.windspeedEntities[i].speedUnit, matchedGroups[i].getAverageSpeed());
                 for (const measurement of matchedGroups[i].getMeasurements()) {
@@ -163,13 +166,13 @@ export class WindRoseDirigent {
                 this.windRoseData.push(windRoseData);
             }
             this.measurementsReady = true;
-            this.templateParser.addWindRoseDataValues(this.windRoseData[0]);
+            this.templateParser.addWindRoseDataValues(this.windRoseData[activeSpeedEntityIndex]);
             this.templateParser.addMeasurementValues(measurementHolder);
 
-            if (this.cardConfig.dataPeriod.logMeasurementCounts) {
-                console.log(`Measurements:\n${measurementHolder.getInfoText()}${matchedGroups[0].getInfo()} - strategy: ${this.cardConfig.matchingStrategy}`);
+            if (this.cardConfig.matchingStrategy.logMeasurementCounts) {
+                console.log(`Measurements:\n${measurementHolder.getInfoText()}${matchedGroups[activeSpeedEntityIndex].getInfo()} - strategy: ${this.cardConfig.matchingStrategy.name}`);
             }
-            return Promise.resolve(true);
+            return Promise.resolve(measurementHolder);
         });
     }
 
@@ -184,6 +187,7 @@ export class WindRoseDirigent {
     }
 
     renderGraphs(): void {
+        const activeSpeedEntityIndex = this.getActiveSpeedEntity();
         if (!this.initReady || !this.measurementsReady) {
             this.log.method("renderGraphs', 'Not ready yet " + this.initReady + " - "  + this.measurementsReady);
         }
@@ -197,7 +201,7 @@ export class WindRoseDirigent {
         setTimeout(() => {
             this.windRoseRenderer.removeGraphs();
             this.log.debug('renderGraphs()', this.svg, this.windRoseData, this.windBarRenderers);
-            this.windRoseRenderer.drawWindRose(this.windRoseData[0]);
+            this.windRoseRenderer.drawWindRose(this.windRoseData[activeSpeedEntityIndex]);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
             }
@@ -209,8 +213,8 @@ export class WindRoseDirigent {
             this.currentDirectionRenderer?.drawCurrentWindDirection(this.degreesCalculator.getWindDirectionRenderDegrees());
             this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
 
-            if (this.cardConfig.backgroundImage !== undefined && this.backgroundElement === undefined) {
-                this.backgroundElement = this.svg.image(this.cardConfig.backgroundImage)
+            if (this.cardConfig.roseConfig.backgroundImage !== undefined && this.backgroundElement === undefined) {
+                this.backgroundElement = this.svg.image(this.cardConfig.roseConfig.backgroundImage)
                     .size(1000, 1000)
                     .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
                     .back();
@@ -254,6 +258,10 @@ export class WindRoseDirigent {
 
     setTextBlocks(textBlockTop: HTMLDivElement, textBlockBottom: HTMLDivElement): void {
         this.htmlRenderer.setHtmlElements(textBlockTop, textBlockBottom);
+    }
+
+    private getActiveSpeedEntity() {
+        return this.cardConfig.windspeedEntities.findIndex(entityConfig => entityConfig.useForWindRose);
     }
 
 }

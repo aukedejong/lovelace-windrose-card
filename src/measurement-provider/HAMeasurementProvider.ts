@@ -1,102 +1,74 @@
 import {HAWebservice} from "./HAWebservice";
 import {MeasurementHolder} from "./MeasurementHolder";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {DataPeriod} from "../config/DataPeriod";
 import {Measurement} from "./Measurement";
 import {Log} from "../util/Log";
 import {WindDirectionEntity} from "../config/WindDirectionEntity";
+import {HARequestData} from "./HARequestData";
 
 export class HAMeasurementProvider {
 
     private readonly cardConfig: CardConfigWrapper;
-    private readonly dataPeriod: DataPeriod;
     private readonly directionEntity: WindDirectionEntity;
 
     constructor(private readonly haWebservice: HAWebservice,
                 cardConfig: CardConfigWrapper) {
 
         this.cardConfig = cardConfig;
-        this.dataPeriod = cardConfig.dataPeriod;
         this.directionEntity = cardConfig.windDirectionEntity;
     }
 
     getMeasurements(): Promise<MeasurementHolder> {
-        const timeRange = HAMeasurementProvider.calculateTimeRange(this.dataPeriod);
-
+        const activePeriod = this.cardConfig.activePeriod;
         const requests = [];
-        requests.push(this.haWebservice.getMeasurementData(timeRange.startTime, timeRange.endTime, this.cardConfig.windDirectionEntity));
+        const directionRequestData = HARequestData.fromWindDirectionEntity(this.cardConfig.windDirectionEntity, activePeriod);
+        const speedRequestDatas:  HARequestData[] = [];
+        requests.push(this.haWebservice.getMeasurementData(activePeriod.startTime, activePeriod.endTime, directionRequestData));
         for (const windspeedEntity of this.cardConfig.windspeedEntities) {
-            requests.push(this.haWebservice.getMeasurementData(timeRange.startTime, timeRange.endTime, windspeedEntity));
+            const haSpeedRequestdata = HARequestData.fromWindSpeedEntity(windspeedEntity, activePeriod);
+            speedRequestDatas.push(haSpeedRequestdata);
+            requests.push(this.haWebservice.getMeasurementData(activePeriod.startTime, activePeriod.endTime, haSpeedRequestdata));
         }
 
         return Promise.all(requests).then(results => {
             Log.debug('WebSocket results: ', results);
-
             const measurementHolder = new MeasurementHolder();
-            if (this.cardConfig.windDirectionEntity.useStatistics) {
-                measurementHolder.directionMeasurements = HAMeasurementProvider.parseStatsMeasurements(
-                    results[0][this.directionEntity.entity],
-                    this.directionEntity.entity,
-                    false);
-            } else {
-                measurementHolder.directionMeasurements = HAMeasurementProvider.parseHistoryMeasurements(
-                    results[0][this.directionEntity.entity],
-                    this.directionEntity.entity,
-                    this.directionEntity.attribute,
-                    false);
-                HAMeasurementProvider.sortAndFillEndTime(measurementHolder.directionMeasurements);
-            }
-
-            this.cardConfig.windspeedEntities.forEach((speedEntity, i) => {
-                if (speedEntity.useStatistics) {
-                    measurementHolder.addSpeedMeasurements(HAMeasurementProvider.parseStatsMeasurements(
-                        results[i + 1][speedEntity.entity],
-                        speedEntity.entity,
-                        true));
+            try {
+                if (directionRequestData.useStatistics) {
+                    measurementHolder.directionMeasurements = HAMeasurementProvider.parseStatsMeasurements(
+                        results[0][this.directionEntity.entity],
+                        this.directionEntity.entity,
+                        false);
                 } else {
-                    const measurements = HAMeasurementProvider.parseHistoryMeasurements(
-                        results[i + 1][speedEntity.entity],
-                        speedEntity.entity,
-                        speedEntity.attribute,
-                        true);
-                    HAMeasurementProvider.sortAndFillEndTime(measurements);
-                    measurementHolder.addSpeedMeasurements(measurements);
+                    measurementHolder.directionMeasurements = HAMeasurementProvider.parseHistoryMeasurements(
+                        results[0][this.directionEntity.entity],
+                        this.directionEntity.entity,
+                        this.directionEntity.attribute,
+                        false);
+                    HAMeasurementProvider.sortAndFillEndTime(measurementHolder.directionMeasurements);
                 }
-            });
+
+                speedRequestDatas.forEach((speedEntity, i) => {
+                    if (speedEntity.useStatistics) {
+                        measurementHolder.addSpeedMeasurements(HAMeasurementProvider.parseStatsMeasurements(
+                            results[i + 1][speedEntity.entity],
+                            speedEntity.entity,
+                            true));
+                    } else {
+                        const measurements = HAMeasurementProvider.parseHistoryMeasurements(
+                            results[i + 1][speedEntity.entity],
+                            speedEntity.entity,
+                            speedEntity.attribute,
+                            true);
+                        HAMeasurementProvider.sortAndFillEndTime(measurements);
+                        measurementHolder.addSpeedMeasurements(measurements);
+                    }
+                });
+            } catch(error: any) {
+                measurementHolder.setErrorState(error, this.cardConfig.windspeedEntities.length);
+            }
             return Promise.resolve(measurementHolder);
         });
-    }
-
-    private static calculateTimeRange(dataPeriod: DataPeriod): { startTime: Date, endTime: Date } {
-        const now = new Date();
-        let startTime: Date;
-        let endTime: Date;
-
-        if (dataPeriod.fromHoursAgo != null && dataPeriod.toHoursAgo != null) {
-            // Time window mode: from X hours ago to Y hours ago
-            startTime = new Date(now);
-            startTime.setHours(startTime.getHours() - dataPeriod.fromHoursAgo);
-            endTime = new Date(now);
-            endTime.setHours(endTime.getHours() - dataPeriod.toHoursAgo);
-        } else if (dataPeriod.hourstoShow) {
-            // Existing mode: last X hours up to now
-            startTime = new Date(now);
-            startTime.setHours(startTime.getHours() - dataPeriod.hourstoShow);
-            endTime = now;
-        } else if ((dataPeriod.fromHourOfDay && dataPeriod.fromHourOfDay > 0) || dataPeriod.fromHourOfDay === 0) {
-            // Existing mode: from hour of day up to now
-            startTime = new Date(now);
-            if (startTime.getHours() < dataPeriod.fromHourOfDay) {
-                startTime.setDate(startTime.getDate() - 1);
-            }
-            startTime.setHours(dataPeriod.fromHourOfDay, 0, 0, 0);
-            endTime = now;
-        } else {
-            throw new Error("No data period config option available.");
-        }
-        
-        Log.info('Using time range for data query', { startTime, endTime });
-        return { startTime, endTime };
     }
 
     private static parseHistoryMeasurements(historyData: HistoryData[], entity: string, attribute: string | undefined, numeric: boolean): Measurement[] {

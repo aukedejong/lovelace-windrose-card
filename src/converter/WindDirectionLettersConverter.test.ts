@@ -50,7 +50,7 @@ describe('WindDirectionLettersConverter tests', () => {
         describe('Test degrees letters to letters.', () => {
 
             test('Convert 354 degrees to letters', () => {
-                expect(windDirectionLettersConverter.convertToLetters(354)).toEqual('NXW');
+                expect(windDirectionLettersConverter.convertToLetters(354)).toEqual('N');
             });
 
             test('Convert 355 degrees to letters', () => {
@@ -70,11 +70,11 @@ describe('WindDirectionLettersConverter tests', () => {
             });
 
             test('Convert 6 degrees to letters', () => {
-                expect(windDirectionLettersConverter.convertToLetters(6)).toEqual('NXE');
+                expect(windDirectionLettersConverter.convertToLetters(6)).toEqual('N');
             });
 
             test('Convert 11 degrees to letters', () => {
-                expect(windDirectionLettersConverter.convertToLetters(6)).toEqual('NXE');
+                expect(windDirectionLettersConverter.convertToLetters(6)).toEqual('N');
             });
 
             test('Convert undefined degrees to letters', () => {

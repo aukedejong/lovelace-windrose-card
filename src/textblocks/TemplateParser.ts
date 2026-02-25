@@ -6,6 +6,7 @@ import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
 import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
 import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {EntityState} from "../entity-state-processing/EntityState";
+import {Period} from "../config/buttons/Period";
 
 export class TemplateParser {
 
@@ -17,21 +18,35 @@ export class TemplateParser {
         this.templateValues = [];
     }
 
+    public addPeriodData(period: Period): void {
+        this.addOrUpdateValue("start-time", period.startTime.toLocaleTimeString());
+        this.addOrUpdateValue("end-time", period.endTime.toLocaleTimeString());
+        this.addOrUpdateValue("start-date", period.startTime.toLocaleDateString());
+        this.addOrUpdateValue("end-date", period.endTime.toLocaleDateString());
+        const minutes = Math.round((period.endTime.getTime() - period.startTime.getTime()) / 60000)
+        this.addOrUpdateValue('period-hours', Math.round(minutes / 60));
+        this.addOrUpdateValue('period-minutes', minutes);
+    }
+
     public addWindRoseDataValues(windRoseData: WindRoseData): void {
         this.addOrUpdateValue("calm-percentage", Math.round(windRoseData.speedRangePercentages[0]));
     }
 
     public addMeasurementValues(measurementHolder: MeasurementHolder): void {
-        this.addOrUpdateValue("time-first-direction", MatchUtils.cleanTime(measurementHolder.directionMeasurements[0].startTime));
-        this.addOrUpdateValue("time-last-direction", MatchUtils.cleanTime(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
-        this.addOrUpdateValue("date-first-direction", MatchUtils.cleanDate(measurementHolder.directionMeasurements[0].startTime));
-        this.addOrUpdateValue("date-last-direction", MatchUtils.cleanDate(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
+        if (measurementHolder.directionMeasurements.length > 0) {
+            this.addOrUpdateValue("time-first-direction", MatchUtils.cleanTime(measurementHolder.directionMeasurements[0].startTime));
+            this.addOrUpdateValue("time-last-direction", MatchUtils.cleanTime(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
+            this.addOrUpdateValue("date-first-direction", MatchUtils.cleanDate(measurementHolder.directionMeasurements[0].startTime));
+            this.addOrUpdateValue("date-last-direction", MatchUtils.cleanDate(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
+        }
         this.addOrUpdateValue("direction-count", measurementHolder.directionMeasurements.length);
         measurementHolder.speedMeasurements.forEach((measurements: Measurement[], index: number) => {
-            this.addOrUpdateValue("time-first-speed-" + index, MatchUtils.cleanTime(measurements[0].startTime));
-            this.addOrUpdateValue("time-last-speed-" + index, MatchUtils.cleanTime(measurements[measurements.length - 1].startTime));
-            this.addOrUpdateValue("date-first-speed-" + index, MatchUtils.cleanDate(measurements[0].startTime));
-            this.addOrUpdateValue("date-last-speed-" + index, MatchUtils.cleanDate(measurements[measurements.length - 1].startTime));
+            if (measurements.length > 0) {
+                this.addOrUpdateValue("time-first-speed-" + index, MatchUtils.cleanTime(measurements[0].startTime));
+                this.addOrUpdateValue("time-last-speed-" + index, MatchUtils.cleanTime(measurements[measurements.length - 1].startTime));
+                this.addOrUpdateValue("date-first-speed-" + index, MatchUtils.cleanDate(measurements[0].startTime));
+                this.addOrUpdateValue("date-last-speed-" + index, MatchUtils.cleanDate(measurements[measurements.length - 1].startTime));
+            }
             this.addOrUpdateValue('speed-' + index  + '-count', measurements.length);
         });
     }
@@ -41,13 +56,18 @@ export class TemplateParser {
         this.addOrUpdateValue('min-speed', Math.round(matchedMeasurements.minSpeed));
         this.addOrUpdateValue('max-speed', Math.round(matchedMeasurements.maxSpeed));
         this.addOrUpdateValue('average-speed', Math.round(matchedMeasurements.getAverageSpeed()));
-        this.addOrUpdateValue('time-first-match', MatchUtils.cleanTime(matchedMeasurements.firstDateTime));
-        this.addOrUpdateValue('date-first-match', MatchUtils.cleanDate(matchedMeasurements.firstDateTime));
-        this.addOrUpdateValue('time-last-match', MatchUtils.cleanTime(matchedMeasurements.lastDateTime));
-        this.addOrUpdateValue('date-last-match', MatchUtils.cleanDate(matchedMeasurements.lastDateTime));
-        const minutes = Math.round((matchedMeasurements.lastDateTime - matchedMeasurements.firstDateTime) / 60)
-        this.addOrUpdateValue('period-hours', Math.round(minutes / 60));
-        this.addOrUpdateValue('period-minutes', minutes);
+        if (matchedMeasurements.getMeasurementCount() > 0) {
+            this.addOrUpdateValue('time-first-match', MatchUtils.cleanTime(matchedMeasurements.firstDateTime));
+            this.addOrUpdateValue('date-first-match', MatchUtils.cleanDate(matchedMeasurements.firstDateTime));
+            this.addOrUpdateValue('time-last-match', MatchUtils.cleanTime(matchedMeasurements.lastDateTime));
+            this.addOrUpdateValue('date-last-match', MatchUtils.cleanDate(matchedMeasurements.lastDateTime));
+            const minutes = Math.round((matchedMeasurements.lastDateTime - matchedMeasurements.firstDateTime) / 60)
+            this.addOrUpdateValue('match-period-hours', Math.round(minutes / 60));
+            this.addOrUpdateValue('match-period-minutes', minutes);
+        } else {
+            this.addOrUpdateValue('match-period-hours', 0);
+            this.addOrUpdateValue('match-period-minutes', 0);
+        }
         
         // Statistical wind measures for better weather reporting
         const speeds = matchedMeasurements.getMeasurements().map((m: any) => m.speed).sort((a: number, b: number) => a - b);
@@ -89,7 +109,6 @@ export class TemplateParser {
     }
 
     public addOrUpdateValue(name: string, value: string | number) {
-        console.log('Add template value: ', name, value);
         const templateValue = this.templateValues.find((value) => value.name === name);
         if (templateValue) {
             templateValue.value = value + '';
@@ -102,6 +121,11 @@ export class TemplateParser {
         this.templateValues.forEach(templateValue => {
             template = template.replace(templateValue.matchValue(), templateValue.value);
         });
+        // Removed left over placeholders.
+        const matches = Array.from(template.matchAll(/\$\{([^}]+)\}/g), m => m[0]);
+        for (let placeholder of matches) {
+            template = template.replace(placeholder, '');
+        }
         return template;
     }
 
@@ -111,7 +135,6 @@ export class TemplateParser {
         }
         const entityStates: EntityState[] = [];
         const matches = Array.from(template.matchAll(/\$\{([^}]+)\}/g), m => m[0]);
-        console.log('Matches: ', matches);
         for (let placeholder of matches) {
 
             let entity: string;

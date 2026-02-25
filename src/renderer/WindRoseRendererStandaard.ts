@@ -48,7 +48,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
         this.doAnimation = !config.disableAnimations;
-        this.legendTextSize = config.circleLegendTextSize;
+        this.legendTextSize = config.roseConfig.circleLegendTextSize;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.degreesCalculator = degreesCalculator;
@@ -56,7 +56,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         this.dimensionCalculator = imensionCalculator;
         this.windRoseRenderUtil = new WindRoseRenderUtil(config, this.dimensionCalculator, this.degreesCalculator, svg);
         this.roseCenter = this.dimensionCalculator.roseCenter();
-        this.leaveArc = this.windRoseRenderUtil.calcLeaveArc(config.windDirectionCount);
+        this.leaveArc = this.windRoseRenderUtil.calcLeaveArc(config.roseConfig.windDirectionCount);
         this.backgroundDrawn = false;
         this.roseDrawn = false;
     }

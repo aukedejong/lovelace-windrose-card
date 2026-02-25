@@ -53,9 +53,10 @@ export class FullTimeMatcher implements MatchStrategy {
             prevTds = tds;
         }
         if (prevTds) {
-            prevTds.seconds = (Date.now() / 1000) - prevTds.time;
+            mergedList.pop();
+            //prevTds.seconds = (Date.now() / 1000) - prevTds.time;
         }
-        if (mergedList[0].speed === undefined || mergedList[0].direction === undefined) {
+        if (mergedList.length > 0 && (mergedList[0].speed === undefined || mergedList[0].direction === undefined)) {
             mergedList.shift();
         }
         const matchedMeasurements = new MatchedMeasurements();

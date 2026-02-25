@@ -4,41 +4,41 @@ import {CardColors} from "./CardColors";
 import {Log} from "../util/Log";
 import {WindSpeedEntity} from "./WindSpeedEntity";
 import {WindDirectionEntity} from "./WindDirectionEntity";
-import {DataPeriod} from "./DataPeriod";
 import {CompassConfig} from "./CompassConfig";
 import {CurrentDirectionConfig} from "./CurrentDirectionConfig";
 import {CornersInfo} from "./CornersInfo";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
-import {CardConfigWindSpeedEntity} from "../card/CardConfigWindSpeedEntity";
 import {CardConfigActions} from "../card/CardConfigActions";
 import {DirectionLabels} from "./DirectionLabels";
 import {TextBlocks} from "./TextBlocks";
+import {ButtonsConfig} from "./buttons/ButtonsConfig";
+import {MatchingStrategy} from "./MatchingStrategy";
+import {Period} from "./buttons/Period";
+import {RoseConfig} from "./RoseConfig";
 
 
 export class CardConfigWrapper {
 
     title: string;
-    dataPeriod: DataPeriod;
+    dataPeriod: Period | undefined;
+    activePeriod: Period;
+    buttonsConfig: ButtonsConfig | undefined;
     refreshInterval: number;
     windDirectionEntity: WindDirectionEntity;
     windspeedEntities: WindSpeedEntity[];
     windspeedBarLocation: string;
     hideWindspeedBar: boolean;
-    centerCalmPercentage: boolean;
+    roseConfig: RoseConfig;
     directionLabels: DirectionLabels;
-    windDirectionCount: number;
-    windRoseDrawNorthOffset: number;
     currentDirection: CurrentDirectionConfig;
-    matchingStrategy: string;
+    matchingStrategy: MatchingStrategy;
     cardColor: CardColors;
     compassConfig: CompassConfig;
     cornersInfo: CornersInfo;
     textBlocks: TextBlocks;
-    backgroundImage: string | undefined;
     actions: CardConfigActions | undefined;
     cardWidth: number;
     disableAnimations: boolean;
-    circleLegendTextSize: number;
     logLevel: string;
 
     filterEntitiesQueryParameter: string;
@@ -49,71 +49,107 @@ export class CardConfigWrapper {
             data_period: {
                 hours_to_show: GlobalConfig.defaultHoursToShow
             },
+            rose_config: {
+                windrose_draw_north_offset: 0,
+                center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
+            },
             refresh_interval: GlobalConfig.defaultRefreshInterval,
-            windspeed_bar_location: GlobalConfig.defaultWindspeedBarLocation,
+            windspeed_bar_location: 'right',
             wind_direction_entity: {
-                entity: '',
+                entity: 'sensor.',
                 use_statistics: false,
                 direction_compensation: 0
             },
             windspeed_entities: [
                 {
-                    entity: '',
-                    name: '',
+                    entity: 'sensor.',
+                    name: 'Wind speed',
                     speed_unit: GlobalConfig.defaultInputSpeedUnit,
                     use_statistics: false,
                     windspeed_bar_full: GlobalConfig.defaultWindspeedBarFull,
                     output_speed_unit: GlobalConfig.defaultOutputSpeedUnit,
                     speed_range_beaufort: GlobalConfig.defaultSpeedRangeBeaufort,
-                    speed_range_step: undefined,
-                    speed_range_max: undefined,
-                    speed_ranges: undefined,
+                    current_speed_arrow: true
                 }
             ],
+            buttons_config: {
+                location: 'bottom',
+                buttons: [
+                    {
+                        type: 'period_selector',
+                        button_text: 'Today',
+                        preset_period: 'today'
+                    },
+                    {
+                        type: 'period_selector',
+                        button_text: 'Last 7 days',
+                        preset_period: 'last_7_days'
+                    },
+                    {
+                        type: 'period_selector',
+                        button_text: 'Last 30 days',
+                        preset_period: 'last_30_days',
+                        use_analytics: true,
+                        analytics_period: 'hour'
+                    }
+                ]
+            },
             direction_labels: {
                 cardinal_direction_letters: 'NESW'
             },
-            windrose_draw_north_offset: 0,
             current_direction: {
-                show_arrow: false,
-                arrow_size: 50,
-                center_circle_size: 30
+                show_arrow: true
             },
-            compass_direction: {
-                auto_rotate: false,
-                entity: ''
+            matching_strategy: {
+                name: GlobalConfig.defaultMatchingStategy
             },
-            cardinal_direction_letters: GlobalConfig.defaultCardinalDirectionLettersNotParsed,
-            matching_strategy: GlobalConfig.defaultMatchingStategy,
-            center_calm_percentage: GlobalConfig.defaultCenterCalmPercentage,
-            background_image: undefined,
+            corner_info: {
+                top_left: {
+                    label: "Wind direction",
+                    unit: " °",
+                    entity: 'sensor.',
+                 },
+                top_right: {
+                    label: "Wind speed",
+                    unit: " bft",
+                    entity: 'sensor.',
+                },
+            },
+            text_blocks: {
+                top: {
+                    text: `      <table>
+          <tr>
+              <td>Period:</td><td>\${start-date}, \${start-time} - \${end-date}, \${end-time}</td>
+          </tr>
+      </table>`
+                },
+            },
             log_level: GlobalConfig.defaultLogLevel
         };
     }
 
     constructor(private readonly cardConfig: CardConfig) {
         this.title = this.cardConfig.title;
-        this.dataPeriod = DataPeriod.fromConfig(cardConfig.hours_to_show, cardConfig.data_period);
-        this.refreshInterval = this.checkRefreshInterval();
+        this.checkDeprecations(cardConfig)
         this.windspeedBarLocation = this.checkWindspeedBarLocation();
+        this.dataPeriod = Period.fromConfig(cardConfig.data_period);
+        this.buttonsConfig = ButtonsConfig.fromConfig(cardConfig.buttons_config, this.windspeedBarLocation);
+        this.activePeriod = Period.determineActivePeriod(this.dataPeriod, this.buttonsConfig);
+        this.refreshInterval = this.checkRefreshInterval();
         this.windDirectionEntity = WindDirectionEntity.fromConfig(cardConfig.wind_direction_entity);
         this.windspeedEntities = this.checkWindspeedEntities();
-        this.windRoseDrawNorthOffset = this.checkWindRoseDrawNorthOffset();
-        this.centerCalmPercentage = ConfigCheckUtils.checkBooleanDefaultTrue(cardConfig.center_calm_percentage);
+        this.roseConfig = RoseConfig.fromConfig(cardConfig.rose_config);
         this.currentDirection = this.checkCurrentDirection()
         this.disableAnimations = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.disable_animations);
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
-        this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels, cardConfig.cardinal_direction_letters);
-        this.windDirectionCount = this.checkWindDirectionCount();
-        this.matchingStrategy = this.checkMatchingStrategy();
+        this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels);
+        this.matchingStrategy = MatchingStrategy.fromConfig(cardConfig.matching_strategy);
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.cardWidth = !cardConfig.card_width ? 4 : cardConfig.card_width;
         this.cardColor = CardColors.fromConfig(cardConfig.colors);
         this.compassConfig = CompassConfig.fromConfig(cardConfig.compass_direction);
         this.cornersInfo = CornersInfo.create(cardConfig.corner_info);
         this.textBlocks = TextBlocks.fromConfig(cardConfig.text_blocks);
-        this.backgroundImage = ConfigCheckUtils.checkString(cardConfig.background_image);
-        this.circleLegendTextSize = ConfigCheckUtils.checkNummerOrDefault(cardConfig.circle_legend_text_size, 30);
         this.logLevel = Log.checkLogLevel(this.cardConfig.log_level);
         this.actions = cardConfig.actions;
         Log.info('Config check OK');
@@ -138,7 +174,7 @@ export class CardConfigWrapper {
     private checkCurrentDirection(): CurrentDirectionConfig {
         if (this.cardConfig.current_direction) {
             let centerCircleSize;
-            if (this.centerCalmPercentage) {
+            if (this.roseConfig.centerCalmPercentage) {
                 centerCircleSize = GlobalConfig.defaultCurrentDirectionCircleSizeCenterCalm;
             } else {
                 centerCircleSize = ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize);
@@ -158,33 +194,13 @@ export class CardConfigWrapper {
             throw new Error('WindRoseCard: No windspeed_entities configured, minimal 1 needed.');
         }
         const entities:WindSpeedEntity[] = [];
-        const parentWindSpeedConfig = {
-            entity: '',
-            name: '',
-            use_statistics: false,
-            render_relative_scale: false,
-            windspeed_bar_full: this.cardConfig.windspeed_bar_full,
-            speed_unit: '',
-            output_speed_unit: this.cardConfig.output_speed_unit,
-            output_speed_unit_label: this.cardConfig.output_speed_unit_label,
-            speed_range_beaufort: this.cardConfig.speed_range_beaufort,
-            speed_range_step: this.cardConfig.speed_range_step,
-            speed_range_max: this.cardConfig.speed_range_max,
-            speed_ranges: this.cardConfig.speed_ranges
-        } as CardConfigWindSpeedEntity;
         for (const entityConfig of this.cardConfig.windspeed_entities) {
-            entities.push(WindSpeedEntity.fromConfig(entityConfig, parentWindSpeedConfig, this.windspeedBarLocation))
+            entities.push(WindSpeedEntity.fromConfig(entityConfig, this.windspeedBarLocation))
+        }
+        if (entities.findIndex(entityConfig => entityConfig.useForWindRose) === -1) {
+            entities[0].useForWindRose = true;
         }
         return entities;
-    }
-
-    private checkWindRoseDrawNorthOffset(): number {
-        if (this.cardConfig.windrose_draw_north_offset && isNaN(this.cardConfig.windrose_draw_north_offset)) {
-            throw new Error('WindRoseCard: Invalid render direction offset, should be a number in degress between 0 and 360.');
-        } else if (this.cardConfig.windrose_draw_north_offset) {
-            return this.cardConfig.windrose_draw_north_offset;
-        }
-        return 0;
     }
 
     private checkWindspeedBarLocation(): string {
@@ -198,32 +214,72 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultWindspeedBarLocation;
     }
 
-    private checkWindDirectionCount(): number {
-        if (this.cardConfig.wind_direction_count) {
-            if (isNaN(this.cardConfig.wind_direction_count) || this.cardConfig.wind_direction_count < 4 ||
-                    this.cardConfig.wind_direction_count > 32) {
-                throw new Error("Wind direction count can a number between 4 and 32");
-            }
-            return this.cardConfig.wind_direction_count;
-        }
-        return GlobalConfig.defaultWindDirectionCount;
-    }
-
-    private checkMatchingStrategy(): string {
-        if (this.cardConfig.matching_strategy) {
-            if (this.cardConfig.matching_strategy !== 'direction-first' && this.cardConfig.matching_strategy !== 'speed-first'
-                && this.cardConfig.matching_strategy !== 'time-frame' && this.cardConfig.matching_strategy !== 'full-time') {
-                throw new Error('Invalid matching stategy ' + this.cardConfig.matching_strategy +
-                    '. Valid options: direction-first, speed-first, time-frame and full-time');
-            }
-            return this.cardConfig.matching_strategy;
-        }
-        return GlobalConfig.defaultMatchingStategy;
-    }
-
     private createEntitiesQueryParameter() {
         return this.windDirectionEntity + ',' + this.windspeedEntities
             .map(config => config.entity)
             .join(',');
+    }
+
+    private checkDeprecations(cardConfig: CardConfig) {
+        //Not supported
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'max_width')) {
+            throw new Error('max_width option not supported anymore, since using vector graphics.')
+        }
+
+        //To data_period
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'hours_to_show')) {
+            throw new Error('hours_to_show option on root level is moved to data_period object.')
+        }
+
+        //To windspeed_entities
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'windspeed_bar_full')) {
+            throw new Error('windspeed_bar_full option on root level is moved to windspeed_entities object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'output_speed_unit')) {
+            throw new Error('output_speed_unit option on root level is moved to windspeed_entities object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'output_speed_unit_label')) {
+            throw new Error('output_speed_unit_label option on root level is moved to windspeed_entities object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'speed_range_beaufort')) {
+            throw new Error('speed_range_beaufort option on root level is moved to windspeed_entities object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'speed_range_step')) {
+            throw new Error('speed_range_step option on root level is moved to windspeed_entities object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'speed_range_max')) {
+            throw new Error('speed_range_max option on root level is moved to windspeed_entities object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'speed_ranges')) {
+            throw new Error('speed_ranges option on root level is moved to windspeed_entities object.')
+        }
+
+        //To direction_labels
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'cardinal_direction_letters')) {
+            throw new Error('cardinal_direction_letters option on root level is moved to direction_labels object.')
+        }
+
+        //To rose_config
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'wind_direction_count')) {
+            throw new Error('wind_direction_count option on root level is moved to rose_config object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'background_image')) {
+            throw new Error('background_image option on root level is moved to rose_config object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'circle_legend_text_size')) {
+            throw new Error('circle_legend_text_size option on root level is moved to rose_config object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'windrose_draw_north_offset')) {
+            throw new Error('windrose_draw_north_offset option on root level is moved to rose_config object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'center_calm_percentage')) {
+            throw new Error('center_calm_percentage option on root level is moved to rose_config object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'cirlce_count')) {
+            throw new Error('cirlce_count option on root level is moved to rose_config object.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'outer_circle_percentage')) {
+            throw new Error('outer_circle_percentage option on root level is moved to rose_config object.')
+        }
     }
 }

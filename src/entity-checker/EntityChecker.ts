@@ -41,7 +41,7 @@ export class EntityChecker {
         }
         speedUnit = speedUnit?.toLowerCase();
         if (new WindSpeedConvertFunctionFactory().speedUnitRecognized(speedUnit)) {
-            Log.info(`Recognized spped unit ${speedUnit} for entity ${entity.entity}`);
+            Log.info(`Recognized speed unit ${speedUnit} for entity ${entity.entity}`);
             return speedUnit;
         }
         throw new Error(`Entity ${entity.entity} speed unit (${speedUnit}) could not be auto determined, please configure the unit.`)

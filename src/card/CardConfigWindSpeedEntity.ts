@@ -7,9 +7,9 @@ export interface CardConfigWindSpeedEntity {
     name: string;
     use_statistics: boolean;
     statistics_period: string;
-    render_relative_scale: boolean;
     windspeed_bar_full: boolean;
     speed_unit: string;
+    use_for_windrose: boolean;
 
     output_speed_unit: string;
     output_speed_unit_label: string;
@@ -22,6 +22,7 @@ export interface CardConfigWindSpeedEntity {
     current_speed_arrow_size: number;
     current_speed_arrow_location: string;
 
+    bar_render_scale: string;
     bar_label_text_size: number;
     bar_speed_text_size: number;
     bar_percentage_text_size: number;

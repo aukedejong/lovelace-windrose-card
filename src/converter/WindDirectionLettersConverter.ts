@@ -81,12 +81,12 @@ export class WindDirectionLettersConverter {
             Log.warn('Can not convert wind direction to cardinal letters, direction: ', direction);
             return 'CALM';
         }
-        let deling = 11.25 //DefaultLetters is 5
+        let deling =  22.5 //DefaultLetters is 4
         if (this.windDirectionLetters) {
             deling = this.windDirectionLetters.length === 5 ? 11.25 : 22.5;
         }
         let index = Math.round(+direction / deling);
-        if (this.windDirectionLetters?.length === 4) {
+        if (!this.windDirectionLetters || this.windDirectionLetters.length === 4) {
             index = index * 2;
         }
         if (index === 32) {

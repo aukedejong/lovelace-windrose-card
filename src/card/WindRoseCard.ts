@@ -12,9 +12,14 @@ import {Log2} from "../util/Log2";
 import {HAMeasurementProvider} from "../measurement-provider/HAMeasurementProvider";
 import {HAWebservice} from "../measurement-provider/HAWebservice";
 import {repeat} from 'lit/directives/repeat.js';
-import {Button} from "../config/Button";
-import {PeriodSelector} from "../config/PeriodSelector";
 import {TextBlock} from "../config/TextBlock";
+import {ButtonsConfig} from "../config/buttons/ButtonsConfig";
+import {PeriodSelectorButton} from "../config/buttons/types/PeriodSelectorButton";
+import {ButtonInterface} from "../config/buttons/ButtonInterface";
+import {PeriodShiftButton} from "../config/buttons/types/PeriodShiftButton";
+import {WindRoseSpeedSelectButton} from "../config/buttons/types/WindRoseSpeedSelectButton";
+import {PeriodShiftPlayButton} from "../config/buttons/types/PeriodShiftPlayButton";
+import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -25,7 +30,7 @@ import {TextBlock} from "../config/TextBlock";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 1.26.1 `,
+    `%c  WINROSE-CARD  %c Version 2.0.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -52,7 +57,7 @@ export class WindRoseCard extends LitElement {
     config!: CardConfig;
     refreshCardConfigOnHass = false;
     cardConfig!: CardConfigWrapper;
-    updateInterval: NodeJS.Timer | undefined;
+    updateInterval: NodeJS.Timeout | undefined;
     _hass!: HomeAssistant;
     svg: Svg;
     warningMessage: string = '';
@@ -123,21 +128,21 @@ export class WindRoseCard extends LitElement {
             <ha-card header="${this.cardConfig?.title}">
                 <div class="card-content">
                     <div id="error-container">${this.errorMessage}</div>
-                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'top')}
+                    ${this.renderButtons(this.cardConfig.buttonsConfig, 'top')}
                     ${this.renderTextBlock(this.cardConfig.textBlocks.top, 'top')}
-                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'top-below-text')}
+                    ${this.renderButtons(this.cardConfig.buttonsConfig, 'top-below-text')}
                     <div id="svg-container"></div>
-                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'bottom-above-text')}
+                    ${this.renderButtons(this.cardConfig.buttonsConfig, 'bottom-above-text')}
                     ${this.renderTextBlock(this.cardConfig.textBlocks.bottom, 'bottom')}
-                    ${this.renderPeriodSelector(this.cardConfig.dataPeriod.periodSelector, 'bottom')}
+                    ${this.renderButtons(this.cardConfig.buttonsConfig, 'bottom')}
                 </div>
             </ha-card>
         `;
     }
 
-    renderPeriodSelector(periodSelector: PeriodSelector | undefined, location: string): TemplateResult {
-        this.log.method('renderPeriodSelector', periodSelector, location);
-        if (periodSelector === undefined || periodSelector.location !== location) {
+    renderButtons(buttonsConfig: ButtonsConfig | undefined, location: string): TemplateResult {
+        this.log.method('renderButtons', buttonsConfig, location);
+        if (buttonsConfig === undefined || buttonsConfig.location !== location) {
             return html``;
         }
         const blendMode = this.cardConfig.cardColor.rosePercentages === 'auto' ? 'difference': 'normal';
@@ -148,15 +153,72 @@ export class WindRoseCard extends LitElement {
                 }
             </style>
             <div id="period-selector" class="${location}">
-                ${repeat(periodSelector.buttons, (button) => button.hours, (button, index) =>
-                        html`<div id="period-${index}" 
-                                  @click="${this.updatePeriodFunc(button)}" 
-                                  class="${button.active ? 'active' : ''}" 
-                                  style="color: ${button.active ? periodSelector.activeColor: periodSelector.color}; background-color: ${button.active ? periodSelector.activeBgColor : periodSelector.bgColor}">
-                            ${button.title}
-                        </div>`)}
+                ${repeat(buttonsConfig.buttons, (button) => button.baseConfig.buttonText, (button, index) =>
+                    html`<div id="period-${index}" 
+                                          @click="${this.handleButtonClickFunc(button)}" 
+                                          class="${button.baseConfig.active ? 'active' : ''}" 
+                                          style="${button.baseConfig.buttonColors.getCss(button.baseConfig.active)}">
+                                    ${button.baseConfig.buttonText}
+                    </div>`)}
             </div>
         `;
+    }
+
+    handleButtonClickFunc(button: ButtonInterface): () => void {
+        if (button instanceof PeriodSelectorButton) {
+            return () => {
+                this.log.method('updatePeriod', button.period.hoursToShow);
+                this.cardConfig.buttonsConfig?.disablePeriodSelectors();
+                this.cardConfig.buttonsConfig?.undoPausedPlays();
+                button.baseConfig.active = true;
+                this.cardConfig.activePeriod = button.period.clone();
+                this.refreshMeasurements(true);
+            }
+        } else if (button instanceof PeriodShiftButton) {
+            return () => {
+                this.log.method('periodShiftButton');
+                this.cardConfig.buttonsConfig?.disablePeriodSelectors();
+                this.cardConfig.buttonsConfig?.undoPausedPlays();
+                const moved = this.cardConfig.activePeriod.movePeriod(button.hours);
+                if (moved) {
+                    this.cardConfig.buttonsConfig?.disablePeriodSelectors();
+                    button.baseConfig.active = true;
+                    this.refreshMeasurements(true);
+                    setTimeout(() => {
+                        button.baseConfig.active = false;
+                        this.requestUpdate();
+                    }, 150)
+                }
+            }
+        } else if (button instanceof PeriodShiftPlayButton) {
+            return () => {
+                if (button.baseConfig.active) {
+                    button.baseConfig.active = false;
+                    button.paused = true;
+                    this.requestUpdate();
+                } else {
+                    this.cardConfig.buttonsConfig?.disablePeriodSelectors();
+                    button.baseConfig.active = true;
+                    if (!button.paused) {
+                        this.cardConfig.activePeriod = button.getFirstPeriod();
+                    }
+                    button.paused = false;
+                    this.refreshMeasurementsPlay(button);
+                }
+            }
+        } else if (button instanceof WindRoseSpeedSelectButton) {
+            return () => {
+                this.log.method('windRoseSpeedSelectButton', button.index);
+                this.cardConfig.buttonsConfig?.disableWindRoseSpeedSelectors();
+                button.baseConfig.active = true;
+                this.cardConfig.windspeedEntities.forEach(entityConfig => entityConfig.useForWindRose = false);
+                this.cardConfig.windspeedEntities[button.index].useForWindRose = true;
+                this.refreshMeasurements(true);
+            }
+        }
+        return () => {
+            this.log.warn('NOOP button: ', button.baseConfig.buttonText);
+        }
     }
 
     renderTextBlock(textBlock: TextBlock | undefined, location: string): TemplateResult {
@@ -267,28 +329,37 @@ export class WindRoseCard extends LitElement {
         };
     }
 
-    updatePeriodFunc(period: Button): () => void {
-        this.log.method('updatePeriodFunc', period);
-        return () => {
-            this.log.method('updatePeriod', period);
-            this.cardConfig.dataPeriod.periodSelector?.buttons.forEach((period) => period.active = false);
-            period.active = true;
-            this.cardConfig.dataPeriod.hourstoShow = period.hours;
-            this.refreshMeasurements(true);
-        }
-    }
-
     refreshMeasurements(requestUpdate: boolean = false): void {
         this.log.method('refreshMeasurements');
-        this.windRoseDirigent.refreshData().then((refresh: boolean) => {
+        this.errorMessage = '';
+        this.windRoseDirigent.refreshData().then((measurementHolder: MeasurementHolder) => {
             this.log.debug('refreshData() ready, requesting update.');
-            if (refresh) {
-                this.windRoseDirigent.renderGraphs();
-                this.windRoseDirigent.updateStateRender();
-                if (requestUpdate) {
+            this.windRoseDirigent.renderGraphs();
+            this.windRoseDirigent.updateStateRender();
+            this.errorMessage = measurementHolder?.error?.message;
+            if (requestUpdate) {
+                this.requestUpdate();
+            }
+        });
+    }
+
+    refreshMeasurementsPlay(playButton: PeriodShiftPlayButton): void {
+        this.windRoseDirigent.refreshData().then((measurementHolder: MeasurementHolder) => {
+            this.log.debug('refreshData() ready requesting update.');
+            this.windRoseDirigent.renderGraphs();
+            this.windRoseDirigent.updateStateRender();
+            this.errorMessage = measurementHolder?.error?.message;
+            this.requestUpdate();
+            setTimeout(() => {
+                const moved = this.cardConfig.activePeriod.movePeriod(playButton.stepHours);
+                if (playButton.baseConfig.active && moved && this.cardConfig.activePeriod.endTime <= playButton.period.endTime) {
+                    this.refreshMeasurementsPlay(playButton);
+                } else if (playButton.baseConfig.active) {
+                    playButton.paused = false;
+                    playButton.baseConfig.active = false;
                     this.requestUpdate();
                 }
-            }
+            }, playButton.delay);
         });
     }
 

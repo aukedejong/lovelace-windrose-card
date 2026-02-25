@@ -16,9 +16,23 @@ export class ConfigCheckUtils {
         return +number;
     }
 
+    public static checkNumber(name: string, number: string | number | undefined): number {
+        if (number === null || number === undefined || isNaN(+number as any)) {
+            throw new Error(`Cnofiguration ${name} is not a number: ` + number);
+        }
+        return +number;
+    }
+
     public static checkBooleanDefaultFalse(value: boolean | undefined): boolean {
         if (value === undefined || value === null) {
             return false;
+        }
+        return value;
+    }
+
+    public static checkBooleanDefaultUndefined(value: boolean | undefined): boolean | undefined{
+        if (value === undefined || value === null) {
+            return undefined;
         }
         return value;
     }
@@ -51,6 +65,23 @@ export class ConfigCheckUtils {
             return period;
         }
         throw new Error(`statistics_period ${period} is invalid, should be one of 5minute, hour, day, week, month, year`);
+    }
+
+    public static checkDateString(date: string): boolean {
+        // const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+        //
+        // if (!isoRegex.test(date)) {
+        //     return false;
+        // }
+
+        const parsedDate = new Date(date);
+        return !isNaN(parsedDate.getTime());
+    }
+
+    public static checkHasProperty(obj: unknown, property: string): boolean {
+        return typeof obj === "object" &&
+            obj !== null &&
+            property in obj;
     }
 
 }

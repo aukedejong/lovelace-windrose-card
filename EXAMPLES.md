@@ -1,6 +1,7 @@
 # Lovelace Windrose card 
 ## Configuration examples
 
+## Minimal card
 <img alt="Example for config yaml" float="right" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/minimal-right.png?raw=true" width="482"/>
 
 ```yaml
@@ -20,30 +21,28 @@ current_direction:
   show_arrow: true
 ```
 
-
+## Wind period selectors and corner info
 <img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/maximal-bottom-button.png?raw=true" width="482"/>
 
 ```yaml
 type: custom:windrose-card
 title: Wind direction
-data_period:
-  xhours_to_show: 200
-  period_selector:
-    location: top
-    xactive_color: black
-    xactive_bg_color: null
-    xcolor: red
-    xbg_color: black
-    buttons:
-      - hours: 1
-        title: 1 hour
-      - hours: 8
-        title: 8 hours
-      - hours: 24
-        title: 1 day
-        active: true
-      - hours: 240
-        title: 10 days
+buttons_config:
+  location: top
+  buttons:
+    - type: period_selector
+      button_text: 1 hour
+      hours_to_show: 1
+    - type: period_selector
+      button_text: 8 hours
+      hours_to_show: 8
+    - type: period_selector
+      active: true
+      button_text: 1 day
+      hours_to_show: 24
+    - type: period_selector
+      button_text: 10 days
+      hours_to_show: 240
 refresh_interval: 300
 windspeed_bar_location: bottom
 wind_direction_entity:
@@ -99,33 +98,30 @@ direction_labels:
   secondary_intercardinal_directions_text_size: 30
 ```
 
+## Text with stats and dates.
 <img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/maximal-right-button-stats.png?raw=true" width="482"/>
 
 ```yaml
 type: custom:windrose-card
 title: Wind direction
-data_period:
-  xhours_to_show: 250
-  period_selector:
-    location: bottom
-    xactive_color: black
-    xactive_bg_color: null
-    xcolor: red
-    xbg_color: black
-    buttons:
-      - hours: 1
-        title: 1 hour
-      - hours: 8
-        title: 8 hours
-      - hours: 24
-        title: 1 day
-        active: true
-      - hours: 240
-        title: 10 days
 refresh_interval: 300
 windspeed_bar_location: right
-circle_legend_text_size: 30
-background_image: /hacsfiles/lovelace-windrose-card/bg.png
+buttons_config:
+  location: bottom
+  buttons:
+    - type: period_selector
+      button_text: 1 hour
+      hours_to_show: 1
+    - type: period_selector
+      button_text: 8 hours
+      hours_to_show: 8
+    - type: period_selector
+      active: true
+      button_text: 1 day
+      hours_to_show: 24
+    - type: period_selector
+      button_text: 10 days
+      hours_to_show: 240
 wind_direction_entity:
   entity: sensor.wind_direction_azimuth
   use_statistics: false
@@ -203,13 +199,6 @@ text_blocks:
       </table>
     text_color: gray
     text_size: 14
-  xbottom:
-    text: |-
-      Direction measurements ${direction-count}<br/>
-      Speed measurements ${speed-1-count}
-    text_color: gray
-    text_size: 16
-windrose_draw_north_offset: 0
 current_direction:
   show_arrow: true
   hide_direction_below_speed: 2
@@ -230,31 +219,33 @@ corner_info:
     label: Compass
     unit: °
     entity: input_number.compass
-cardinal_direction_letters: NESW
-matching_strategy: full-time
-center_calm_percentage: true
+matching_strategy:
+  name: full-time
+rose_config:
+  center_calm_percentage: true
+  cardinal_direction_letters: NOZW
+  circle_legend_text_size: 30
+  windrose_draw_north_offset: 0
+  background_image: /hacsfiles/lovelace-windrose-card/bg.png
 direction_labels:
-  cardinal_direction_letters: NESW
+  cardinal_direction_letters: NEZW
   show_cardinal_directions: true
   show_intercardinal_directions: true
   show_secondary_intercardinal_directions: true
   cardinal_directions_text_size: 60
   intercardinal_directions_text_size: 45
   secondary_intercardinal_directions_text_size: 30
-colors:
-  rose_percentages: auto
-
 ```
 
+## Color options and custom direction labels
 <img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/max-colors-bottom-compass.png?raw=true" width="482"/>
 
 ```yaml
 type: custom:windrose-card
-xtitle: Maximum configuration
-data_period:
-  hours_to_show: 200
 refresh_interval: 300
 windspeed_bar_location: bottom
+data_period:
+  hours_to_show: 200
 wind_direction_entity:
   entity: sensor.wind_direction
   use_statistics: false
@@ -286,7 +277,10 @@ windspeed_entities:
         color: orange
       - from_value: 15
         color: red
-windrose_draw_north_offset: 10
+rose_config:
+  windrose_draw_north_offset: 10
+  center_calm_percentage: true
+  background_image: /hacsfiles/lovelace-windrose-card/bg.png
 current_direction:
   show_arrow: true
   arrow_size: 50
@@ -372,9 +366,8 @@ direction_labels:
     wsw: "N"
     wnw: O
     nnw: P
-matching_strategy: full-time
-center_calm_percentage: true
-background_image: /hacsfiles/lovelace-windrose-card/bg.png
+matching_strategy:
+  name: full-time
 colors:
   rose_lines: rgb(0,255,0)
   rose_direction_letters: yellow
@@ -386,5 +379,4 @@ colors:
   bar_name: yellow
   bar_unit_values: blue
   bar_percentages: auto
-
 ```

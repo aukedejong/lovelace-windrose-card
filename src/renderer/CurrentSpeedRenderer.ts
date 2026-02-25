@@ -58,10 +58,12 @@ export class CurrentSpeedRenderer {
         const segmentCount = WindBarRangeCalcUtil.determineSegmentCount(windBarData.speedRangePercentages, this.windSpeedEntityConfig.windspeedBarFull);
         let barStart = this.dimensionCalculator.barStart();
         let barLength = this.dimensionCalculator.barLength();
-        if (this.windSpeedEntityConfig.renderRelativeScale) {
+        if (this.windSpeedEntityConfig.isWindspeedRelativeScale()) {
             this.segmentPositions = WindBarRangeCalcUtil.calcRelativeSegments(this.speedRangeService.getSpeedRanges(), barStart, barLength, this.positionMinus, segmentCount);
-        } else {
+        } else if (this.windSpeedEntityConfig.isAbsoluteRenderScale()) {
             this.segmentPositions = WindBarRangeCalcUtil.calcFixedSizeSegments(this.speedRangeService.getSpeedRanges(), barStart, barLength, this.positionMinus, segmentCount);
+        } else {
+            this.segmentPositions = WindBarRangeCalcUtil.calcPercentageSegments(this.speedRangeService.getSpeedRanges(), barStart, barLength, this.positionMinus, segmentCount, []);
         }
         this.initDone = true;
 

@@ -85,10 +85,12 @@ export class WindBarRenderer {
         let barLength = this.dimensionCalculator.barLength();
         const positionMinus = this.config.windspeedBarLocation !== 'bottom';
 
-        if (this.windSpeedEntityConfig.renderRelativeScale) {
+        if (this.windSpeedEntityConfig.isWindspeedRelativeScale()) {
             segmentPositions = WindBarRangeCalcUtil.calcRelativeSegments(this.speedRanges, barStart, barLength, positionMinus, segmentCount);
-        } else {
+        } else if (this.windSpeedEntityConfig.isAbsoluteRenderScale()) {
             segmentPositions = WindBarRangeCalcUtil.calcFixedSizeSegments(this.speedRanges, barStart, barLength, positionMinus, segmentCount);
+        } else {
+            segmentPositions = WindBarRangeCalcUtil.calcPercentageSegments(this.speedRanges, barStart, barLength, positionMinus, segmentCount, windBarData.speedRangePercentages);
         }
 
         if (this.windBarGroup) {

@@ -1,8 +1,11 @@
 import {WindCounts} from "../counter/WindCounts";
 import {Log} from "../util/Log";
 import {WindRoseData} from "./WindRoseData";
+import {RoseConfig} from "../config/RoseConfig";
 
 export class PercentageCalculator {
+
+    constructor(private roseConfig: RoseConfig) {}
 
     calculate(windCounts: WindCounts): WindRoseData {
         const maxDirectionTotal = Math.max(...windCounts.directionTotals);
@@ -21,7 +24,12 @@ export class PercentageCalculator {
         const directionDegrees: number[] = windCounts.speedRangeDegrees;
         Log.trace("Direction degrees:", directionDegrees);
 
-        const circleData = this.calculateCirclePercentages(maxDirectionTotal, windCounts.total);
+        let circleData: number[];
+        if (this.roseConfig.circleCount && this.roseConfig.outerCirclePercentage) {
+            circleData = this.roseConfig.circleLegendConfig();
+        } else {
+            circleData = this.calculateCirclePercentages(maxDirectionTotal, windCounts.total);
+        }
         Log.trace("Number of circles:", circleData[0]);
         Log.trace("Percentage per circle:", circleData[1]);
         Log.trace("Max circle percentage:", circleData[2]);
@@ -32,9 +40,13 @@ export class PercentageCalculator {
 
     private calculateSpeedRangePercentages(speedRangeCounts: number[], total: number): number[] {
         const onePercent = total / 100;
-        const speedRangePercentages: number[] = [];
-        for (const speedRangeCount of speedRangeCounts) {
-            speedRangePercentages.push(speedRangeCount / onePercent);
+        let speedRangePercentages: number[] = [];
+        if (onePercent > 0) {
+            for (const speedRangeCount of speedRangeCounts) {
+                speedRangePercentages.push(speedRangeCount / onePercent);
+            }
+        } else {
+            speedRangePercentages = new Array(speedRangeCounts.length).fill(0);
         }
         return speedRangePercentages;
     }
@@ -58,10 +70,13 @@ export class PercentageCalculator {
 
     private calculateDirectionPercentages(directionTotals: number[], total: number): number[] {
         const onePercTotal = total / 100;
-        const directionPercentages: number[] = [];
-        for (const directionTotal of directionTotals) {
-            ;
-            directionPercentages.push(directionTotal / onePercTotal);
+        let directionPercentages: number[] = [];
+        if (onePercTotal > 0) {
+            for (const directionTotal of directionTotals) {
+                directionPercentages.push(directionTotal / onePercTotal);
+            }
+        } else {
+            directionPercentages = new Array(directionTotals.length).fill(0);
         }
         return directionPercentages
     }

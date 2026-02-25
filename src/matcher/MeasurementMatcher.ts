@@ -14,13 +14,13 @@ export class MeasurementMatcher {
 
     constructor(private readonly cardConfig: CardConfigWrapper) {
 
-        if (this.cardConfig.matchingStrategy === 'speed-first') {
+        if (this.cardConfig.matchingStrategy.name === 'speed-first') {
             this.matcher = new SpeedFirstMatcher();
-        } else if (this.cardConfig.matchingStrategy === 'direction-first') {
+        } else if (this.cardConfig.matchingStrategy.name === 'direction-first') {
             this.matcher = new DirectionFirstMatcher();
-        } else if (this.cardConfig.matchingStrategy === 'time-frame') {
-            this.matcher = new TimeFrameMatcher(this.cardConfig.dataPeriod.timeInterval);
-        } else if (this.cardConfig.matchingStrategy === 'full-time') {
+        } else if (this.cardConfig.matchingStrategy.name === 'time-frame') {
+            this.matcher = new TimeFrameMatcher(this.cardConfig.matchingStrategy.timeInterval);
+        } else if (this.cardConfig.matchingStrategy.name === 'full-time') {
             this.matcher = new FullTimeMatcher();
         } else {
             throw new Error(`Measurement matcher not found: ${this.cardConfig.matchingStrategy}`);

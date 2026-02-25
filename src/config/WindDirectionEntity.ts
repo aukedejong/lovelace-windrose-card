@@ -1,8 +1,7 @@
 import {CardConfigWindDirectionEntity} from "../card/CardConfigWindDirectionEntity";
 import {ConfigCheckUtils} from "./ConfigCheckUtils";
-import {HARequestData} from "../measurement-provider/HARequestData";
 
-export class WindDirectionEntity implements HARequestData {
+export class WindDirectionEntity {
 
     constructor(
         public readonly entity: string,

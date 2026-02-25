@@ -25,8 +25,8 @@ export class MeasurementCounter {
         this.speedRangeService = speedRangeService;
         this.windDirectionConverter = new WindDirectionConverter(config.windDirectionEntity);
 
-        const leaveDegrees = 360 / config.windDirectionCount;
-        for (let i = 0; i < config.windDirectionCount; i++) {
+        const leaveDegrees = 360 / config.roseConfig.windDirectionCount;
+        for (let i = 0; i < config.roseConfig.windDirectionCount; i++) {
             const degrees = (i * leaveDegrees);
             const minDegrees = degrees - (leaveDegrees / 2);
             const maxDegrees = degrees + (leaveDegrees / 2);
@@ -38,7 +38,7 @@ export class MeasurementCounter {
     init(inputSpeedUnit: string, averageSpeed: number) {
         this.speedConverterFunction = this.windSpeedConverter.getSpeedConverterFunc(inputSpeedUnit);
         this.speedRangeService.generateRanges(this.speedConverterFunction(averageSpeed));
-        this.windData.init(this.speedRangeService.getRangeCount(), this.config.windDirectionCount);
+        this.windData.init(this.speedRangeService.getRangeCount(), this.config.roseConfig.windDirectionCount);
     }
 
     getMeasurementCounts(): WindCounts {

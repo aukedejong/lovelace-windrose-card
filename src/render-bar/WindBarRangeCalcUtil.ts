@@ -80,4 +80,33 @@ export class WindBarRangeCalcUtil {
         return segmentPositions;
     }
 
+    public static calcPercentageSegments(speedRanges: SpeedRange[], start: number, length: number, positionMinus: boolean, segmentCount: number, speedRangePercentages: number[]): SegmentPosition[] {
+        const segmentPositions: SegmentPosition[] = [];
+
+        const minSegmentLength = length / 20;
+        let countZeroPercentage = 0;
+        for (let i = 0; i < segmentCount; i++) {
+            if (speedRangePercentages[i] === 0) {
+                countZeroPercentage++;
+            }
+        }
+        const lengthToDistribute = length - (minSegmentLength * countZeroPercentage);
+        let startPos = start;
+        for (let i = 0; i < segmentCount; i++) {
+
+            let segmentLength = 0;
+            if (speedRangePercentages[i] === 0) {
+                segmentLength = minSegmentLength;
+            } else {
+                segmentLength = (lengthToDistribute / 100) * speedRangePercentages[i];
+            }
+            const endPos = positionMinus ? startPos - segmentLength : startPos + segmentLength;
+            const scale = segmentLength / (speedRanges[i].maxSpeed - speedRanges[i].minSpeed);
+            const segmentPosition = new SegmentPosition(startPos, endPos, speedRanges[i].minSpeed, speedRanges[i].maxSpeed, scale, speedRanges[i].maxSpeed === 0);
+            segmentPositions.push(segmentPosition);
+            startPos = endPos;
+        }
+        return segmentPositions;
+    }
+
 }

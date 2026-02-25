@@ -54,37 +54,18 @@ export class DirectionLabels {
         return values.reduce((prev, current) => (prev > current) ? prev : current);
     }
 
-    static fromConfig(config: CardConfigDirectionLabels, parentLetters: string): DirectionLabels {
+    static fromConfig(config: CardConfigDirectionLabels): DirectionLabels {
 
-        if (!config) {  //Fall back deprecated parent config.
-            const lettersArray = this.checkCardinalDirectionLettersOld(parentLetters);
-            const labels = new CardConfigCustomDirectionLabels();
-            let showCardinalDirections = true;
-            if (lettersArray.every(letter => letter.length === 0)) {
-                showCardinalDirections = false;
-            } else {
-                labels.n = lettersArray[0];
-                labels.e = lettersArray[1];
-                labels.s = lettersArray[2];
-                labels.w = lettersArray[3];
-            }
-            return new DirectionLabels(showCardinalDirections, false, false,
-                GlobalConfig.defaultCardinalDirectionLabelSize,
-                GlobalConfig.defaultIntercardinalDirectionLabelSize,
-                GlobalConfig.defaultSubIntercardinalDirectionLabelSize,
-                labels);
-        }
-        //New config parsing and checks
-        const showCardinalDirections = ConfigCheckUtils.checkBooleanDefaultTrue(config.show_cardinal_directions);
-        const showIntercardinalDirections = ConfigCheckUtils.checkBooleanDefaultFalse(config.show_intercardinal_directions);
-        const showSubIntercardinalDirections = ConfigCheckUtils.checkBooleanDefaultFalse(config.show_secondary_intercardinal_directions);
+        const showCardinalDirections = ConfigCheckUtils.checkBooleanDefaultTrue(config?.show_cardinal_directions);
+        const showIntercardinalDirections = ConfigCheckUtils.checkBooleanDefaultFalse(config?.show_intercardinal_directions);
+        const showSubIntercardinalDirections = ConfigCheckUtils.checkBooleanDefaultFalse(config?.show_secondary_intercardinal_directions);
 
-        const cardinalLabelSize = ConfigCheckUtils.checkNummerOrDefault(config.cardinal_directions_text_size, GlobalConfig.defaultCardinalDirectionLabelSize);
-        const interCardinalLabelSize = ConfigCheckUtils.checkNummerOrDefault(config.intercardinal_directions_text_size, GlobalConfig.defaultIntercardinalDirectionLabelSize);
-        const subInterCardinalLabelSize = ConfigCheckUtils.checkNummerOrDefault(config.secondary_intercardinal_directions_text_size, GlobalConfig.defaultSubIntercardinalDirectionLabelSize)
+        const cardinalLabelSize = ConfigCheckUtils.checkNummerOrDefault(config?.cardinal_directions_text_size, GlobalConfig.defaultCardinalDirectionLabelSize);
+        const interCardinalLabelSize = ConfigCheckUtils.checkNummerOrDefault(config?.intercardinal_directions_text_size, GlobalConfig.defaultIntercardinalDirectionLabelSize);
+        const subInterCardinalLabelSize = ConfigCheckUtils.checkNummerOrDefault(config?.secondary_intercardinal_directions_text_size, GlobalConfig.defaultSubIntercardinalDirectionLabelSize)
 
-        const letters = this.checkCardinalDirectionLetters(config.cardinal_direction_letters);
-        const customLabels = { ...config.custom_labels } as CardConfigCustomDirectionLabels;
+        const letters = this.checkCardinalDirectionLetters(config?.cardinal_direction_letters);
+        const customLabels = { ...config?.custom_labels } as CardConfigCustomDirectionLabels;
         if (showCardinalDirections) {
             if (!customLabels.n) {
                 customLabels.n = letters[0];
