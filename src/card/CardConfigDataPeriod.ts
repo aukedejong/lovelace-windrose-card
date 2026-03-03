@@ -5,13 +5,13 @@ export interface CardConfigDataPeriod {
 
     preset_period: string;
 
-    hours_to_show: number;
-
     from_hour_of_day: number;
 
-    from_hours_ago: number;
-    to_hours_ago: number;
+    from_period_ago: string;
+    to_period_ago: string;
 
     from_date: string;
     to_date: string;
+
+    period_back: string; //Old hours_to_show
 }

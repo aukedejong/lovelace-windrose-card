@@ -186,24 +186,25 @@ export class WindRoseDirigent {
         }
     }
 
-    renderGraphs(): void {
+    renderGraphs(animate: boolean): void {
         const activeSpeedEntityIndex = this.getActiveSpeedEntity();
         if (!this.initReady || !this.measurementsReady) {
             this.log.method("renderGraphs', 'Not ready yet " + this.initReady + " - "  + this.measurementsReady);
         }
         this.log.method('renderGraphs');
 
-        const waitForRemoveAnimation = this.windRoseRenderer.animateRemoveGraphs();
-        const animdationDelay = waitForRemoveAnimation ? 300 : 0;
-        for (let i = 0; i < this.windBarRenderers.length; i++) {
-            this.windBarRenderers[i].animateRemoveGraph();
+        if (animate) {
+            this.windRoseRenderer.animateRemoveGraphs();
+            for (let i = 0; i < this.windBarRenderers.length; i++) {
+                this.windBarRenderers[i].animateRemoveGraph();
+            }
         }
         setTimeout(() => {
             this.windRoseRenderer.removeGraphs();
             this.log.debug('renderGraphs()', this.svg, this.windRoseData, this.windBarRenderers);
-            this.windRoseRenderer.drawWindRose(this.windRoseData[activeSpeedEntityIndex]);
+            this.windRoseRenderer.drawWindRose(this.windRoseData[activeSpeedEntityIndex], animate);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
-                this.windBarRenderers[i].drawWindBar(this.windRoseData[i]);
+                this.windBarRenderers[i].drawWindBar(this.windRoseData[i], animate);
             }
             for(const currentSpeedRenderer of this.currentSpeedRenderers) {
                 const barIndex = currentSpeedRenderer.getBarIndex();
@@ -223,7 +224,7 @@ export class WindRoseDirigent {
             this.windRoseRenderer.rotateWindRose();
             this.touchFacesRenderer.moveToFront();
             this.htmlRenderer.renderTextBlocks();
-        }, animdationDelay);
+        }, animate ? 300 : 0);
     }
 
     updateStateRender(): void {

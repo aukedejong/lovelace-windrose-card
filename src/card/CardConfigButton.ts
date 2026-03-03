@@ -12,10 +12,10 @@ export interface CardConfigButton extends CardConfigDataPeriod {
     windspeed_entity_index: number;
 
     //PeriodShiftButton
-    hours: number;
+    shift_period: string;
 
     //PeriodShiftPlayButton
-    step_hours: number;
-    period_hours: number;
+    step_period: string;
+    window_period: string;
     delay: number;
 }

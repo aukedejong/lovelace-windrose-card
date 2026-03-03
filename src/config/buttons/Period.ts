@@ -4,6 +4,7 @@ import {PeriodSelectorButton} from "./types/PeriodSelectorButton";
 import {Log} from "../../util/Log";
 import {ConfigCheckUtils} from "../ConfigCheckUtils";
 import {PresetPeriodHelper} from "../../util/PresetPeriodHelper";
+import {PeriodCodeHelper} from "../../util/PeriodCodeHelper";
 
 export class Period {
 
@@ -15,10 +16,10 @@ export class Period {
         public readonly useStatistics: boolean | undefined,
         public readonly statisticsPeriod: string | undefined,
         public presetPeriod: string | undefined,
-        public hoursToShow: number | undefined,
+        public periodBack: string | undefined,
         public fromHourOfDay: number | undefined,
-        public fromHoursAgo: number | undefined,
-        public toHoursAgo: number | undefined,
+        public fromPeriodAgo: string | undefined,
+        public toPeriodAgo: string | undefined,
         public initStartTime: Date | undefined,
         public initEndTime: Date | undefined) {
 
@@ -31,12 +32,12 @@ export class Period {
     }
 
     toString(): string {
-        return `Type: ${this.type} (hoursToShow: ${this.hoursToShow}), (fromHoursOfDay: ${this.fromHourOfDay}, fromHoursAgo: ${this.fromHoursAgo}), toHoursAgo: ${this.toHoursAgo})`;
+        return `Type: ${this.type} (periodBack: ${this.periodBack}), (fromHoursOfDay: ${this.fromHourOfDay}, fromPeriodAgo: ${this.fromPeriodAgo}), toPeriodAgo: ${this.toPeriodAgo})`;
     }
 
     clone(): Period {
-        return new Period(this.type, this.useStatistics,this.statisticsPeriod,  this.presetPeriod, this.hoursToShow, this.fromHourOfDay,
-            this.fromHoursAgo, this.toHoursAgo, this.startTime, this.endTime);
+        return new Period(this.type, this.useStatistics,this.statisticsPeriod,  this.presetPeriod, this.periodBack, this.fromHourOfDay,
+            this.fromPeriodAgo, this.toPeriodAgo, this.startTime, this.endTime);
     }
 
     private calculateTimeRange() {
@@ -44,21 +45,15 @@ export class Period {
         if (this.startTime && this.endTime) {
             return; //Calculation not needed.
         }
-        if (this.fromHoursAgo != null && this.toHoursAgo != null) {
-            // Time window mode: from X hours ago to Y hours ago
-            this.startTime = new Date(now);
-            this.startTime.setHours(this.startTime.getHours() - this.fromHoursAgo);
-            this.endTime = new Date(now);
-            this.endTime.setHours(this.endTime.getHours() - this.toHoursAgo);
+        if (this.fromPeriodAgo != null && this.toPeriodAgo != null) {
+            this.startTime = PeriodCodeHelper.move(this.fromPeriodAgo, now);
+            this.endTime = PeriodCodeHelper.move(this.toPeriodAgo, now);
 
-        } else if (this.hoursToShow) {
-            // Existing mode: last X hours up to now
-            this.startTime = new Date(now);
-            this.startTime.setHours(this.startTime.getHours() - this.hoursToShow);
+        } else if (this.periodBack) {
+            this.startTime = PeriodCodeHelper.move(this.periodBack, new Date(now));
             this.endTime = now;
 
         } else if ((this.fromHourOfDay && this.fromHourOfDay > 0) || this.fromHourOfDay === 0) {
-            // Existing mode: from hour of day up to now
             this.startTime = new Date(now);
             if (this.startTime.getHours() < this.fromHourOfDay) {
                 this.startTime.setDate(this.startTime.getDate() - 1);
@@ -72,12 +67,12 @@ export class Period {
         Log.info('Using time range for data query', this.startTime, this.endTime);
     }
 
-    movePeriod(hours: number): boolean {
-        const endTime = new Date(this.endTime.getTime() + (hours * 3600000));
+    movePeriod(period: string): boolean {
+        const endTime = PeriodCodeHelper.move(period, this.endTime);
         if (endTime > new Date()) {
             return false;
         }
-        this.startTime = new Date(this.startTime.getTime() + (hours * 3600000));
+        this.startTime = PeriodCodeHelper.move(period, this.startTime);
         this.endTime = endTime;
         return true;
     }
@@ -97,15 +92,15 @@ export class Period {
                 [fromDate, toDate] = PresetPeriodHelper.getPeriod(config.preset_period);
                 optionsSet++;
             }
-            if (this.checkHoursToShow(config.hours_to_show)) {
-                type = 'hoursToShow';
+            if (PeriodCodeHelper.checkInPast('period_back', config.period_back)) {
+                type = 'periodBack'
                 optionsSet++;
             }
             if (this.checkFromHourOfDay(config.from_hour_of_day)) {
                 type = 'fromHourOfDay';
                 optionsSet++;
             }
-            if (this.checkTimeWindowRelative(config.from_hours_ago, config.to_hours_ago)) {
+            if (this.checkTimeWindowRelative(config.from_period_ago, config.to_period_ago)) {
                 type = 'windowRelative';
                 optionsSet++;
             }
@@ -119,10 +114,10 @@ export class Period {
                 throw new Error('No data period config options set.');
             }
             if (optionsSet > 1) {
-                throw new Error('Multiple period types set, use one type: preset-period, hours_to_show, from_hours_of_day, time window, or date options.')
+                throw new Error('Multiple period types set, use one type: preset-period, period_back, from_hours_of_day, time window, or date options.')
             }
-            return new Period(type, useStatistics, statsPeriod, config.preset_period, config.hours_to_show, config.from_hour_of_day, config.from_hours_ago,
-                config.to_hours_ago, fromDate, toDate);
+            return new Period(type, useStatistics, statsPeriod, config.preset_period, config.period_back, config.from_hour_of_day, config.from_period_ago,
+                config.to_period_ago, fromDate, toDate);
         }
         return undefined;
     }
@@ -137,43 +132,36 @@ export class Period {
         throw new Error('Data_period or an active period_selector button should be configured.')
     }
 
-    private static checkHoursToShow(hoursToShow: number | undefined): boolean {
-        if (hoursToShow && isNaN(hoursToShow) ) {
-            throw new Error('Invalid hours_to_show, should be a number above 0.');
-        } else if (hoursToShow) {
-            return true
-        }
-        return false;
-    }
-
     private static checkFromHourOfDay(fromHourOfDay: number | undefined): boolean {
         if (fromHourOfDay && (isNaN(fromHourOfDay) || fromHourOfDay < 0 || fromHourOfDay > 23)) {
-            throw new Error('Invalid hours_to_show, should be a number between 0 and 23, hour of the day..');
+            throw new Error('Invalid rom_hour_of_day, should be a number between 0 and 23, hour of the day.');
         } else if (fromHourOfDay != null && fromHourOfDay >= 0) {
             return true
         }
         return false;
     }
 
-    private static checkTimeWindowRelative(fromHoursAgo: number | undefined, toHoursAgo: number | undefined): boolean {
-        const hasFromHoursAgo = fromHoursAgo != null && fromHoursAgo >= 0;
-        const hasToHoursAgo = toHoursAgo != null && toHoursAgo >= 0;
-
+    private static checkTimeWindowRelative(fromPeriodAgo: string | undefined, toPeriodAgo: string | undefined): boolean {
+        const hasFromHoursAgo = PeriodCodeHelper.check('from_period_ago', fromPeriodAgo);
+        const hasToHoursAgo = PeriodCodeHelper.check('to_period_ago', toPeriodAgo);
+        const now = new Date();
         if (hasFromHoursAgo && !hasToHoursAgo) {
-            throw new Error('WindRoseCard: from_hours_ago requires to_hours_ago to be set.');
+            throw new Error('WindRoseCard: from_period_ago requires to_period_ago to be set.');
         }
         if (!hasFromHoursAgo && hasToHoursAgo) {
-            throw new Error('WindRoseCard: to_hours_ago requires from_hours_ago to be set.');
+            throw new Error('WindRoseCard: to_period_ago requires from_period_ago to be set.');
         }
         if (hasFromHoursAgo && hasToHoursAgo) {
-            if (isNaN(fromHoursAgo!) || fromHoursAgo! < 0) {
-                throw new Error('WindRoseCard: Invalid from_hours_ago, should be a number >= 0.');
+            const fromDate = PeriodCodeHelper.move(fromPeriodAgo!, now);
+            const toDate = PeriodCodeHelper.move(toPeriodAgo!, now);
+            if (fromDate >= now) {
+                throw new Error('WindRoseCard: from_period_ago should result in a date in the past.');
             }
-            if (isNaN(toHoursAgo!) || toHoursAgo! < 0) {
-                throw new Error('WindRoseCard: Invalid to_hours_ago, should be a number >= 0.');
+            if (toDate > now) {
+                throw new Error('WindRoseCard: to_period_ago should result in a date in the past or now.');
             }
-            if (fromHoursAgo! < toHoursAgo!) {
-                throw new Error('WindRoseCard: from_hours_ago must be >= to_hours_ago.');
+            if (fromDate >= toDate) {
+                throw new Error('WindRoseCard: from_period_ago must be before to_period_ago.');
             }
             return true;
         }
@@ -219,6 +207,15 @@ export class Period {
         }
         if (ConfigCheckUtils.checkHasProperty(config, 'log_measurement_counts')) {
             throw new Error('log_measurement_counts option is moved to matching-strategy object on root level.')
+        }
+        if (ConfigCheckUtils.checkHasProperty(config, 'hours_to_show')) {
+            throw new Error('hours_to_show option is changed to period_back option, see readme "Period code explained".')
+        }
+        if (ConfigCheckUtils.checkHasProperty(config, 'from_hours_ago')) {
+            throw new Error('from_hours_ago option is changed to from_period_ago option, see readme "Period code explained".')
+        }
+        if (ConfigCheckUtils.checkHasProperty(config, 'to_hours_ago')) {
+            throw new Error('to_hours_ago option is changed to to_period_ago option, see readme "Period code explained".')
         }
     }
 }

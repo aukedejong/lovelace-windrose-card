@@ -64,8 +64,7 @@ Select "Manage Resources"
 
 ### Example configurations:
 
-- Minimal: [click here](#minimal-configuration)
-- Maximum: [click here](#maximum-configuration)
+- See: [examples](./EXAMPLES.md)
 
 
 ### Card options
@@ -89,7 +88,7 @@ Select "Manage Resources"
 | corner_info               |      [object](#Object-corner_info)      |         |    -     | Configuration for displaying entity states in the corners around the windrose.                                                                                                                                         |
 | text_blocks               |      [object](#Object-text_blocks)      |         |    -     | Configuration for displaying text above and below the windrose. It's possible to show interesting values about the dat measurements used by the card.                                                                  |
 | actions                   |        [object](#Object-actions)        |         |    -     | Configuration for HA actions, for example to display more-info popups.                                                                                                                                                 |
-| matching_strategy         |   [object](#Object-matching-strategy)   |         |    -     | How to match direction and speed measurements.                                                                                                                                                                         |
+| matching_strategy         |   [object](#Object-matching_strategy)   |         |    -     | How to match direction and speed measurements.                                                                                                                                                                         |
 | colors                    |        [object](#Object-colors)         |         |    -     | Configure colors for different parts of the windrose and windspeedbar. See object Colors.                                                                                                                              |
 | disable_animations        |                 boolean                 |  false  |    -     | Disables windrose leave and windbar animation. Current wind direction and speed arrow animation are not disabled.                                                                                                      |
 | log_level                 |                 string                  |  WARN   |    -     | Browser console log level, options: NONE, ERROR, WARN, INFO, DEBUG and TRACE                                                                                                                                           |
@@ -115,17 +114,17 @@ Wind rose graph related configuration.
 Only one of the options can be used at the same time.
 The statistics related properties overwrite the ones at the entity config level.
 
-| Name              |          Type           | Default | Required | Description                                                                                                                                                                                         |
-|-------------------|:-----------------------:|:-------:|:--------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| use_statistics    |         boolean         |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for the entities. Can make fetching data faster. This settings overwrite the setting at the direction and speen entity config. |
-| statistics_period |         string          | 5minute |    -     | Statistics period, possible options: 5minute, hour, day, week, month and year. More info about [data retention](#Home-Assistant-data-retention)                                                     |
-| preset_period     |         string          |         |    -     | Preset periods, see list below this table.                                                                                                                                                          |
-| hours_to_show     |         number          |         |    -     | Show winddata for the last number of hours. Number higher then 0.                                                                                                                                   |
-| from_hour_of_day  |         number          |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used.    |
-| from_hours_ago    |         number          |         |    -     | Show winddata from the configured hours ago till the to_hours_ago value.                                                                                                                            |
-| to_hours_ago      |         number          |         |    -     | Show winddata from the configured hours from the from_hours_ago value till this value.                                                                                                              |
-| from_date         | string, ISO format date |         |    -     | Show winddata from the configured date time till the to_date value.                                                                                                                                 |
-| to_date           | string, ISO format date |         |    -     | Show winddata from the configured from_date value till this value.                                                                                                                                  |
+| Name                                      |                      Type                      | Default | Required | Description                                                                                                                                                                                         |
+|-------------------------------------------|:----------------------------------------------:|:-------:|:--------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| use_statistics                            |                    boolean                     |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for the entities. Can make fetching data faster. This settings overwrite the setting at the direction and speen entity config. |
+| statistics_period                         |                     string                     | 5minute |    -     | Statistics period, possible options: 5minute, hour, day, week, month and year. More info about [data retention](#Home-Assistant-data-retention)                                                     |
+| preset_period                             |                     string                     |         |    -     | Preset periods, see list below this table.                                                                                                                                                          |
+| period_back (replaced hours_to_show       | string [(period code)](#Period-code-explained) |         |    -     | Configure period from moment back in history till now. More info: [Period code explained](#Period-code-explained)                                                                                   |
+| from_hour_of_day                          |                     number                     |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used.    |
+| from_period_ago (replaced from_hours_ago) | string [(period code)](#Period-code-explained) |         |    -     | Show winddata from the configured period ago till the to_period_ago value.                                                                                                                          |
+| to_period_ago (replace to_hours_ago)      | string [(period code)](#Period-code-explained) |         |    -     | Show winddata from the configured period from the from_period_ago value till this value.                                                                                                            |
+| from_date                                 |            string, ISO format date             |         |    -     | Show winddata from the configured date time till the to_date value.                                                                                                                                 |
+| to_date                                   |            string, ISO format date             |         |    -     | Show winddata from the configured from_date value till this value.                                                                                                                                  |
 
 #### List of preset_period options.
 
@@ -140,7 +139,6 @@ The statistics related properties overwrite the ones at the entity config level.
 - last_6_months
 - this_year
 - last_year
-
 
 ### Object buttons_config
 
@@ -181,45 +179,53 @@ buttons_config:
 Shifts the time period with the set hours. This works for all period types. So if you have hours_to_show set, it moves that period keeping the period length the same.
 Pressing again on the period_select button, reset the time period.
 It's not possible to shift the time to the future.
+There are no animations used for the transition.
 
-| Name                       |              Type               | Default | Required | Description                                                                         |
-|----------------------------|:-------------------------------:|:-------:|:--------:|-------------------------------------------------------------------------------------|
-| type                       |             string              |         |    x     | Fixed: period_shift                                                                 |
-| button_text                |             string              |         |    x     | Button text.                                                                        |
-| colors                     | [object](#Object-button_colors) |         |    -     | Button specific colors, overwrite the defaults buttons_config object.               |
-| hours                      |             number              |         |    -     | Shift the time period used the retrieve the data hours forward or backward in time. |
+| Name         |                      Type                      | Default | Required | Description                                                                    |
+|--------------|:----------------------------------------------:|:-------:|:--------:|--------------------------------------------------------------------------------|
+| type         |                     string                     |         |    x     | Fixed: period_shift                                                            |
+| button_text  |                     string                     |         |    x     | Button text.                                                                   |
+| colors       |        [object](#Object-button_colors)         |         |    -     | Button specific colors, overwrite the defaults buttons_config object.          |
+| shift_period | string [(period code)](#Period-code-explained) |         |    -     | Shift the time period used the retrieve the data forward or backward in time.  |
 
 ```yaml
 buttons_config:
   buttons:
     - type: period_shift
       button_text: "-1h"
-      hours: -1
+      shift_period: -1h
     - type: period_shift
       button_text: "+1h"
-      hours: 1
+      shift_period: +1h
 ```
 
 #### Button type period_shift_play (EXPERIMENTAL)
+Animate the changes in de the windrose during a time period.
+The period configured in the data period properties is the time used for the animation.
+The period_hours configures the period use for the windrose.
+The step_hours moves the period forward in time, until it reached the and of the configured period.
+There are no animations used for the transition.
 
-| Name                       |              Type               | Default | Required | Description                                                                |
-|----------------------------|:-------------------------------:|:-------:|:--------:|----------------------------------------------------------------------------|
-| type                       |             string              |         |    x     | Fixed: period_shift_play                                                   |
-| button_text                |             string              |         |    x     | Button text.                                                               |
-| colors                     | [object](#Object-button_colors) |         |    -     | Button specific colors, overwrite the defaults buttons_config object.      |
-| windspeed_entity_index     |             number              |         |    -     | Index of windspeed entity to use for the windrose graph. First is index 0. |
-| The data period properties |                                 |         |    -     | See [object](#Object-data_period)                                          |
+| Name                       |                      Type                      | Default | Required | Description                                                                      |
+|----------------------------|:----------------------------------------------:|:-------:|:--------:|----------------------------------------------------------------------------------|
+| type                       |                     string                     |         |    x     | Fixed: period_shift_play                                                         |
+| button_text                |                     string                     |         |    x     | Button text.                                                                     |
+| colors                     |        [object](#Object-button_colors)         |         |    -     | Button specific colors, overwrite the defaults buttons_config object.            |
+| The data period properties |                                                |         |    x     | See [object](#Object-data_period), the time period the anmiation is using.       |
+| step_period                | string [(period code)](#Period-code-explained) |         |    x     | Period to move for the next frame.                                               |
+| window_period              | string [(period code)](#Period-code-explained) |         |    x     | The window period used for the windrose calculation                              |
+| delay                      |                     number                     |         |    x     | Delay between frames, this is without the calculation time needed for the frame. |
+
 
 ```yaml
 buttons_config:
   buttons:
     - type: period_shift_play
-      from_date: "2025-06-01"
-      to_date: "2026-01-01"
+      preset_period: last_6_months
       button_text: Play
-      step_hours: 120
+      step_hours: 12
       period_hours: 240
-      delay: 150
+      delay: 50
       use_statistics: true
       statistics_period: hour
  ```
@@ -229,6 +235,7 @@ The windrose diagram uses a direction and speed data. Before only the first conf
 Now the windspeed sensor used, can be changed with this button.
 
 In the windspeed_entties configuration, the use_for_windrose property is added, to set the default entity used for the windrose.
+There are no animations used for the transition.
 
 | Name                       |              Type               | Default | Required | Description                                                                    |
 |----------------------------|:-------------------------------:|:-------:|:--------:|--------------------------------------------------------------------------------|
@@ -281,6 +288,32 @@ buttons_config:
       colors:
         color: blue
 ```
+
+### Period code explained
+
+Old versions, hours_to_show, from_hours_ago and to_hours_ago only supported hours. Now al sorts of periods can be used in combination with each-other.
+
+This code is used by the following property's:
+
+General period definition for
+- period_back
+- from_period_argo / to_period_ago
+Buttons:
+- Type: period_shift:
+- Config: shift_period
+- Type: period_shift_play
+- Config: step_period, window_period
+
+| Options      | Example | Description                        |
+|--------------|:-------:|------------------------------------|
+| -nh / +nh    |  -10h   | 10 hours before now                |
+| -nd / +nd    |  -10d   | 10 days before now                 |
+| -nw / +nw    |   -5w   | 5 week before now                  |
+| -nm / +nm    |   -2m   | 2 month before now                 |
+| -nq / +nq    |   -1q   | 1 year quater before now           |
+| -ny / +ny    |   -1y   | 1 year before now                  |
+| Combination  |  -5w+2d | 5 weeks before then 2 days forward |
+
 
 ### Home Assistant data retention
 

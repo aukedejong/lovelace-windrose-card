@@ -1,6 +1,8 @@
 -------
 v2.0.0
 Breaking changes:
+- Changed hours_to_show to period_back with the possibily to use other unit instead of hours. See readme Period code explained.
+- Changed from_hours_ago/to_hours_ago to from_period_ago/to_period_ago with the possibility to use other units instead of hours. See readme Period code explained.
 - Changed data_period object, period_selector is replaced by buttons_config on root level.
   The data_period object only contains period proeprties.
   Statistics can also be turned on here.
@@ -28,15 +30,16 @@ Breaking changes:
     - outer_circle_percentage
 - Removed render_relative_scale in object windspeed_entities, replaced by bar_render_scale with options: absolute, windspeed_relative and percentage_relative.
   Percentage_relative is the new options.
-- In cornet info, when displaying cardinal direction letters, converted from degrees, now default uses only NESW letters, no X.
+- In corner info, when displaying cardinal direction letters, converted from degrees, now default uses only NESW letters, no X.
 
 Features:
+- More options to configure a time period with a period code, exmaple: -200h (200 hours), -2w (2 weeks), -2m+1w (2 month, 1 week)
 - Button to toggle between the speed sensors used for the rose graph, fixes #172.
 - Button to shift the time period hours back or forward in time.
 - Button to start an animation of windrose over time.
 - Windbar scale options added: percentage relative, fixed #167.
 - Rose legend circle percentages configurable, default auto.
-- Added use_for_windrose in windspeed_entities object.
+- Added use_for_windrose in windspeed_entities object. Can be changed with a button.
 - New data_period option: preset_period
   Possible options:
     - today
@@ -59,7 +62,7 @@ Features:
 - Improved error handling, when no measurements are found.
 - Button border color can now be configured. Fixes #176
 - Default generated config uses more features.
-- All removed/moved config options should show an error message with helpful info, to help with the upgrade.
+- All removed/moved/changed config options should show an error message with helpful info, to help with the upgrade.
 
 v1.26.1
 Fixes:

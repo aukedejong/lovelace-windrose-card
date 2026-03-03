@@ -4,7 +4,7 @@ export interface WindRoseRenderer {
 
     drawEmptyWindrose(): void;
 
-    drawWindRose(windRoseData: WindRoseData): void;
+    drawWindRose(windRoseData: WindRoseData, animate: boolean): void;
 
     animateRemoveGraphs(): boolean;
 

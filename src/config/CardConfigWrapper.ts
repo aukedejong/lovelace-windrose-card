@@ -228,7 +228,7 @@ export class CardConfigWrapper {
 
         //To data_period
         if (ConfigCheckUtils.checkHasProperty(cardConfig, 'hours_to_show')) {
-            throw new Error('hours_to_show option on root level is moved to data_period object.')
+            throw new Error('hours_to_show option on root level is replaced with period_back in data_period object.')
         }
 
         //To windspeed_entities

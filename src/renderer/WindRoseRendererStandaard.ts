@@ -39,7 +39,6 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
     private windDirectionTextGroup!: SVG.G;
     private roseCircles!: SVG.G;
     private circleLegend!: SVG.G;
-    private doAnimation: boolean;
 
     constructor(config: CardConfigWrapper,
                 imensionCalculator: DimensionCalculator,
@@ -47,7 +46,6 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
-        this.doAnimation = !config.disableAnimations;
         this.legendTextSize = config.roseConfig.circleLegendTextSize;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
@@ -79,7 +77,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
             .add(this.windDirectionTextGroup);
     }
 
-    drawWindRose(windRoseData: WindRoseData): void {
+    drawWindRose(windRoseData: WindRoseData, animate: boolean): void {
         if (windRoseData === undefined) {
             this.log.error("drawWindRose(): Can't draw, no windrose data set.");
             return;
@@ -100,7 +98,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         this.circleLegend = this.drawCircleLegend();
 
         //Animate show graph
-        if (this.doAnimation) {
+        if (animate) {
             this.leavesGroup.scale(0.1, 0.1, this.roseCenter.x, this.roseCenter.y);
             this.leavesGroup.animate(300, 0, 'now')
                 .scale(10, 10, this.roseCenter.x, this.roseCenter.y)
@@ -109,7 +107,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
     }
 
     animateRemoveGraphs(): boolean {
-        if (this.leavesGroup === undefined || !this.doAnimation) {
+        if (this.leavesGroup === undefined) {
             this.log.method('animateRemoveGraphs', 'not rendered yet');
             return false;
         }

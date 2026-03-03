@@ -45,7 +45,6 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     private roseCircles!: SVG.G;
     private circleLegend!: SVG.G;
     private centerZeroSpeedGroup!: SVG.G;
-    private doAnimation: boolean;
 
     constructor(config: CardConfigWrapper,
                 dimensionCalculator: DimensionCalculator,
@@ -53,7 +52,6 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
-        this.doAnimation = !config.disableAnimations;
         this.circleLegendTextSize = config.roseConfig.circleLegendTextSize;
         this.centerRadius = GlobalConfig.defaultCenterCalmPercenteCircleSize;
         this.speedRangeService = speedRangeService;
@@ -86,7 +84,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
             .add(this.windDirectionTextGroup);
     }
 
-    drawWindRose(windRoseData: WindRoseData): void {
+    drawWindRose(windRoseData: WindRoseData, animate: boolean): void {
         if (windRoseData === undefined) {
             this.log.error('drawWindRose()', 'Can\'t draw, no windrose data.');
             return;
@@ -106,9 +104,8 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
 
         this.circleLegend = this.drawCircleLegend();
         this.centerZeroSpeedGroup = this.drawCenterZeroSpeed();
-
         //Animate show graph
-        if (this.doAnimation) {
+        if (animate) {
             this.leavesGroup.scale(0.1, 0.1, this.roseCenter.x, this.roseCenter.y);
             this.leavesGroup.animate(300, 0, 'now')
                 .scale(10, 10, this.roseCenter.x, this.roseCenter.y)
@@ -117,8 +114,8 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     }
 
     animateRemoveGraphs(): boolean {
-        if (this.leavesGroup === undefined || !this.doAnimation) {
-            this.log.method('animateRemoveGraphs', 'not rendered yet or anmiation disabled');
+        if (this.leavesGroup === undefined) {
+            this.log.method('animateRemoveGraphs', 'not rendered yet');
             return false
         }
         this.log.method('animateRemoveGraphs');

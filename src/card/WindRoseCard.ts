@@ -113,7 +113,7 @@ export class WindRoseCard extends LitElement {
             this.measurementProvider = new HAMeasurementProvider(new HAWebservice(this._hass), this.cardConfig);
             this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor);
             this.entityStateProcessor.init(this.cardConfig)
-            this.refreshMeasurements();
+            this.refreshMeasurements(!this.cardConfig.disableAnimations);
         } catch(e) {
             Log.error("Error during init: ", e);
             this.errorMessage = e as string;
@@ -167,23 +167,23 @@ export class WindRoseCard extends LitElement {
     handleButtonClickFunc(button: ButtonInterface): () => void {
         if (button instanceof PeriodSelectorButton) {
             return () => {
-                this.log.method('updatePeriod', button.period.hoursToShow);
+                this.log.method('updatePeriod', button.period);
                 this.cardConfig.buttonsConfig?.disablePeriodSelectors();
                 this.cardConfig.buttonsConfig?.undoPausedPlays();
                 button.baseConfig.active = true;
                 this.cardConfig.activePeriod = button.period.clone();
-                this.refreshMeasurements(true);
+                this.refreshMeasurements(!this.cardConfig.disableAnimations);
             }
         } else if (button instanceof PeriodShiftButton) {
             return () => {
                 this.log.method('periodShiftButton');
                 this.cardConfig.buttonsConfig?.disablePeriodSelectors();
                 this.cardConfig.buttonsConfig?.undoPausedPlays();
-                const moved = this.cardConfig.activePeriod.movePeriod(button.hours);
+                const moved = this.cardConfig.activePeriod.movePeriod(button.shiftPeriod);
                 if (moved) {
                     this.cardConfig.buttonsConfig?.disablePeriodSelectors();
                     button.baseConfig.active = true;
-                    this.refreshMeasurements(true);
+                    this.refreshMeasurements(false);
                     setTimeout(() => {
                         button.baseConfig.active = false;
                         this.requestUpdate();
@@ -213,7 +213,7 @@ export class WindRoseCard extends LitElement {
                 button.baseConfig.active = true;
                 this.cardConfig.windspeedEntities.forEach(entityConfig => entityConfig.useForWindRose = false);
                 this.cardConfig.windspeedEntities[button.index].useForWindRose = true;
-                this.refreshMeasurements(true);
+                this.refreshMeasurements(false);
             }
         }
         return () => {
@@ -245,7 +245,7 @@ export class WindRoseCard extends LitElement {
         if (this.cardConfig && this.updateInterval === undefined) {
 
             this.updateInterval = setInterval(
-                () => this.refreshMeasurements(),this.cardConfig.refreshInterval * 1000);
+                () => this.refreshMeasurements(!this.cardConfig.disableAnimations), this.cardConfig.refreshInterval * 1000);
             this.log.info('Interval running with ' + this.cardConfig.refreshInterval + ' seconds.');
         }
     }
@@ -329,29 +329,27 @@ export class WindRoseCard extends LitElement {
         };
     }
 
-    refreshMeasurements(requestUpdate: boolean = false): void {
+    refreshMeasurements(animate: boolean): void {
         this.log.method('refreshMeasurements');
         this.errorMessage = '';
         this.windRoseDirigent.refreshData().then((measurementHolder: MeasurementHolder) => {
             this.log.debug('refreshData() ready, requesting update.');
-            this.windRoseDirigent.renderGraphs();
+            this.windRoseDirigent.renderGraphs(animate);
             this.windRoseDirigent.updateStateRender();
             this.errorMessage = measurementHolder?.error?.message;
-            if (requestUpdate) {
-                this.requestUpdate();
-            }
+            this.requestUpdate();
         });
     }
 
     refreshMeasurementsPlay(playButton: PeriodShiftPlayButton): void {
         this.windRoseDirigent.refreshData().then((measurementHolder: MeasurementHolder) => {
             this.log.debug('refreshData() ready requesting update.');
-            this.windRoseDirigent.renderGraphs();
+            this.windRoseDirigent.renderGraphs(false);
             this.windRoseDirigent.updateStateRender();
             this.errorMessage = measurementHolder?.error?.message;
             this.requestUpdate();
             setTimeout(() => {
-                const moved = this.cardConfig.activePeriod.movePeriod(playButton.stepHours);
+                const moved = this.cardConfig.activePeriod.movePeriod(playButton.stepPeriod);
                 if (playButton.baseConfig.active && moved && this.cardConfig.activePeriod.endTime <= playButton.period.endTime) {
                     this.refreshMeasurementsPlay(playButton);
                 } else if (playButton.baseConfig.active) {

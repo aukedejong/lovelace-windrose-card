@@ -34,7 +34,6 @@ export class WindBarRenderer {
     private readonly barSpeedTextSize: number;
     private windBarGroup!: SVG.G;
     private animationOrigin!: number;
-    private doAnimation: boolean;
 
     constructor(config: CardConfigWrapper,
                 dimensionCalculator: DimensionCalculator,
@@ -49,7 +48,6 @@ export class WindBarRenderer {
         this.windSpeedEntityConfig = config.windspeedEntities[positionIndex];
         this.barLabelTextSize = this.windSpeedEntityConfig.barLabelTextSize;
         this.barSpeedTextSize = this.windSpeedEntityConfig.barSpeedTextSize;
-        this.doAnimation = !config.disableAnimations;
         this.svgUtil = svgUtil;
         if (this.windSpeedEntityConfig.outputSpeedUnitLabel) {
             this.outputSpeedUnitLabel = this.windSpeedEntityConfig.outputSpeedUnitLabel;
@@ -67,12 +65,12 @@ export class WindBarRenderer {
     }
 
     animateRemoveGraph(): void {
-        if (this.windBarGroup && this.doAnimation) {
+        if (this.windBarGroup) {
             this.animateBar(false);
         }
     }
 
-    drawWindBar(windBarData: WindRoseData) {
+    drawWindBar(windBarData: WindRoseData, animate: boolean) {
         if (windBarData === undefined) {
             this.log.method('drawWindBar', 'Can\'t draw bar, windRoseData not set.');
             return;
@@ -100,13 +98,13 @@ export class WindBarRenderer {
 
         if (this.config.windspeedBarLocation === 'bottom') {
             this.animationOrigin = this.dimensionCalculator.barStartY(this.positionIndex);
-            this.drawBarLegendBottom(windBarData.speedRangePercentages, segmentPositions);
+            this.drawBarLegendBottom(windBarData.speedRangePercentages, segmentPositions, animate);
 
         } else if (this.config.windspeedBarLocation === 'right') {
             this.animationOrigin = this.dimensionCalculator.barStartX(this.positionIndex);
-            this.drawBarLegendRight(windBarData.speedRangePercentages, segmentPositions);
+            this.drawBarLegendRight(windBarData.speedRangePercentages, segmentPositions, animate);
         }
-        if (this.doAnimation) {
+        if (animate) {
             this.animateBar(true);
         }
     }
@@ -124,7 +122,7 @@ export class WindBarRenderer {
         }
     }
 
-    private drawBarLegendBottom(percentages: number[], segmentPositions: SegmentPosition[]) {
+    private drawBarLegendBottom(percentages: number[], segmentPositions: SegmentPosition[], animate: boolean) {
         const y = this.dimensionCalculator.barStartY(this.positionIndex);
         const y2 = y + this.barHeight;
         const labelUnitY = this.dimensionCalculator.barLabelY(this.positionIndex)
@@ -174,12 +172,12 @@ export class WindBarRenderer {
         const unitLabel = this.svgUtil.drawText2(lastSegment.end, labelUnitY , this.outputSpeedUnitLabel, TextAttributes.windBarAttribute(this.cardColors.barUnitName, this.barLabelTextSize, "auto", "end"));
         this.windBarGroup.add(unitLabel);
 
-        if (this.doAnimation) {
+        if (animate) {
             this.windBarGroup.scale(1, 0.001, 0, this.animationOrigin);
         }
     }
 
-    private drawBarLegendRight(percentages: number[], segmentPositions: SegmentPosition[]) {
+    private drawBarLegendRight(percentages: number[], segmentPositions: SegmentPosition[], animate: boolean) {
         const x = this.dimensionCalculator.barStartX(this.positionIndex);
         const x2 = x + this.barWidth;
         const labelX = this.dimensionCalculator.barLabelX(this.positionIndex);
@@ -232,7 +230,7 @@ export class WindBarRenderer {
         const unitLabel = this.svgUtil.drawText2(barCenterX, lastSegment.end - 15, this.outputSpeedUnitLabel, TextAttributes.windBarAttribute(this.cardColors.barUnitName, this.barLabelTextSize, "auto", "middle"))
         this.windBarGroup.add(unitLabel);
 
-        if (this.doAnimation) {
+        if (animate) {
             this.windBarGroup.scale(0.001, 1, this.animationOrigin, 0);
         }
     }

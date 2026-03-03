@@ -4,6 +4,7 @@ import {CardConfigButton} from "../../../card/CardConfigButton";
 import {ButtonColors} from "../ButtonColors";
 import {ConfigCheckUtils} from "../../ConfigCheckUtils";
 import {Period} from "../Period";
+import {PeriodCodeHelper} from "../../../util/PeriodCodeHelper";
 
 export class PeriodShiftPlayButton
     implements ButtonInterface {
@@ -12,8 +13,8 @@ export class PeriodShiftPlayButton
 
     constructor(
         public readonly baseConfig: ButtonBaseConfig,
-        public readonly stepHours: number,
-        public readonly periodHours: number,
+        public readonly stepPeriod: string,
+        public readonly windowPeriod: string,
         public readonly delay: number,
         public readonly period: Period) {
     }
@@ -25,17 +26,28 @@ export class PeriodShiftPlayButton
         if (!period) {
             throw new Error("Period not set for period shift play button.");
         }
-        const stepHours = ConfigCheckUtils.checkNumber("step_hours", button.step_hours);
-        const periodHours = ConfigCheckUtils.checkNumber("period_hours", button.period_hours);
+        let stepPeriod: string;
+        if (PeriodCodeHelper.check('step_period', button.step_period)) {
+            stepPeriod = button.step_period;
+        } else {
+            throw new Error('WindRoseCard: step_period not set');
+        }
+        let windowPeriod: string = '';
+        if (PeriodCodeHelper.check('window_period', button.window_period)) {
+            windowPeriod = button.window_period;
+        } else {
+            throw new Error('WindRoseCard: window_period not set');
+        }
         const delay = ConfigCheckUtils.checkNumber("delay", button.delay);
 
-        return new PeriodShiftPlayButton(baseConfig, stepHours, periodHours, delay, period);
+        return new PeriodShiftPlayButton(baseConfig, stepPeriod, windowPeriod, delay, period);
     }
 
     getFirstPeriod(): Period {
-        const endDate = new Date(this.period.startTime.getTime() + (this.periodHours * 3600000));
-        return new Period('play', this.period.useStatistics, this.period.statisticsPeriod, undefined,undefined, undefined,
-            undefined, undefined, this.period.startTime, endDate);
+        const endDate = PeriodCodeHelper.move(this.windowPeriod, this.period.startTime);
+        return new Period('play', this.period.useStatistics, this.period.statisticsPeriod, undefined,
+            undefined, undefined, undefined,
+            undefined, this.period.startTime, endDate);
     }
 
 }

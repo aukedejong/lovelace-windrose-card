@@ -9,7 +9,7 @@ type: custom:windrose-card
 title: Minimal configuration
 windspeed_bar_location: right
 data_period:
-  hours_to_show: 200
+  period_back: -200h
 wind_direction_entity:
   entity: sensor.wind_direction_azimuth
 windspeed_entities:
@@ -27,24 +27,24 @@ current_direction:
 ```yaml
 type: custom:windrose-card
 title: Wind direction
+refresh_interval: 300
+windspeed_bar_location: bottom
 buttons_config:
   location: top
   buttons:
     - type: period_selector
       button_text: 1 hour
-      hours_to_show: 1
+      period_back: -1h
     - type: period_selector
       button_text: 8 hours
-      hours_to_show: 8
+      period_back: -8h
     - type: period_selector
       active: true
       button_text: 1 day
-      hours_to_show: 24
+      period_back: -1d
     - type: period_selector
       button_text: 10 days
-      hours_to_show: 240
-refresh_interval: 300
-windspeed_bar_location: bottom
+      period_back: -10d
 wind_direction_entity:
   entity: sensor.wind_direction_azimuth
   use_statistics: false
@@ -65,7 +65,11 @@ windspeed_entities:
     windspeed_bar_full: true
     current_speed_arrow: true
     use_statistics: false
-windrose_draw_north_offset: 0
+matching_strategy:
+  name: direction-first
+rose_config:
+  windrose_draw_north_offset: 0
+  center_calm_percentage: true
 current_direction:
   show_arrow: true
 compass_direction:
@@ -85,9 +89,6 @@ corner_info:
     label: Compass
     unit: °
     entity: input_number.compass
-cardinal_direction_letters: NESW
-matching_strategy: direction-first
-center_calm_percentage: true
 direction_labels:
   cardinal_direction_letters: NESW
   show_cardinal_directions: true
@@ -111,17 +112,17 @@ buttons_config:
   buttons:
     - type: period_selector
       button_text: 1 hour
-      hours_to_show: 1
+      period_back: -1h
     - type: period_selector
       button_text: 8 hours
-      hours_to_show: 8
+      period_back: -8h
     - type: period_selector
       active: true
       button_text: 1 day
-      hours_to_show: 24
+      period_back: -1d
     - type: period_selector
       button_text: 10 days
-      hours_to_show: 240
+      period_back: -10d
 wind_direction_entity:
   entity: sensor.wind_direction_azimuth
   use_statistics: false
@@ -134,7 +135,7 @@ windspeed_entities:
     windspeed_bar_full: false
     speed_range_beaufort: true
     current_speed_arrow: true
-    render_relative_scale: false
+    bar_render_scale: absolute
     use_statistics: false
     xspeed_ranges:
       - from_value: 0
@@ -185,7 +186,7 @@ text_blocks:
           </tr>
           <tr>
               <td>Temperature</td>
-              <td>${weather.gorredijk.temperature} °C</td>
+              <td>${weather.home.temperature} °C</td>
               <td>Wind speed</td>
               <td>${sensor.wind_speed} Bft</td>
           </tr>
@@ -245,9 +246,9 @@ type: custom:windrose-card
 refresh_interval: 300
 windspeed_bar_location: bottom
 data_period:
-  hours_to_show: 200
+  period_back: -200h
 wind_direction_entity:
-  entity: sensor.wind_direction
+  entity: sensor.wind_direction_azimuth
   use_statistics: false
   direction_compensation: 0
   direction_letters: NOZWX
@@ -335,11 +336,11 @@ actions:
       url_path: https://www.home-assistant.io
   speed_bar_1:
     tap_action:
-      entity: sensor.keuken_sensor_air_temperature
+      entity: sensor.kitchen_sensor_air_temperature
       action: more-info
   speed_bar_2:
     tap_action:
-      entity: sensor.keuken_sensor_air_temperature
+      entity: sensor.livingroom_sensor_air_temperature
       action: more-info
 direction_labels:
   cardinal_direction_letters: NESW
@@ -379,4 +380,115 @@ colors:
   bar_name: yellow
   bar_unit_values: blue
   bar_percentages: auto
+```
+
+## Period shift and play buttons.
+<img alt="Peview bars bottom" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/examples/period_shift_play_buttons.png?raw=true" width="482"/>
+
+```yaml
+type: custom:windrose-card
+title: Time shift/play buttons
+refresh_interval: 300
+windspeed_bar_location: right
+disable_animations: false
+log_level: INFO
+buttons_config:
+  location: bottom
+  buttons:
+    - type: period_shift
+      button_text: "-12h"
+      shift_period: -12h
+      colors:
+        active_color: red
+        active_bg_color: inherit
+        active_border_color: red
+        color: green
+        bg_color: inherit
+    - type: period_shift
+      button_text: +12h
+      shift_period: +12h
+      colors:
+        active_color: red
+        active_bg_color: inherit
+        color: green
+        bg_color: inherit
+    - type: period_shift_play
+      period_back: "-10w"
+      button_text: Play
+      step_period: +3h
+      window_period: +10d
+      delay: 50
+      use_statistics: true
+      statistics_period: hour
+    - type: period_selector
+      active: true
+      button_text: 7 days
+      preset_period: last_30_days
+    - type: period_selector
+      active: false
+      button_text: This month
+      preset_period: this_month
+      use_statistics: true
+      statistics_period: 5minute
+wind_direction_entity:
+  entity: sensor.gorredijk_wind_direction_azimuth
+  use_statistics: false
+  statistics_period: hour
+  direction_compensation: 0
+  direction_letters: NOZWX
+windspeed_entities:
+  - entity: sensor.gorredijk_wind_speed
+    name: Speed
+    speed_unit: auto
+    use_statistics: false
+    statistics_period: hour
+    windspeed_bar_full: false
+    bar_render_scale: percentage_relative
+    output_speed_unit: kph
+    current_speed_arrow: true
+    speed_range_beaufort: true
+current_direction:
+  show_arrow: true
+  arrow_size: 50
+  center_circle_size: 30
+  hide_direction_below_speed: 3
+direction_labels:
+  cardinal_direction_letters: NESW
+  show_cardinal_directions: true
+  show_intercardinal_directions: true
+matching_strategy:
+  name: full-time
+rose_config:
+  center_calm_percentage: true
+text_blocks:
+  top:
+    text: |-
+      <table>
+          <tr>
+              <td>Direction measure’s:</td>
+              <td>${direction-count}</td>
+              <td>Match count:</td>
+              <td>${match-count}</td>
+          </tr>
+          <tr>
+              <td>Speed measure’s.:</td>
+              <td>${speed-0-count}</td>
+              <td>Period hours</td>
+              <td>${period-hours}</td>
+          </tr>
+          <tr>
+              <td>First match time</td><td colspan="2">${date-first-match}, ${time-first-match}</td>
+          </tr>
+          <tr>
+              <td>Last match time</td><td colspan="2">${date-last-match} - ${time-last-match}</td>
+          </tr>
+          <tr>
+              <td>Period start</td><td colspan="2">${start-date} - ${start-time}</td>
+          </tr>
+          <tr>
+              <td>Period end</td><td colspan="2">${end-date} - ${end-time}</td>
+          </tr>
+      </table>
+    text_color: gray
+    text_size: 14
 ```
