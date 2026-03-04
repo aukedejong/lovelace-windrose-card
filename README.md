@@ -119,7 +119,7 @@ The statistics related properties overwrite the ones at the entity config level.
 | use_statistics                            |                    boolean                     |  false  |    -     | Use Home Assistant 5 minute statistics data, works only if available for the entities. Can make fetching data faster. This settings overwrite the setting at the direction and speen entity config. |
 | statistics_period                         |                     string                     | 5minute |    -     | Statistics period, possible options: 5minute, hour, day, week, month and year. More info about [data retention](#Home-Assistant-data-retention)                                                     |
 | preset_period                             |                     string                     |         |    -     | Preset periods, see list below this table.                                                                                                                                                          |
-| period_back (replaced hours_to_show       | string [(period code)](#Period-code-explained) |         |    -     | Configure period from moment back in history till now. More info: [Period code explained](#Period-code-explained)                                                                                   |
+| period_back (replaced hours_to_show)      | string [(period code)](#Period-code-explained) |         |    -     | Configure period from moment back in history till now. More info: [Period code explained](#Period-code-explained)                                                                                   |
 | from_hour_of_day                          |                     number                     |         |    -     | Show winddata from the configured hours till now. 0 is midnight, so only data of the current day is used. If the set hour is not yet arrived, data from the previous day from that hour is used.    |
 | from_period_ago (replaced from_hours_ago) | string [(period code)](#Period-code-explained) |         |    -     | Show winddata from the configured period ago till the to_period_ago value.                                                                                                                          |
 | to_period_ago (replace to_hours_ago)      | string [(period code)](#Period-code-explained) |         |    -     | Show winddata from the configured period from the from_period_ago value till this value.                                                                                                            |
@@ -172,11 +172,11 @@ buttons_config:
   buttons:
     - type: period_selector
       button_text: 100h
-      hours_to_show: 100
+      period_back: -100h
 ```
 
 #### Button type period_shift
-Shifts the time period with the set hours. This works for all period types. So if you have hours_to_show set, it moves that period keeping the period length the same.
+Shifts the time period with the set hours. This works for all period types. So if you have period_back set, it moves that period keeping the period length the same.
 Pressing again on the period_select button, reset the time period.
 It's not possible to shift the time to the future.
 There are no animations used for the transition.
@@ -317,7 +317,7 @@ Buttons:
 
 ### Home Assistant data retention
 
-The hours_to_show option does not have a limit yet. When set higher then is available in Home Assistant, the card will not show a message.
+The period_back option does not have a limit yet. When set higher then is available in Home Assistant, the card will not show a message.
 Home Assistant has a default entity state retention of 10 days. This can be changed in the recorder configuration. See [https://www.home-assistant.io/integrations/recorder/#purge_keep_days](https://www.home-assistant.io/integrations/recorder/#purge_keep_days).
 
 Information about the retrieved entity states, counts, dates can writen to the browser console (F12).
@@ -325,12 +325,12 @@ Set config  log_measurement_counts to true.
 
 ```
 date_period:
-  hours_to_show: 59
+  period_back: -59h
   log_measurement_counts: true
 ```
 
 #### State data
-When using entity state data, using an hours_to_show of more then 240 hours (10 days, in reality it's a little bit more) will not give the card more measurements.
+When using entity state data, using an period_back of more then 240 hours (10 days, in reality it's a little bit more) will not give the card more measurements.
 
 #### Statistics data
 When using statistics data, the card uses 5 minute period by default. This is short-term statistics and will not contain more then 10 days (default) history.
@@ -934,7 +934,7 @@ Uses speed_range_step and speed_range_max.
 type: custom:windrose-card
 title: Wind direction
 data_period:
-  hours_to_show: 24
+  period_back: -24h
 wind_direction_entity:
   entity: sensor.wind_direction
 windspeed_entities:
@@ -961,7 +961,7 @@ Always make sure there is a speedrange starting from 0, otherwise you get this e
 type: custom:windrose-card
 title: Wind direction
 data_period:
-  hours_to_show: 24
+  period_back: -24h
 wind_direction_entity:
   entity: sensor.wind_direction
 windspeed_entities:
