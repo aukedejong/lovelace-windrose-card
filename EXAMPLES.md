@@ -33,17 +33,17 @@ buttons_config:
   location: top
   buttons:
     - type: period_selector
-      button_text: 1 hour
+      button_text: 1 Hour
       period_back: -1h
     - type: period_selector
-      button_text: 8 hours
+      button_text: 8 Hours
       period_back: -8h
     - type: period_selector
       active: true
-      button_text: 1 day
+      button_text: 1 Day
       period_back: -1d
     - type: period_selector
-      button_text: 10 days
+      button_text: 10 Days
       period_back: -10d
 wind_direction_entity:
   entity: sensor.wind_direction_azimuth
@@ -77,7 +77,7 @@ compass_direction:
   entity: input_number.compass
 corner_info:
   top_left:
-    label: Current gust
+    label: Current Gust
     unit: null
     entity: sensor.wind_gust
   top_right:
@@ -104,24 +104,24 @@ direction_labels:
 
 ```yaml
 type: custom:windrose-card
-title: Wind direction
+title: Wind Direction
 refresh_interval: 300
 windspeed_bar_location: right
 buttons_config:
   location: bottom
   buttons:
     - type: period_selector
-      button_text: 1 hour
+      button_text: 1 Hour
       period_back: -1h
     - type: period_selector
-      button_text: 8 hours
+      button_text: 8 Hours
       period_back: -8h
     - type: period_selector
       active: true
-      button_text: 1 day
+      button_text: 1 Day
       period_back: -1d
     - type: period_selector
-      button_text: 10 days
+      button_text: 10 Days
       period_back: -10d
 wind_direction_entity:
   entity: sensor.wind_direction_azimuth
@@ -208,7 +208,7 @@ compass_direction:
   entity: input_number.compass
 corner_info:
   top_left:
-    label: Current gust
+    label: Current Gust
     unit: null
     entity: sensor.wind_gust
   top_right:
@@ -422,7 +422,7 @@ buttons_config:
       statistics_period: hour
     - type: period_selector
       active: true
-      button_text: 7 days
+      button_text: 7 Days
       preset_period: last_30_days
     - type: period_selector
       active: false

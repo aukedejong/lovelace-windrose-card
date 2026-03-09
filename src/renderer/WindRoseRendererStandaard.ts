@@ -5,7 +5,7 @@ import {TextAttributes} from "./TextAttributes";
 import {SvgUtil} from "./SvgUtil";
 import {Coordinate} from "./Coordinate";
 import {DegreesCalculator} from "./DegreesCalculator";
-import SVG, {PathArray, Svg} from "@svgdotjs/svg.js";
+import SVG, {Element, PathArray, Svg} from "@svgdotjs/svg.js";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardColors} from "../config/CardColors";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
@@ -75,6 +75,10 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
             .add(cross)
             .add(defaultCircles)
             .add(this.windDirectionTextGroup);
+    }
+
+    drawBackgroundImage(): Element {
+        return this.windRoseRenderUtil.drawBackgroundImage();
     }
 
     drawWindRose(windRoseData: WindRoseData, animate: boolean): void {

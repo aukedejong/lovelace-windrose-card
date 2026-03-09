@@ -215,10 +215,7 @@ export class WindRoseDirigent {
             this.infoCornersRendeerer?.drawCornerValues(this.entityStatesProcessor.getCornerInfoStates());
 
             if (this.cardConfig.roseConfig.backgroundImage !== undefined && this.backgroundElement === undefined) {
-                this.backgroundElement = this.svg.image(this.cardConfig.roseConfig.backgroundImage)
-                    .size(1000, 1000)
-                    .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
-                    .back();
+                this.backgroundElement = this.windRoseRenderer.drawBackgroundImage();
             }
             this.currentDirectionRenderer?.moveToFront();
             this.windRoseRenderer.rotateWindRose();

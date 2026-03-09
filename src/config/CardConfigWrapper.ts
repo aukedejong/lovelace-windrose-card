@@ -47,7 +47,7 @@ export class CardConfigWrapper {
         return {
             title: 'Wind direction',
             data_period: {
-                hours_to_show: GlobalConfig.defaultHoursToShow
+                period_back: GlobalConfig.defaultPeriodBack
             },
             rose_config: {
                 windrose_draw_north_offset: 0,

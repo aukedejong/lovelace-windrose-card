@@ -124,7 +124,10 @@ export class Period {
 
     static determineActivePeriod(dataPeriod: Period | undefined, buttonsConfig: ButtonsConfig | undefined): Period {
         const activeButton = ButtonsConfig.getActivePeriodSelector(buttonsConfig);
-        if (activeButton && activeButton instanceof PeriodSelectorButton) {
+        if (activeButton && dataPeriod) {
+            throw new Error('Data_period and active period_selector button configured. Data_period can be removed from config.');
+        }
+        if (activeButton) {
             return (activeButton as PeriodSelectorButton).period.clone() as Period;
         } else if (dataPeriod) {
             return dataPeriod.clone();

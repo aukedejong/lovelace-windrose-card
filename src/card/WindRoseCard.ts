@@ -154,12 +154,14 @@ export class WindRoseCard extends LitElement {
             </style>
             <div id="period-selector" class="${location}">
                 ${repeat(buttonsConfig.buttons, (button) => button.baseConfig.buttonText, (button, index) =>
-                    html`<div id="period-${index}" 
+                    html`${button.baseConfig.newRow ? html`<span class="new-row"></span>` : '' }
+                    <div id="period-${index}" 
                                           @click="${this.handleButtonClickFunc(button)}" 
                                           class="${button.baseConfig.active ? 'active' : ''}" 
                                           style="${button.baseConfig.buttonColors.getCss(button.baseConfig.active)}">
                                     ${button.baseConfig.buttonText}
                     </div>`)}
+                
             </div>
         `;
     }
@@ -266,8 +268,12 @@ export class WindRoseCard extends LitElement {
                 flex-direction: row;
                 justify-content: space-between;
                 flex-wrap: wrap;
-                row-gap: 8px;
-                column-gap: 8px;
+                row-gap: 0;
+                column-gap: 0;
+            }
+            #period-selector > .new-row {
+                flex-basis: 100%;
+                height: 0;
             }
             #period-selector.top {
                 margin-bottom: 10px;
@@ -282,6 +288,7 @@ export class WindRoseCard extends LitElement {
                 border-color: rgb(100, 100, 100);
                 cursor: pointer;
                 padding: 4px;
+                margin: 4px;
                 white-space: nowrap;
             }
             #period-selector.bottom-above-text {

@@ -2,6 +2,7 @@ export interface CardConfigRose {
 
     wind_direction_count: number | undefined;
     background_image: string | undefined;
+    clip_background_image: boolean | undefined;
     circle_legend_text_size: number | undefined;
     windrose_draw_north_offset: number | undefined;
     center_calm_percentage: boolean | undefined;

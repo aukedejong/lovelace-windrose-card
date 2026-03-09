@@ -7,7 +7,7 @@ import {CircleCoordinate} from "./CircleCoordinate";
 import {Coordinate} from "./Coordinate";
 import {ColorUtil} from "../util/ColorUtil";
 import {DegreesCalculator} from "./DegreesCalculator";
-import SVG, {Svg} from "@svgdotjs/svg.js";
+import SVG, {Element, Svg} from "@svgdotjs/svg.js";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardColors} from "../config/CardColors";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
@@ -82,6 +82,10 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
             .add(cross)
             .add(defaultCircles)
             .add(this.windDirectionTextGroup);
+    }
+
+    drawBackgroundImage(): Element {
+        return this.windRoseRenderUtil.drawBackgroundImage();
     }
 
     drawWindRose(windRoseData: WindRoseData, animate: boolean): void {

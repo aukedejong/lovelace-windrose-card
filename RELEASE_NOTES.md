@@ -1,4 +1,16 @@
 -------
+v2.1.0
+Fixes:
+- Don't allow data_period and active period_selector button at the same time.. Before the active button was used for the period, the data_period was ignore.
+- Default config for new card still used the hours_to_show option. Fix the default generated config and made it use a more features.
+- Text cleanup in the examples, fixes #192
+
+Features:
+- Added clip_background_image option in rose_config. Hide the background image part outside the outer circle. Fixes #184
+- Added option new_row for button, force the button to the next row. Fixes #178
+
+
+-------
 v2.0.0
 Breaking changes:
 - Changed hours_to_show to period_back with the possibily to use other unit instead of hours. See readme Period code explained.

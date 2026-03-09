@@ -7,6 +7,7 @@ export interface CardConfigButton extends CardConfigDataPeriod {
     button_text: string;
     colors: CardConfigButtonColors;
     active: boolean;
+    new_row: boolean;
 
     //WindRoseSpeedSelectButton
     windspeed_entity_index: number;

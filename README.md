@@ -102,6 +102,7 @@ Wind rose graph related configuration.
 |----------------------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | wind_direction_count       | string  |   16    |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                               |
 | background_image           | string  |         |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                |
+| clip_background_image      | boolean |  false  |    -     | Clips the background image, removed the part outside the outer circle of the windrose.                                                                         |
 | circle_legend_text_size    | number  |   30    |    -     | Text size of the percentage displayed in the windrose.                                                                                                         |
 | windrose_draw_north_offset | number  |    0    |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation            |
 | center_calm_percentage     | boolean |  true   |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave. |
@@ -163,6 +164,7 @@ If you have an active button of this type, the data_period object is not needed.
 |----------------------------|:-------------------------------:|:-------:|:--------:|-----------------------------------------------------------------------|
 | type                       |             string              |         |    x     | Fixed: period_selector                                                |
 | button_text                |             string              |         |    x     | Button text.                                                          |
+| new_row                    |             boolean             |  false  |    -     | Force this and the next buttons to the next row.                      |
 | colors                     | [object](#Object-button_colors) |         |    -     | Button specific colors, overwrite the defaults buttons_config object. |
 | active                     |             boolean             |  false  |    -     | If button is active. This is the initial data period.                 |
 | The data period properties |                                 |         |    -     | See [object](#Object-data_period)                                     |
@@ -320,12 +322,12 @@ Buttons:
 The period_back option does not have a limit yet. When set higher then is available in Home Assistant, the card will not show a message.
 Home Assistant has a default entity state retention of 10 days. This can be changed in the recorder configuration. See [https://www.home-assistant.io/integrations/recorder/#purge_keep_days](https://www.home-assistant.io/integrations/recorder/#purge_keep_days).
 
-Information about the retrieved entity states, counts, dates can writen to the browser console (F12).
+Information about the retrieved entity states, counts, dates can be writen to the browser console (F12).
 Set config  log_measurement_counts to true.
 
 ```
-date_period:
-  period_back: -59h
+matching_strategy:
+  name: speed-first
   log_measurement_counts: true
 ```
 

@@ -1,4 +1,4 @@
-import SVG, {Svg} from "@svgdotjs/svg.js";
+import SVG, {Element, Svg} from "@svgdotjs/svg.js";
 import {SvgUtil} from "./SvgUtil";
 import {WindRoseData} from "./WindRoseData";
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
@@ -8,6 +8,7 @@ import {DegreesCalculator} from "./DegreesCalculator";
 import {CardConfigCustomDirectionLabels} from "../card/CardConfigCustomDirectionLabels";
 import {DirectionLabels} from "../config/DirectionLabels";
 import {DimensionCalculator} from "../dimensions/DimensionCalculator";
+import {RoseConfig} from "../config/RoseConfig";
 
 export class WindRoseRenderUtil {
 
@@ -16,6 +17,7 @@ export class WindRoseRenderUtil {
     private readonly degreesCalculator: DegreesCalculator;
     private readonly svgUtil!: SvgUtil;
     private readonly svg: Svg;
+    private readonly roseConfig: RoseConfig;
     private readonly centerRadius: number;
     private readonly roseCenter: Coordinate;
     private readonly customLabels: CardConfigCustomDirectionLabels;
@@ -35,6 +37,7 @@ export class WindRoseRenderUtil {
         this.showCardinalDirections = config.directionLabels.showCardinalDirections;
         this.showIntercardinalDirections = config.directionLabels.showIntercardinalDirections;
         this.showSecondaryIntercardinalDirections = config.directionLabels.showSecondaryIntercardinalDirections;
+        this.roseConfig = config.roseConfig;
 
         this.dimensionCalculator = dimensionCalculator;
         this.degreesCalculator = degreesCalculator;
@@ -43,6 +46,19 @@ export class WindRoseRenderUtil {
 
         this.centerRadius = 60;
         this.roseCenter = this.dimensionCalculator.roseCenter();
+    }
+
+    public drawBackgroundImage(): Element {
+         let backgroundElement = this.svg.image(this.roseConfig.backgroundImage)
+            .size(1000, 1000)
+            .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
+            .back();
+        if (this.roseConfig.clipBackgroundImage) {
+            const clipper = this.svg.clip().add(this.svg.circle(1000)
+                .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500));
+            backgroundElement = backgroundElement.clipWith(clipper);
+        }
+        return backgroundElement;;
     }
 
     public calcLeaveArc(windDirectionCount: number): number {
