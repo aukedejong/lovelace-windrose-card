@@ -1,4 +1,14 @@
 -------
+v2.2.0
+Features:
+- Added Period code options for minutes and seconds. Example -10s (10 seconds back) and -10mi (10 minutes back). Fixes #194
+- Added rose_opacity option, useful if you want the background to be visible. Fixes #198
+
+Fixes:
+- When using relative period config, recalculate the time period when the card auto refreshes. Fixes #199
+
+
+-------
 v2.1.0
 Fixes:
 - Don't allow data_period and active period_selector button at the same time.. Before the active button was used for the period, the data_period was ignore.

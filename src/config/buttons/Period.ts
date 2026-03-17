@@ -23,12 +23,7 @@ export class Period {
         public initStartTime: Date | undefined,
         public initEndTime: Date | undefined) {
 
-        if (initStartTime === undefined || initEndTime === undefined) {
-            this.calculateTimeRange();
-        } else {
-            this.startTime = initStartTime;
-            this.endTime = initEndTime;
-        }
+        this.calculateTimeRange();
     }
 
     toString(): string {
@@ -37,17 +32,26 @@ export class Period {
 
     clone(): Period {
         return new Period(this.type, this.useStatistics,this.statisticsPeriod,  this.presetPeriod, this.periodBack, this.fromHourOfDay,
-            this.fromPeriodAgo, this.toPeriodAgo, this.startTime, this.endTime);
+            this.fromPeriodAgo, this.toPeriodAgo, undefined, undefined);
+    }
+
+    recalculateTimeRange(): void {
+        this.calculateTimeRange();
     }
 
     private calculateTimeRange() {
         const now = new Date();
-        if (this.startTime && this.endTime) {
+        if (this.initStartTime && this.initEndTime) {
+            this.startTime = this.initStartTime;
+            this.endTime = this.initEndTime;
             return; //Calculation not needed.
         }
         if (this.fromPeriodAgo != null && this.toPeriodAgo != null) {
             this.startTime = PeriodCodeHelper.move(this.fromPeriodAgo, now);
             this.endTime = PeriodCodeHelper.move(this.toPeriodAgo, now);
+
+        } else if (this.presetPeriod) {
+            [this.startTime, this.endTime] = PresetPeriodHelper.getPeriod(this.presetPeriod);
 
         } else if (this.periodBack) {
             this.startTime = PeriodCodeHelper.move(this.periodBack, new Date(now));
@@ -89,7 +93,6 @@ export class Period {
             let toDate: Date | undefined;
             if (ConfigCheckUtils.checkString(config.preset_period)) {
                 type = 'preset';
-                [fromDate, toDate] = PresetPeriodHelper.getPeriod(config.preset_period);
                 optionsSet++;
             }
             if (PeriodCodeHelper.checkInPast('period_back', config.period_back)) {

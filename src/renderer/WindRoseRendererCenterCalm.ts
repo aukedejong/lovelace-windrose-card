@@ -31,6 +31,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     private readonly speedRangeService: SpeedRangeService;
     private readonly leaveArc: number;
     private readonly centerRadius: number;
+    private readonly roseOpacity: number;
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
     private readonly roseCenter: Coordinate;
@@ -62,6 +63,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         this.degreesCalculator = degreesCalculator;
         this.roseCenter = this.dimensionCalculator.roseCenter();
         this.leaveArc = this.windRoseRenderUtil.calcLeaveArc(config.roseConfig.windDirectionCount);
+        this.roseOpacity = config.roseConfig.roseOpacity;
         this.backgroundDrawn = false;
         this.roseDrawn = false;
     }
@@ -208,7 +210,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         var y2 = center.y + Math.round(Math.sin(radians2) * radius);
 
         return svg.path(`M ${center.x} ${center.y} L ${x1} ${y1} A${radius} ${radius} 0 0 1 ${x2} ${y2} Z`)
-            .attr({'fill': color, stroke: this.cardColors.roseLines});
+            .attr({'fill': color, stroke: this.cardColors.roseLines, opacity: this.roseOpacity });
     }
 
     private drawCircleLegend(): SVG.G {
@@ -242,7 +244,8 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         const centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
             this.centerRadius));
         centerCircle.attr({
-            fill: this.speedRanges[0].color
+            fill: this.speedRanges[0].color,
+            opacity: this.roseOpacity
         });
         centerZeroSpeedGroup.add(centerCircle);
 

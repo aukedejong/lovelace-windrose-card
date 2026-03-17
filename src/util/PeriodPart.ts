@@ -1,17 +1,21 @@
 import {
     addDays,
     addHours,
+    addMinutes,
     addMonths,
     addQuarters,
+    addSeconds,
     addWeeks,
     addYears,
     subDays,
     subHours,
     subMonths,
     subQuarters,
+    subSeconds,
     subWeeks,
     subYears
 } from "date-fns";
+import {subMinutes} from "date-fns/subMinutes";
 
 export class PeriodPart {
 
@@ -45,6 +49,8 @@ export class PeriodPart {
     moveDate(date: Date): Date {
         if (this.direction === '+') {
             switch (this.unit) {
+                case 's': return addSeconds(date, this.value);
+                case 'mi': return addMinutes(date, this.value);
                 case 'h': return addHours(date, this.value);
                 case 'd': return addDays(date, this.value);
                 case 'w': return addWeeks(date, this.value);
@@ -55,6 +61,8 @@ export class PeriodPart {
             }
         } else {
             switch(this.unit) {
+                case 's': return subSeconds(date, this.value);
+                case 'mi': return subMinutes(date, this.value);
                 case 'h': return subHours(date, this.value);
                 case 'd': return subDays(date, this.value);
                 case 'w': return subWeeks(date, this.value);

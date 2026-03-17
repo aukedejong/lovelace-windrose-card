@@ -11,8 +11,8 @@ export class PeriodCodeHelper {
     // q quarter
     // y years
 
-    static readonly CHECK_REGEX = /^([+-]\d+[hdwmqy])+$/;
-    static readonly DECODE_REGEX = /([+-])(\d+)([hdwmqy])/g;
+    static readonly CHECK_REGEX = /^([+-]\d+(mi|[shdwmqy]))+$/;
+    static readonly DECODE_REGEX = /([+-])(\d+)(mi|[shdwmqy])/g;
 
     static checkInPast(configName: string, periodCode: string | undefined): boolean {
         if (PeriodCodeHelper.check(configName, periodCode)) {
@@ -35,7 +35,7 @@ export class PeriodCodeHelper {
         return false;
     }
 
-    static toHours(periodCode: string) {
+    static toHoursForTest(periodCode: string) {
         const parts = this.decodeToParts(periodCode);
         let hours = 0;
         parts.forEach((part) => {
@@ -47,6 +47,7 @@ export class PeriodCodeHelper {
     static move(periodCode: string, date: Date) {
         const parts = this.decodeToParts(periodCode);
         let newDate: Date = date;
+        console.log('Parts: ', parts);
         parts.forEach((part) => {
             newDate = part.moveDate(newDate);
         })
@@ -58,6 +59,7 @@ export class PeriodCodeHelper {
         let match: RegExpExecArray | null;
         PeriodCodeHelper.DECODE_REGEX.lastIndex = 0;
         while (( match = PeriodCodeHelper.DECODE_REGEX.exec(periodCode)) !== null) {
+            console.log('Match: ', match);
             result.push(new PeriodPart(match[1], match[3], +match[2]));
         }
         return result;

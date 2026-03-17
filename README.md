@@ -102,6 +102,7 @@ Wind rose graph related configuration.
 |----------------------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | wind_direction_count       | string  |   16    |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                               |
 | background_image           | string  |         |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                |
+| rose_opacity               | number  |    1    |    -     | Opacity of the fill colors in the rose leaves and center cirlce. Values between 0 and 1. Usefull if you want the background to be visible.                     |
 | clip_background_image      | boolean |  false  |    -     | Clips the background image, removed the part outside the outer circle of the windrose.                                                                         |
 | circle_legend_text_size    | number  |   30    |    -     | Text size of the percentage displayed in the windrose.                                                                                                         |
 | windrose_draw_north_offset | number  |    0    |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation            |
@@ -306,15 +307,17 @@ Buttons:
 - Type: period_shift_play
 - Config: step_period, window_period
 
-| Options      | Example | Description                        |
-|--------------|:-------:|------------------------------------|
-| -nh / +nh    |  -10h   | 10 hours before now                |
-| -nd / +nd    |  -10d   | 10 days before now                 |
-| -nw / +nw    |   -5w   | 5 week before now                  |
-| -nm / +nm    |   -2m   | 2 month before now                 |
-| -nq / +nq    |   -1q   | 1 year quater before now           |
-| -ny / +ny    |   -1y   | 1 year before now                  |
-| Combination  |  -5w+2d | 5 weeks before then 2 days forward |
+| Options     | Example | Description                        |
+|-------------|:-------:|------------------------------------|
+| -ns / +ns   |  -10s   | 10 seconds before now              |
+| -nmi / +nmi |  -10mi  | 10 minutes before now              |
+| -nh / +nh   |  -10h   | 10 hours before now                |
+| -nd / +nd   |  -10d   | 10 days before now                 |
+| -nw / +nw   |   -5w   | 5 week before now                  |
+| -nm / +nm   |   -2m   | 2 month before now                 |
+| -nq / +nq   |   -1q   | 1 year quater before now           |
+| -ny / +ny   |   -1y   | 1 year before now                  |
+| Combination | -5w+2d  | 5 weeks before then 2 days forward |
 
 
 ### Home Assistant data retention

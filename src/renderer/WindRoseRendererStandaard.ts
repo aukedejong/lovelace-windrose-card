@@ -27,6 +27,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
     private readonly degreesCalculator: DegreesCalculator;
     private readonly speedRangeService: SpeedRangeService;
     private readonly leaveArc: number;
+    private readonly roseOpacity: number;
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
     private readonly roseCenter: Coordinate;
@@ -55,6 +56,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         this.windRoseRenderUtil = new WindRoseRenderUtil(config, this.dimensionCalculator, this.degreesCalculator, svg);
         this.roseCenter = this.dimensionCalculator.roseCenter();
         this.leaveArc = this.windRoseRenderUtil.calcLeaveArc(config.roseConfig.windDirectionCount);
+        this.roseOpacity = config.roseConfig.roseOpacity;
         this.backgroundDrawn = false;
         this.roseDrawn = false;
     }
@@ -212,7 +214,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
             ['A', radius, radius, 0, 0, 1, x2, y2],
             ['Z']
         ]);
-        return svg.path(path).attr({'fill': color, stroke: this.cardColors.roseLines});
+        return svg.path(path).attr({'fill': color, stroke: this.cardColors.roseLines, opacity: this.roseOpacity });
     }
 
     private drawCircleLegend(): SVG.G {

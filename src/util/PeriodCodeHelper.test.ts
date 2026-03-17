@@ -27,28 +27,32 @@ describe('PeriodCodeHelper tests', () => {
         test('Two units, minus add plus', () => {
             expect(PeriodCodeHelper.check('', '-2y-1q')).toBeTruthy(); //-2y-1q
         });
+
+        test('Two units, minus add plus with mi', () => {
+            expect(PeriodCodeHelper.check('', '-2mi-1q')).toBeTruthy(); //-2y-1q
+        });
     });
 
     describe('Check to hours', () => {
 
         test('Hours to hours', () => {
-            expect(PeriodCodeHelper.toHours('+2h')).toEqual(2);
+            expect(PeriodCodeHelper.toHoursForTest('+2h')).toEqual(2);
         });
 
         test('Days to hours', () => {
-            expect(PeriodCodeHelper.toHours('-2d')).toEqual(-48);
+            expect(PeriodCodeHelper.toHoursForTest('-2d')).toEqual(-48);
         });
 
         test('Weeks to hours', () => {
-            expect(PeriodCodeHelper.toHours('+2w')).toEqual(14 * 24);
+            expect(PeriodCodeHelper.toHoursForTest('+2w')).toEqual(14 * 24);
         });
 
         test('Months to hours', () => {
-            expect(PeriodCodeHelper.toHours('+2m')).toEqual(31 * 24 * 2);
+            expect(PeriodCodeHelper.toHoursForTest('+2m')).toEqual(31 * 24 * 2);
         });
 
         test('Combi to hours', () => {
-            expect(PeriodCodeHelper.toHours('+2m+1d+4h')).toEqual(31 * 24 * 2 + 24 + 4);
+            expect(PeriodCodeHelper.toHoursForTest('+2m+1d+4h')).toEqual(31 * 24 * 2 + 24 + 4);
         });
     });
 
@@ -84,6 +88,16 @@ describe('PeriodCodeHelper tests', () => {
     });
 
     describe('Move date', () => {
+
+        test('+2s', () => {
+            expect(PeriodCodeHelper.move("+2s", new Date(2026,2,15, 0, 0, 0)))
+                .toEqual(new Date(2026,2,15, 0, 0, 2));
+        });
+
+        test('+2mi', () => {
+            expect(PeriodCodeHelper.move("+2mi", new Date(2026,2,15, 0, 0, 0)))
+                .toEqual(new Date(2026,2,15, 0, 2, 0));
+        });
 
         test('+2h', () => {
             expect(PeriodCodeHelper.move("+2h", new Date(2026,2,15)))
