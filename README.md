@@ -12,11 +12,7 @@ If you miss a feature that would make this card more useful for other use-cases,
 Look here for example configurations with screepcapture: [examples](EXAMPLES.md)
 
 <img alt="Peview bars right" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-example-right.png?raw=true" width="482"/>
-<video controls width="600">
-  <source src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/Windrose - Play demo.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
+<img alt="Peview bars right" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/windrose-play-demo-animated.gif?raw=true" width="482"/>
 
 ## Install
 
