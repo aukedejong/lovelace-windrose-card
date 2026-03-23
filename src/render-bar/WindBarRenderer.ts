@@ -13,6 +13,8 @@ import {WindBarRangeCalcUtil} from "./WindBarRangeCalcUtil";
 import {SegmentPosition} from "./SegmentPosition";
 import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 import {Log2} from "../util/Log2";
+import {CircleCoordinate} from "../renderer/CircleCoordinate";
+import {Coordinate} from "../renderer/Coordinate";
 
 export class WindBarRenderer {
 
@@ -33,6 +35,7 @@ export class WindBarRenderer {
     private readonly barLabelTextSize: number;
     private readonly barSpeedTextSize: number;
     private windBarGroup!: SVG.G;
+    private eventSegmentsGroup!: SVG.G;
     private animationOrigin!: number;
 
     constructor(config: CardConfigWrapper,
@@ -93,8 +96,10 @@ export class WindBarRenderer {
 
         if (this.windBarGroup) {
             this.windBarGroup.remove();
+            this.eventSegmentsGroup.remove();
         }
         this.windBarGroup = this.svgUtil.createGroup();
+        this.eventSegmentsGroup = this.svgUtil.createGroup();
 
         if (this.config.windspeedBarLocation === 'bottom') {
             this.animationOrigin = this.dimensionCalculator.barStartY(this.positionIndex);
@@ -128,6 +133,8 @@ export class WindBarRenderer {
         const labelUnitY = this.dimensionCalculator.barLabelY(this.positionIndex)
         const percLabelY = this.dimensionCalculator.barPercLabelY(this.positionIndex)
         const speedLabelY = this.dimensionCalculator.barSpeedLabelY(this.positionIndex);
+        const startX = segmentPositions[0].start;
+        const endX = startX + this.dimensionCalculator.barLength();
 
         //Bar label
         const barLabel = this.svgUtil.drawText2(segmentPositions[0].start, labelUnitY, this.windSpeedEntityConfig.name,
@@ -141,6 +148,22 @@ export class WindBarRenderer {
             const segment = this.svgUtil.drawPathRect(segmentPosition.start, y, segmentPosition.end, y2);
             segment.attr({ fill: this.speedRanges[index].color, stroke: this.config.cardColor.barBorder});
             this.windBarGroup.add(segment);
+
+            //Tooltip
+            let renderTooltip = false;
+            const percText = `${Math.round(percentages[index])}%`;
+            const percentageTextColor = this.getPercentageTextColor(this.cardColors.barPercentages, this.speedRanges[index].color);
+            const percLength = this.svgUtil.getTextLength(percText, this.windSpeedEntityConfig.barPercentageTextSize)
+            if (percentages[index] > 0 && segmentPosition.length < percLength) {
+                let tooltipCenter = this.determineTooltipPositionBottomBar(startX, endX, (percLength + 20) / 2, segmentPosition.center);
+                const tooltip = this.svgUtil.drawTooltip(tooltipCenter, y - ((this.windSpeedEntityConfig.barPercentageTextSize + 10) / 2) - 10, percLength + 20, percText, this.speedRanges[index].color, percentageTextColor, this.windSpeedEntityConfig.barPercentageTextSize);
+                const dot = this.svgUtil.drawCircle(new CircleCoordinate(new Coordinate(segmentPosition.center, percLabelY - 2), 4))
+                    .attr({ 'pointer-events': 'none', fill: percentageTextColor });
+                this.setTooltipEvents(segment, tooltip);
+                this.windBarGroup.add(dot);
+                this.eventSegmentsGroup.add(segment).add(dot);
+                renderTooltip = true;
+            }
 
             //Speed labels
             if (this.windSpeedEntityConfig.speedRangeBeaufort) {
@@ -156,9 +179,8 @@ export class WindBarRenderer {
             }
 
             //Percentages
-            if (percentages[index] > 0) {
-                let percentageTextColor = this.getPercentageTextColor(this.cardColors.barPercentages, this.speedRanges[index].color);
-                const perc = this.svgUtil.drawText2(segmentPosition.center, percLabelY, `${Math.round(percentages[index])}%`, TextAttributes.windBarAttribute(percentageTextColor, this.windSpeedEntityConfig.barPercentageTextSize, "middle", "middle"));
+            if (percentages[index] > 0 && !renderTooltip) {
+                const perc = this.svgUtil.drawText2(segmentPosition.center, percLabelY, percText, TextAttributes.windBarAttribute(percentageTextColor, this.windSpeedEntityConfig.barPercentageTextSize, "middle", "middle"));
                 this.windBarGroup.add(perc);
             }
         });
@@ -177,12 +199,24 @@ export class WindBarRenderer {
         }
     }
 
+    private determineTooltipPositionBottomBar(barStart: number, barEnd: number, offset: number, center: number) {
+        if (center < barStart + offset) {
+            return barStart + offset;
+        } else if (center > barEnd - offset) {
+            return barEnd - offset;
+        }
+        return center;
+    }
+
     private drawBarLegendRight(percentages: number[], segmentPositions: SegmentPosition[], animate: boolean) {
         const x = this.dimensionCalculator.barStartX(this.positionIndex);
         const x2 = x + this.barWidth;
         const labelX = this.dimensionCalculator.barLabelX(this.positionIndex);
         const barCenterX = this.dimensionCalculator.barPercLabelX(this.positionIndex);
         const speedLabelX = this.dimensionCalculator.barSpeedLabelX(this.positionIndex);
+        const tooltipMinimumY = segmentPositions[0].start - 25;
+        const startY = segmentPositions[0].start;
+        const endY = startY - this.dimensionCalculator.barLength();
 
         //Bar label
         var barLabel = this.svgUtil.drawText2(labelX, segmentPositions[0].start, this.windSpeedEntityConfig.name, TextAttributes.windBarAttribute(this.cardColors.barName, this.barLabelTextSize, "auto", "left"))
@@ -195,6 +229,24 @@ export class WindBarRenderer {
             const segment = this.svgUtil.drawPathRect(x, segmentPosition.start, x2, segmentPosition.end);
             segment.attr({ fill: this.speedRanges[index].color, stroke: this.config.cardColor.barBorder});
             this.windBarGroup.add(segment);
+
+            //Tooltip
+            let renderTooltip = false;
+            const percText = `${Math.round(percentages[index])}%`;
+            const percentageTextColor = this.getPercentageTextColor(this.cardColors.barPercentages, this.speedRanges[index].color);
+            const percLength = this.svgUtil.getTextLength(percText, this.windSpeedEntityConfig.barPercentageTextSize);
+            console.log(segmentPosition, percLength, startY, endY);
+            if (percentages[index] > 0 && segmentPosition.length > -this.windSpeedEntityConfig.barPercentageTextSize) {
+
+                const tooltipCenter = this.determineTooltipPositionRightBar(startY, endY, (this.windSpeedEntityConfig.barPercentageTextSize + 10) / 2, segmentPosition.center);
+                const tooltip = this.svgUtil.drawTooltip(x - ((percLength / 2) + 20), tooltipCenter, percLength + 10, percText, this.speedRanges[index].color, percentageTextColor, this.windSpeedEntityConfig.barPercentageTextSize);
+                const dot = this.svgUtil.drawCircle(new CircleCoordinate(new Coordinate(barCenterX, segmentPosition.center), 4))
+                    .attr({ 'pointer-events': 'none', fill: percentageTextColor });
+                this.setTooltipEvents(segment, tooltip);
+                this.windBarGroup.add(dot);
+                this.eventSegmentsGroup.add(segment).add(dot);
+                renderTooltip = true;
+            }
 
             //Speed labels
             if (this.windSpeedEntityConfig.speedRangeBeaufort) {
@@ -210,11 +262,11 @@ export class WindBarRenderer {
             }
 
             //Percentages
-            if (percentages[index] > 0) {
+            if (percentages[index] > 0 && !renderTooltip) {
                 let percentage = Math.round(percentages[index]);
                 let percFontSize = percentage === 100 ? this.windSpeedEntityConfig.barPercentageTextSize * 0.8 : this.windSpeedEntityConfig.barPercentageTextSize
                 let percentageTextColor = this.getPercentageTextColor(this.cardColors.barPercentages, this.speedRanges[index].color);
-                const perc = this.svgUtil.drawText2(barCenterX, segmentPosition.center, `${percentage}%`, TextAttributes.windBarAttribute(percentageTextColor, percFontSize, "middle", "middle"));
+                const perc = this.svgUtil.drawText2(barCenterX, segmentPosition.center + 5, `${percentage}%`, TextAttributes.windBarAttribute(percentageTextColor, percFontSize, "middle", "middle"));
                 this.windBarGroup.add(perc);
             }
 
@@ -235,11 +287,31 @@ export class WindBarRenderer {
         }
     }
 
+    moveEventSegmentsToFront() {
+        this.eventSegmentsGroup.front();
+    }
+
+    private determineTooltipPositionRightBar(barStart: number, barEnd: number, offset: number, center: number) {
+        if (center > barStart - offset) {
+            return barStart - offset;
+        } else if (center < barEnd + offset) {
+            return barEnd + offset;
+        }
+        return center;
+    }
+
     private getPercentageTextColor(configColor: string, backgroundColor: string) {
         if (configColor === 'auto') {
              return ColorUtil.getTextColorBasedOnBackground(backgroundColor);
         }
         return configColor;
+    }
+
+    private setTooltipEvents(segment: SVG.Element, tooltip: SVG.G): void {
+        segment.mouseover(() => { tooltip.front(); tooltip.show() });
+        segment.mouseout(() => tooltip.hide());
+        segment.touchmove(() => { tooltip.front(); tooltip.show() });
+        segment.touchleave(() => tooltip.hide());
     }
 
 }

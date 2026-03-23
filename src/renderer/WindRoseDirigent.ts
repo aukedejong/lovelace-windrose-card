@@ -220,6 +220,7 @@ export class WindRoseDirigent {
             this.currentDirectionRenderer?.moveToFront();
             this.windRoseRenderer.rotateWindRose();
             this.touchFacesRenderer.moveToFront();
+            this.windBarRenderers.forEach(windBarrenderer => windBarrenderer.moveEventSegmentsToFront());
             this.htmlRenderer.renderTextBlocks();
         }, animate ? 300 : 0);
     }

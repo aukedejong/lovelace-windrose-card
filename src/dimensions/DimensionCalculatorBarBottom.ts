@@ -89,7 +89,7 @@ export class DimensionCalculatorBarBottom extends DimensionCalculatorWindRose im
     }
 
     barPercLabelY(positionIndex: number): number {
-        return this.barStartY(positionIndex) + (this.barHeight(positionIndex) / 2) + 2;
+        return this.barStartY(positionIndex) + (this.barHeight(positionIndex) / 2) + 3;
     }
 
     touchFaceBar(positionIndex: number): RectCoordinates {

@@ -1,6 +1,7 @@
 export class SegmentPosition {
 
     public readonly center: number;
+    public readonly length: number;
 
     constructor(public readonly start: number,
                 public readonly end: number,
@@ -10,6 +11,7 @@ export class SegmentPosition {
                 public readonly showLastLabel: boolean) {
 
         this.center =  start + ((end - start) / 2);
+        this.length = end - start;
     }
 
     calcPosition(speed: number, minus = false) {

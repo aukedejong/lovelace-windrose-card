@@ -10,7 +10,7 @@ export class SvgUtil {
     constructor(public readonly svg: Svg) {
     }
 
-    public createGroup() {
+    public createGroup(): SVG.G {
         return this.svg.group();
     }
 
@@ -100,7 +100,7 @@ export class SvgUtil {
         return textWidth;
     }
 
-    public drawCircle(circleCoridnate: CircleCoordinate): SVG.Circle{
+    public drawCircle(circleCoridnate: CircleCoordinate): SVG.Circle {
         return this.svg.circle(circleCoridnate.radius * 2).center(circleCoridnate.centerPoint.x, circleCoridnate.centerPoint.y);
     }
 
@@ -110,5 +110,14 @@ export class SvgUtil {
 
     public drawText2(x: number, y: number, text: string, attributes: TextAttributes): SVG.Text {
         return this.svg.plain(text).dmove(x, y).attr(attributes);
+    }
+
+    public drawTooltip(x: number, y: number, length: number, text: string, backgroundColor: string, percentageTextColor: string, fontSize: number): SVG.G {
+        const height = fontSize + 10;
+        const border = this.svg.rect(length, height).move(x - (length / 2), y - (height / 2)).radius(10).attr({ fill: backgroundColor})
+        const tooltipText = this.drawText2(x, y + 3, text, TextAttributes.windBarAttribute(percentageTextColor, fontSize, "middle", "middle"));
+        const group = this.svg.group().add(border).add(tooltipText);
+        group.hide();
+        return group;
     }
 }

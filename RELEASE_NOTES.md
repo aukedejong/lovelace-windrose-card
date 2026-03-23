@@ -1,4 +1,10 @@
 -------
+v2.3.0
+Feature:
+- When a percentage doesn't fit the windbar segment, a dot is visible. When hovering/touching the segment, a popup shows the percentage. Fixes #193
+
+
+-------
 v2.2.0
 Features:
 - Added Period code options for minutes and seconds. Example -10s (10 seconds back) and -10mi (10 minutes back). Fixes #194

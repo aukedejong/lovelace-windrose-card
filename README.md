@@ -432,6 +432,24 @@ When your windspeed entity uses an unit of measurement not mentioned in the tabl
 Just enter in the name of any colormap from [this page](https://matplotlib.org/stable/gallery/color/colormap_reference.html),
 along with your desired upper and lower bounds and the increment from one range to the next.
 
+```yaml
+windspeed_entities:
+  - entity: sensor.wind_speed
+    name: Speed
+    speed_range_beaufort: false
+    speed_ranges:
+      - from_value: 0
+        color: rgb(0,255,0)
+      - from_value: 5
+        color: blue
+      - from_value: 10
+        color: hsl(200, 100%, 60%)
+      - from_value: 20
+        color: orange
+      - from_value: 40
+        color: red
+```
+
 ```python3
 from matplotlib import colormaps
 MIN_SPEED = 0
