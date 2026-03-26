@@ -10,7 +10,7 @@ export class GlobalConfig {
     static defaultWindspeedBarFull = true;
     static defaultMatchingStategy = 'direction-first';
     static defaultCenterCalmPercentage = true;
-    static defaultLogLevel: 'NONE';
+    static defaultLogLevel = 'NONE';
     static defaultSpeedRangeBeaufort = true;
     static defaultCenterCalmPercenteCircleSize = 60
     static defaultCurrentDirectionArrowSize = 50;
