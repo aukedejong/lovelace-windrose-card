@@ -1,11 +1,25 @@
+
 -------
-v2.3.0
+### ### v2.4.0
+Feature:
+- Center circle, where the calm percentage normally is displayed, can now be configured to show other values. Fixed #78
+
+Fixes:
+- Fixed situations where a lot of log message where logged. Thanks 2bitoperations
+- Auto determining input speed unit when used in corner info. Fixes #203
+
+Other:
+- Switched from rollup to esbuild.
+- Several dependency updates.
+
+-------
+### v2.3.0
 Feature:
 - When a percentage doesn't fit the windbar segment, a dot is visible. When hovering/touching the segment, a popup shows the percentage. Fixes #193
 
 
 -------
-v2.2.0
+### v2.2.0
 Features:
 - Added Period code options for minutes and seconds. Example -10s (10 seconds back) and -10mi (10 minutes back). Fixes #194
 - Added rose_opacity option, useful if you want the background to be visible. Fixes #198
@@ -13,9 +27,8 @@ Features:
 Fixes:
 - When using relative period config, recalculate the time period when the card auto refreshes. Fixes #199
 
-
 -------
-v2.1.0
+### v2.1.0
 Fixes:
 - Don't allow data_period and active period_selector button at the same time.. Before the active button was used for the period, the data_period was ignore.
 - Default config for new card still used the hours_to_show option. Fix the default generated config and made it use a more features.
@@ -27,7 +40,7 @@ Features:
 
 
 -------
-v2.0.0
+### v2.0.0
 Breaking changes:
 - Changed hours_to_show to period_back with the possibily to use other unit instead of hours. See readme Period code explained.
 - Changed from_hours_ago/to_hours_ago to from_period_ago/to_period_ago with the possibility to use other units instead of hours. See readme Period code explained.
@@ -92,11 +105,11 @@ Features:
 - Default generated config uses more features.
 - All removed/moved/changed config options should show an error message with helpful info, to help with the upgrade.
 
-v1.26.1
+### v1.26.1
 Fixes:
 - When current speed arrow is disabled, the current direction arrow did not work. Fixed. Thanks @rocket
 
-v1.26.0
+### v1.26.0
 Features:
 - Added time period option, from hours ago to a hours ago.
 - Added statistics to be used in text blocks:
@@ -112,47 +125,47 @@ Fixes:
 
 All credits go to David Marton, thanks for your work!
 
-v1.25.1
+### ### v1.25.1
 Fix:
 - Fix problem: Multiple background image elements added to HTML, when using period buttons.
 
-v1.25.0
+### v1.25.0
 Feature:
 - Add text above and below the windrose with entity states or specific values about the data used for the windrose.
 
-v1.24.1
+### v1.24.1
 Fix:
 - Possible fix for older HA versions.
 
-v1.24.0
+### v1.24.0
 Feature:
 - Added auto option for rose percentage text color, this is also the default.
   The text color depends on the background, making the text more readable when a windrose leave is the text background.
 
-v1.23.5
+### v1.23.5
 Fixes:
 - Current wind direction center circle is now drawn on top.
 - Current wind direction hide_direction_below_speed option was not working in some cases because the direction was not updated when the speed changes.
 - Improved efficiency during card start up.
 
-v1.23.4
+### v1.23.4
 Fixes:
 - Auto text color switching when light/dark theme switches automatically. Refresh was needed before.
 
-v1.23.3
+### v1.23.3
 Fixes:
 - Current direction arrow position fixe d.
 - Fixed error in console when not using actions.~~
 
-v1.23.2
+### v1.23.2
 Fixes:
 - Touch actions not working correctly for the speed bars.
 
-v1.23.1
+### v1.23.1
 Fixes:
 - Cropping of speed labels in certain conditions when using vertical bars.
 
-v1.23.0
+### v1.23.0
 Feature:
 - Animated rendering of the windrose leaves and the windbars. (can be disabled)
 - Wind speed compensation using a factor or shift. Fixes #138
@@ -160,21 +173,18 @@ Feature:
 Fixes:
 - Speed label space calculation fix when using vertical speed bars.
 
-
-v1.22.0
+### v1.22.0
 Features:
 - Hold action support
 - Support for new state_class for directional sensors.
   Since HA 2025.4 the new state class measurement_angle is introduced.
   With this change we have long term statistics (LTS) for wind direction data.
 
-
-v1.21.1
+### v1.21.1
 Fix:
 - Top margin for corner info label text increased.
 
-v1.21.0
-
+### v1.21.0
 Features:
 - Text sizes in speed bars configurable, fixes #132
 - Current speed arrow location can now also be rendered on the other side of the bar, fixes #139
@@ -205,12 +215,11 @@ windspeed_entities:
 
 Thank you all for reporting the issues and feature requests.
 
-
-v1.20.1
+### v1.20.1
 Fix:
 - Compass direction as heading, now the current wind direction is also compensated.
 
-v1.20.0
+### v1.20.0
 Feature:
 - Using compass auto rotation, it's now also possible to use it as heading direction instead of north direction. Thanks @alnavasa
   ```
@@ -224,61 +233,60 @@ Fixes:
 - Made speed unit recognition case-insensitive.
 
 
-v1.19.1
+### v1.19.1
 Fixes:
 - The second windspeedbar used the wrong speed unit converter.
 
-
 Finally implemented a feature requested back in 2023. It was a big one, needed a lot of code changes.
-v1.19.0
+
+### v1.19.0
 Feature:
 - Show current wind speed arrow on the legend bars, implements #49 
 Fixes:
 - When not showing all speed ranges in the legend bar (windspeed_bar_full: false), render_relative_scale did not work.
 - Refactored bar render code.
 
-
-v1.18.1
+### v1.18.1
 Fix:
 - In corner info, when converting degrees to cardinal direction letters, some direction where not converted correctly. Thanks deanfourie1. Fixes #137
 
-v1.18.0
+### v1.18.0
 Feature:
 - Background and text color configurable for the inactive data period select buttons.
 - Card width options for use in sections layout. Experimental, please give me feedback. I don't completely understand the inner workings of the sections layout view.
 
-v1.17.0
+### v1.17.0
 Features:
 - Current wind direction arrow hidden and show center circle/dot when wind speed is below configured value.
 
-v1.16.2
+### v1.16.2
 Fix:
 - deprecated root level hours_to_show property works again.
 
-v1.16.1
+### v1.16.1
 Fix:
 - range selector button layout fixes when using a more buttons that fit on a row.
 
-v1.16.0
+### v1.16.0
 
 Finally implemented a very long requested feature.
 Please report bugs and feature request in GitHub.
 Feature:
 - Time range selector buttons. Fixes #41
 
-v1.15.2
+### v1.15.2
 Fixes:
 - Top overflow error, fixes #131
   Only visible when title is not used.
 
-v1.15.1
+### v1.15.1
 Fixes:
 - Config check for conflicting speed range configurations
 - When the average wind speed is zero, first dynamic speed range was not selected.
 - Readme errors corrected
 - When using log_measurement_counts, also log average wind speed.
 
-v1.15.0
+### v1.15.0
 Features:
 - Statistics period can be configured. Long-term statistics can now be used by te card.
 - The windspeed unit can be auto determined for weather entity's. Reading attribute wind_speed_unit. Fixes #129
@@ -286,23 +294,22 @@ Features:
 - Measurement and match statistics can be logged to the console (F12), set this property to true: log_measurement_counts in data_period.
   In a future release these stats and counts can be displayed on the card.
 
-
-v1.14.2
+### v1.14.2
 Fixes:
 - Fix in error message, using wrong property name. Thanks @fishter.
 
-v1.14.1
+### v1.14.1
 Fixes:
 - Windrose circles rendering fixed when not using center calm percentage.
 
-v1.14.0
+### v1.14.0
 Features:
 - Attribute support for compass, corner info, wind direction and wind speed entities.
 - Improved feedback about configuration errors in the card. Before some error where only reported in the browsers console.
 - Added paragraph about data retention in the readme.
 
 
-v1.13.0
+### v1.13.0
 Features:
 - Intercardinal and secondary intercardinal direction labels can be displayed.
 - Labels based on the four direction letters or custom values for all 16 directions.
@@ -311,42 +318,41 @@ Fixes:
 - Updates and cleanup libraries/dependencies used by the card.
   Possibly fixes the Failed to execute 'define' on 'CustomElementRegistry' errors some people get.
 
-
-v1.12.8
+### v1.12.8
 Fix:
 - Only animate current winddirection indicator when it's state changes, not when windrose is redrawn or on initial render.
 
-v1.12.7
+### v1.12.7
 Fix:
 - 1 Beaufort kph speed limit fix, should be 0 to 1 kph.
 
-v1.12.6
+### v1.12.6
 Fixes:
 - Improved error message about cardinal_direction_letters config. Fixes #114
 - Position label windspeed Beaufort 12 is now centered. Fixes #116
 
-v1.12.5
+### v1.12.5
 Fix:
 - fallback to deprecated configuration for speed_range_max (root level)s
 
-v1.12.4
+### v1.12.4
 Fix:
 - render background image in the background, not in front of other elements.
 
-v1.12.3
+### v1.12.3
 Fix:
 - added mouse hoverhand cursor to action area, forgot one.
 
-v1.12.2
+### v1.12.2
 Fixes:
 - added mouse hover hand cursor to action area's.
 - Readme fix: center_calm_percentage option is not available within speed unit config.
 
-v1.12.1
+### v1.12.1
 Fixes:
 - Dynamic speed range fixes, had multiple bugs adn design errors.
 
-v1.12.0
+### v1.12.0
 Features:
 - New matching strategy 'full-time'. See Readme for details. Fixes #102
 - Corner info label and value text size configurable. Fixes #104
@@ -362,42 +368,40 @@ Features:
   - Wind speed sensor units: bft, mps, kph, mph, fps and knots
 - Dynamic speed ranges depending on average wind speed. Fixes #93
 
-v1.11.7
+### v1.11.7
 Fixes:
 - Initial cardinal direction letters configuration when adding card now works. Fixes #101
 
-v1.11.6
+### v1.11.6
 Fixes:
 - Small fix in measurement matching
 - Margin calculation when speedbars are hidden. Fixes #97
 - Background image position fixed when using longer cardinal direction labels. 
 
-v1.11.5
+### v1.11.5
 
 - Entity config check reverted, check if state is available in states array.
 
-v1.11.4
+### v1.11.4
 
 Fixes:
 - Text position error on Safari/MacOS/iOS, Tspan was added by the SVG library, causing padding issues.
 
-v1.11.3
-
+### v1.11.3
 Fixes:
 - Changed current wind direction arrow animation to take the shortest route to next wind direction. Fixes #94
 - Change from buggy Snap SVG library to SVG.js library. Needed for above fix.
 - Changed text alignments in the speed bar.
 - Corner info now using configured display precision. Fixes #92
 
-v1.11.2
+### v1.11.2
 Fix: Data_period Cconfig check fix
 
-v1.11.1
+### v1.11.1
 
 Fix: handles no wind periods better. Fixes #86
 
-v1.11.0
-
+### v1.11.0
 Feature:
 - Possible to display words instead of letters on the cardinal direction points on the windrose. Fixes #82
   Its not perfect, because of the margin used in combination with auto rotation and the display of corner info.
@@ -407,8 +411,7 @@ Fixes:
 - Matching strategy time-frame did not work for direction sensor using letters. Fixes: #64
 - The direction_letters property wasn't used, instead the cardinal_direction_letters property was also used to parse states.
 
-v1.10.0
-
+### v1.10.0
 Features:
 - Background image support. Fixes #54
 - New match strategy: time_frame. Fixes #64

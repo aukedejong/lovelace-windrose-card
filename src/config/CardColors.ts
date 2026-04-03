@@ -7,6 +7,7 @@ export class CardColors {
     roseSubIntercardinalDirectionLabels: string;
     roseCenterPercentage: string;
     rosePercentages: string;
+    roseCenterBackground: string;
     roseCurrentDirectionArrow: string;
     barBorder: string;
     barUnitName: string;
@@ -21,6 +22,7 @@ export class CardColors {
         this.roseIntercardinalDirectionLabels = primaryColor;
         this.roseSubIntercardinalDirectionLabels = primaryColor;
         this.roseCenterPercentage = 'auto';
+        this.roseCenterBackground = 'auto';
         this.rosePercentages = 'auto';
         this.roseCurrentDirectionArrow = 'red';
         this.barBorder = 'rgb(160, 160, 160)';
@@ -64,6 +66,9 @@ export class CardColors {
             }
             if (config.rose_center_percentage) {
                 cardColors.roseCenterPercentage = config.rose_center_percentage;
+            }
+            if (config.rose_center_background) {
+                cardColors.roseCenterBackground = config.rose_center_background;
             }
             if (config.rose_current_direction_arrow) {
                 cardColors.roseCurrentDirectionArrow = config.rose_current_direction_arrow

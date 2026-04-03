@@ -47,7 +47,6 @@ export class PeriodCodeHelper {
     static move(periodCode: string, date: Date) {
         const parts = this.decodeToParts(periodCode);
         let newDate: Date = date;
-        console.log('Parts: ', parts);
         parts.forEach((part) => {
             newDate = part.moveDate(newDate);
         })
@@ -59,7 +58,6 @@ export class PeriodCodeHelper {
         let match: RegExpExecArray | null;
         PeriodCodeHelper.DECODE_REGEX.lastIndex = 0;
         while (( match = PeriodCodeHelper.DECODE_REGEX.exec(periodCode)) !== null) {
-            console.log('Match: ', match);
             result.push(new PeriodPart(match[1], match[3], +match[2]));
         }
         return result;

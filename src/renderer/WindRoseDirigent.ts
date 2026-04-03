@@ -88,7 +88,7 @@ export class WindRoseDirigent {
         this.measurementMatcher = new MeasurementMatcher(cardConfig);
         this.svgUtil = new SvgUtil(this.svg);
         this.entityStatesProcessor = entityStatesProcessor;
-        this.templateParser = new TemplateParser(entityStatesProcessor);
+        this.templateParser = new TemplateParser();
         this.htmlRenderer = new HtmlRenderer(cardConfig, this.templateParser);
 
         for (const windSpeedEntity of this.cardConfig.windspeedEntities) {
@@ -114,13 +114,18 @@ export class WindRoseDirigent {
 
         this.touchFacesRenderer = new TouchFacesRenderer(cardConfig, this.dimensionCalculator, this.sendEvent, this.svgUtil);
 
-        if (this.cardConfig.roseConfig.centerCalmPercentage) {
-            this.percentageCalculator = new PercentageCalculatorCenterCalm(this.cardConfig.roseConfig);
-            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator);
-        } else {
+        if (this.cardConfig.roseConfig.firstSegmentInLeaves) {
             this.percentageCalculator = new PercentageCalculator(this.cardConfig.roseConfig);
+        } else {
+            this.percentageCalculator = new PercentageCalculatorCenterCalm(this.cardConfig.roseConfig);
+        }
+
+        if (this.cardConfig.roseConfig.centerCircleConfig.enabled) {
+            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator, this.templateParser);
+        } else {
             this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator);
         }
+
         if (this.cardConfig.currentDirection.showArrow) {
             this.currentDirectionRenderer = new CurrentDirectionRenderer(cardConfig, this.dimensionCalculator, this.svg);
         }

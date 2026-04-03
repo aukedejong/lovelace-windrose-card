@@ -19,7 +19,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
     private readonly log = new Log2("WindRoseRendererStandaard");
     
     private readonly cardColors: CardColors;
-    private readonly legendTextSize: number;
+    private readonly circleLegendTextSize: number;
     private speedRanges: SpeedRange[] = [];
     private readonly svg: Svg;
     private readonly dimensionCalculator: DimensionCalculator;
@@ -47,7 +47,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
-        this.legendTextSize = config.roseConfig.circleLegendTextSize;
+        this.circleLegendTextSize = config.roseConfig.circleLegendTextSize;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.degreesCalculator = degreesCalculator;
@@ -85,13 +85,13 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
 
     drawWindRose(windRoseData: WindRoseData, animate: boolean): void {
         if (windRoseData === undefined) {
-            this.log.error("drawWindRose(): Can't draw, no windrose data set.");
+            this.log.error('drawWindRose', 'Can\'t draw, no windrose data.');
             return;
         }
         if (!this.backgroundDrawn) {
             this.drawEmptyWindrose();
         }
-        this.log.method('drawWindRose()', 'windRoseData', windRoseData);
+        this.log.method('drawWindRose', 'windRoseData', windRoseData);
         this.roseDrawn = true;
         this.windRoseData = windRoseData;
         this.speedRanges = this.speedRangeService.getSpeedRanges();
@@ -129,7 +129,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
             this.log.method('removeGraphs', 'not drawn yet');
             return;
         }
-        this.log.method('removeGraphs()');
+        this.log.method('removeGraphs');
         this.leavesGroup.remove();
         this.roseCircles.remove();
         this.circleLegend.remove();
@@ -228,7 +228,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
             const y = center.y + (xy * i);
             const percentage = (this.windRoseData.percentagePerCircle * i) + "%";
             const text = this.svgUtil.drawText2(x, y, percentage,
-                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages, this.legendTextSize));
+                TextAttributes.roseLegendAttribute(this.cardColors.rosePercentages, this.circleLegendTextSize));
 
             // const length = this.svgUtil.getTextLength((this.windRoseData.percentagePerCircle * i) + "%", this.legendTextSize) + 10;
             // const rect = this.svgUtil.drawRect(new RectCoordinates(x - (length / 2), y - ((this.legendTextSize / 2) * 1.3), length, (this.legendTextSize * 1.1)));

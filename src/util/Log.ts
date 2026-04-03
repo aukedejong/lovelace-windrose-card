@@ -1,7 +1,8 @@
 export class Log {
 
     static level = 0;
-    static setLevel(level: string) {
+
+    static setLevel(level: string): void {
         switch(level) {
             case 'NONE': this.level = 0; break;
             case 'ERROR': this.level = 1; break;

@@ -6,10 +6,9 @@
   "type": "module",
   "scripts": {
     "http-server": "http-server ./",
-    "lint": "npx  eslint .",
-    "build-watch": "rollup -c --watch --no-cache",
-    "build": "rimraf build && tsc && rollup -c",
-    "rollup": "rollup -c",
+    "lint": "npx eslint .",
+    "esbuild": "esbuild src/card/WindRoseCard.ts --bundle --minify --outfile=build/windrose-card.js",
+    "esbuild-watch": "esbuild src/card/WindRoseCard.ts --bundle --minify --outfile=build/windrose-card.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -29,30 +28,23 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
     "@jest/globals": "^29.7.0",
-    "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-multi-entry": "^7.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.3.0",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
-    "rollup-plugin-typescript2": "^0.36.0",
     "babel-jest": "^29.7.0",
     "deepmerge": "^4.2.2",
-    "eslint": "9.26.0",
+    "esbuild": "0.27.4",
+    "eslint": "^9.39.4",
     "http-server": "^14.1.1",
     "jest": "^29.7.0",
     "rimraf": "^3.0.2",
-    "rollup": "^4.58.0",
     "ts-jest": "^29.2.5",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@lit-labs/scoped-registry-mixin": "^1.0.3",
-    "@svgdotjs/svg.js": "^3.2.4",
+    "@svgdotjs/svg.js": "^3.2.5",
     "date-fns": "^4.1.0",
-    "home-assistant-js-websocket": "^6.1.0",
-    "lit": "^3.2.1"
+    "home-assistant-js-websocket": "^9.6.0",
+    "lit": "^3.3.2"
   }
 }

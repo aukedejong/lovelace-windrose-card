@@ -5,6 +5,7 @@ export interface CardConfigColors {
     rose_intercardinal_direction_labels: string;
     rose_secondary_intercardinal_direction_labels: string;
     rose_center_percentage: string;
+    rose_center_background: string;
     rose_percentages: string;
     rose_current_direction_arrow: string;
     bar_border: string;

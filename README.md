@@ -98,18 +98,44 @@ Select "Manage Resources"
 
 Wind rose graph related configuration.
 
-| Name                       |  Type   | Default | Required | Description                                                                                                                                                    |
-|----------------------------|:-------:|:-------:|:--------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| wind_direction_count       | string  |   16    |    -     | How many wind direction the windrose can display, min. 4 max. 32                                                                                               |
-| background_image           | string  |         |    -     | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                                |
-| rose_opacity               | number  |    1    |    -     | Opacity of the fill colors in the rose leaves and center cirlce. Values between 0 and 1. Usefull if you want the background to be visible.                     |
-| clip_background_image      | boolean |  false  |    -     | Clips the background image, removed the part outside the outer circle of the windrose.                                                                         |
-| circle_legend_text_size    | number  |   30    |    -     | Text size of the percentage displayed in the windrose.                                                                                                         |
-| windrose_draw_north_offset | number  |    0    |    -     | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation            |
-| center_calm_percentage     | boolean |  true   |    -     | Show the calm speed percentage in the center of windrose. Directions corresponding with speeds in the first speedrange are not displayed in a direction leave. |
-| cirlce_count               | number  |  auto   |    -     | Number of legend circles in the windrose graph.                                                                                                                |
-| outer_circle_percentage    | number  |  auto   |    -     | Percentage of the outer largest legend circle.                                                                                                                 |
+| Name                                |               Type               |      Default       | Required | Description                                                                                                                                         |
+|-------------------------------------|:--------------------------------:|:------------------:|:-------:|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| wind_direction_count                |              string              |         16         |    -    | How many wind direction the windrose can display, min. 4 max. 32                                                                                    |
+| background_image                    |              string              |                    |    -    | Displays a square image with the same size and exactly behind the outer circle of the windrose.                                                     |
+| rose_opacity                        |              number              |         1          |    -    | Opacity of the fill colors in the rose leaves and center cirlce. Values between 0 and 1. Usefull if you want the background to be visible.          |
+| clip_background_image               |             boolean              |       false        |    -    | Clips the background image, removed the part outside the outer circle of the windrose.                                                              |
+| circle_legend_text_size             |              number              |         30         |    -    | Text size of the percentage displayed in the windrose.                                                                                              |
+| windrose_draw_north_offset          |              number              |         0          |    -    | At what degrees the north direction is drawn. For example, if you want the windrose north orientation the same as your properties north orientation |
+| center_calm_percentage (DEPRECATED) |             boolean              |        true        |    -    | This options is replaced by the center_circle object and first_segment_in_leaves boolean. Show the calm speed percentage in the center of windrose. |
+| first_segment_in_leaves             |             boolean              |       false        |    -    | When the center circle is used for the calm percentage, the circle is the first segment. Then this percentage should not be in the leaves.          |
+| center_circle                       | [object](#Object-center_circle)] | defaults of object |    -    | Configuration related to the center circle, sizes and which value is shown.                                                                         |
+| cirlce_count                        |              number              |        auto        |    -    | Number of legend circles in the windrose graph.                                                                                                     |
+| outer_circle_percentage             |              number              |        auto        |    -    | Percentage of the outer largest legend circle.                                                                                                      |
 
+
+### Object center_circle
+
+The center_calm_percentage is replaced by the center_circle object and the first_segment_in_leaves property.
+
+The center_calm_percentage was default true, so the defaults of this object and first_segment_in_leaves result in the same view.
+Also, when this object is not configured, the defaults are used. So cards with no specific configuration, will not see a change.
+
+
+| Name      |               Type               |       Default       | Required | Description                                                                                                                |
+|-----------|:--------------------------------:|:-------------------:|:--------:|----------------------------------------------------------------------------------------------------------------------------|
+| enabled   |              string              |        true         |    -     | If the center circle is shown.                                                                                             |
+| size      |              string              |         60          |    -     | Size of the center circle.                                                                                                 |
+| text      |              string              | ${calm-percentage}% |    -     | Text rendered in the center circle. See [here](#How-to-display-specific-values) for available values. HTML is not allowed. |
+| text_size |              string              |         40          |    -     | Text size.                                                                                                                 |
+
+```yaml
+rose_config:
+  center_circle:
+    enabled: true
+    size: 60
+    text: ${calm-percentage}%
+    text_size: 40
+```
 
 ### Object data_period
 
@@ -669,7 +695,7 @@ Specific values can be displayed in the text.
 | text_size         | string |                      |          | Text size in css pixels                                 |
 | text_color        | string | --primary-text-color |          | Text color, css value                                   |
 
-### How to display specific values.
+### How to display specific values
 
 You can use the values in the table below and any Home Assistant entity state or attribute.
 The name should be wrapped like this:
@@ -912,21 +938,22 @@ Matches:    1213 - min: 0 - max: 67.3 - average: 24.972333 - strategy: direction
 For some values the theme variable --primary-text-color is used. This is needed if HA switches theme and light/dark mode.
 CSS color values are allowed.
 
-| Name                                          |  Type  |       Default        | Required | Description                                                                            |
-|-----------------------------------------------|:------:|:--------------------:|:--------:|:---------------------------------------------------------------------------------------|
-| rose_lines                                    | string |  rgb(160, 160, 160)  |          | Circles, borders and the cross color                                                   |
-| rose_direction_letters (DEPRECATED)           | string | --primary-text-color |          | Direction labels colors                                                                |
-| rose_cardinal_direction_labels                | string | --primary-text-color |          | Cardinal direction labels color                                                        |
-| rose_intercardinal_direction_labels           | string | --primary-text-color |          | Intercardinal direction labels color                                                   |
-| rose_secondary_intercardinal_direction_labels | string | --primary-text-color |          | Secondary intercardinal direction labels color                                         |
-| rose_center_percentage                        | string |         auto         |          | Center calm percentage color. Auto means black or white depending on background color. |
-| rose_percentages                              | string |         auto         |          | Percentage legend color. Auto means using browsers css mix-blend-mode option.          |
-| rose_current_direction_arrow                  | string |         red          |          | Current direction arrow color                                                          |
-| bar_border                                    | string |  rgb(160, 160, 160)  |          | Bar border color                                                                       |
-| bar_unit_name                                 | string | --primary-text-color |          | Unit name color                                                                        |
-| bar_name                                      | string | --primary-text-color |          | Entity name color                                                                      |
-| bar_unit_values                               | string | --primary-text-color |          | Unit value color                                                                       |
-| bar_percentages                               | string |         auto         |          | Percentage color. Auto means black or white depending on background color.             |
+| Name                                          |  Type  |       Default        | Required | Description                                                                                     |
+|-----------------------------------------------|:------:|:--------------------:|:--------:|:------------------------------------------------------------------------------------------------|
+| rose_lines                                    | string |  rgb(160, 160, 160)  |          | Circles, borders and the cross color                                                            |
+| rose_direction_letters (DEPRECATED)           | string | --primary-text-color |          | Direction labels colors                                                                         |
+| rose_cardinal_direction_labels                | string | --primary-text-color |          | Cardinal direction labels color                                                                 |
+| rose_intercardinal_direction_labels           | string | --primary-text-color |          | Intercardinal direction labels color                                                            |
+| rose_secondary_intercardinal_direction_labels | string | --primary-text-color |          | Secondary intercardinal direction labels color                                                  |
+| rose_center_percentage                        | string |         auto         |          | Center circle text color. Auto means black or white depending on background color.              |
+| rose_center_background                        | string |         auto         |          | Center circle background. Auto means the same as the background color of the first bar segment. |
+| rose_percentages                              | string |         auto         |          | Percentage legend color. Auto means using browsers css mix-blend-mode option.                   |
+| rose_current_direction_arrow                  | string |         red          |          | Current direction arrow color                                                                   |
+| bar_border                                    | string |  rgb(160, 160, 160)  |          | Bar border color                                                                                |
+| bar_unit_name                                 | string | --primary-text-color |          | Unit name color                                                                                 |
+| bar_name                                      | string | --primary-text-color |          | Entity name color                                                                               |
+| bar_unit_values                               | string | --primary-text-color |          | Unit value color                                                                                |
+| bar_percentages                               | string |         auto         |          | Percentage color. Auto means black or white depending on background color.                      |
 _
 ### Example colors yaml
 ```yaml

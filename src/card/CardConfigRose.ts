@@ -1,3 +1,5 @@
+import {CardConfigCenterCircle} from "./CardConfigCenterCircle";
+
 export interface CardConfigRose {
 
     wind_direction_count: number | undefined;
@@ -6,7 +8,10 @@ export interface CardConfigRose {
     clip_background_image: boolean | undefined;
     circle_legend_text_size: number | undefined;
     windrose_draw_north_offset: number | undefined;
+
+    first_segment_in_leaves: boolean | undefined;
     center_calm_percentage: boolean | undefined;
+    center_circle: CardConfigCenterCircle;
 
     circle_count: number | undefined;
     outer_circle_percentage: number | undefined

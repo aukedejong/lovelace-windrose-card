@@ -23,6 +23,13 @@ export class ConfigCheckUtils {
         return +number;
     }
 
+    public static checkBooleanOrDefault(value: boolean | undefined, defaultBoolean: boolean): boolean {
+        if (value === undefined || value === null) {
+            return defaultBoolean;
+        }
+        return value;
+    }
+
     public static checkBooleanDefaultFalse(value: boolean | undefined): boolean {
         if (value === undefined || value === null) {
             return false;

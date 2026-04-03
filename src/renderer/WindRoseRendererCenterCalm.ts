@@ -12,10 +12,11 @@ import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CardColors} from "../config/CardColors";
 import {SpeedRangeService} from "../speed-range/SpeedRangeService";
 import {WindRoseRenderUtil} from "./WindRoseRenderUtil";
-import {GlobalConfig} from "../config/GlobalConfig";
 import {DimensionCalculator} from "../dimensions/DimensionCalculator";
 import {WindRoseRenderer} from "./WindRoseRenderer";
 import {Log2} from "../util/Log2";
+import {CenterCircleConfig} from "../config/CenterCircleConfig";
+import {TemplateParser} from "../textblocks/TemplateParser";
 
 export class WindRoseRendererCenterCalm implements WindRoseRenderer {
 
@@ -29,8 +30,9 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     private readonly windRoseRenderUtil: WindRoseRenderUtil;
     private readonly degreesCalculator: DegreesCalculator;
     private readonly speedRangeService: SpeedRangeService;
+    private readonly templateParser: TemplateParser;
     private readonly leaveArc: number;
-    private readonly centerRadius: number;
+    private readonly centerCircleConfig: CenterCircleConfig;
     private readonly roseOpacity: number;
     svgUtil!: SvgUtil;
     windRoseData!: WindRoseData;
@@ -51,16 +53,18 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
                 dimensionCalculator: DimensionCalculator,
                 speedRangeService: SpeedRangeService,
                 svg: Svg,
-                degreesCalculator: DegreesCalculator) {
+                degreesCalculator: DegreesCalculator,
+                templateParser: TemplateParser) {
         this.cardColors = config.cardColor;
         this.circleLegendTextSize = config.roseConfig.circleLegendTextSize;
-        this.centerRadius = GlobalConfig.defaultCenterCalmPercenteCircleSize;
+        this.centerCircleConfig = config.roseConfig.centerCircleConfig;
         this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
         this.dimensionCalculator = dimensionCalculator;
         this.windRoseRenderUtil = new WindRoseRenderUtil(config, this.dimensionCalculator, degreesCalculator, svg);
         this.degreesCalculator = degreesCalculator;
+        this.templateParser = templateParser;
         this.roseCenter = this.dimensionCalculator.roseCenter();
         this.leaveArc = this.windRoseRenderUtil.calcLeaveArc(config.roseConfig.windDirectionCount);
         this.roseOpacity = config.roseConfig.roseOpacity;
@@ -75,7 +79,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         }
         this.log.method('drawEmptyWindrose');
         this.backgroundDrawn = true;
-        this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" })
+        this.svg.attr({ viewBox: this.dimensionCalculator.viewBox(), preserveAspectRatio: "xMidYMid meet" });
         const cross = this.windRoseRenderUtil.drawBackgroundCross();
         const defaultCircles = this.windRoseRenderUtil.drawInnerOuterCircle(true);
         this.windDirectionTextGroup = this.windRoseRenderUtil.drawWindDirectionText();
@@ -92,7 +96,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
 
     drawWindRose(windRoseData: WindRoseData, animate: boolean): void {
         if (windRoseData === undefined) {
-            this.log.error('drawWindRose()', 'Can\'t draw, no windrose data.');
+            this.log.error('drawWindRose', 'Can\'t draw, no windrose data.');
             return;
         }
         if (!this.backgroundDrawn) {
@@ -122,7 +126,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     animateRemoveGraphs(): boolean {
         if (this.leavesGroup === undefined) {
             this.log.method('animateRemoveGraphs', 'not rendered yet');
-            return false
+            return false;
         }
         this.log.method('animateRemoveGraphs');
         this.leavesGroup.animate(300, 0, 'now')
@@ -188,11 +192,11 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
                 }
             }
         }
-        const maxDirectionRadius = (directionPercentage * (this.dimensionCalculator.roseRadius - this.centerRadius)) / this.windRoseData.maxCirclePercentage;
+        const maxDirectionRadius = (directionPercentage * (this.dimensionCalculator.roseRadius - this.centerCircleConfig.size)) / this.windRoseData.maxCirclePercentage;
         for (let i = this.speedRanges.length - 1; i >= 0; i--) {
             const sppedPart = this.drawSpeedPart(this.svg,
                 degrees - 90,
-                (maxDirectionRadius * (percentages[i] / 100)) + this.centerRadius,
+                (maxDirectionRadius * (percentages[i] / 100)) + this.centerCircleConfig.size,
                 this.speedRanges[i].color);
             windDirection.add(sppedPart);
         }
@@ -216,8 +220,8 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     private drawCircleLegend(): SVG.G {
         const circleLegendGroup = this.svg.group();
         const center = this.dimensionCalculator.roseCenter();
-        const radiusStep = (this.dimensionCalculator.roseRadius - this.centerRadius) / this.windRoseData.circleCount;
-        const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.centerRadius;
+        const radiusStep = (this.dimensionCalculator.roseRadius - this.centerCircleConfig.size) / this.windRoseData.circleCount;
+        const centerXY = Math.cos(DrawUtil.toRadians(45)) * this.centerCircleConfig.size;
         const xy = Math.cos(DrawUtil.toRadians(45)) * radiusStep;
 
         for (let i = 1; i <= this.windRoseData.circleCount; i++) {
@@ -239,12 +243,12 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
 
     private drawCenterZeroSpeed(): SVG.G {
         const center = this.dimensionCalculator.roseCenter();
+        const centerBackgroundColor = this.cardColors.roseCenterBackground === "auto" ? this.speedRanges[0].color :  this.cardColors.roseCenterBackground;
 
         const centerZeroSpeedGroup = this.svg.group();
-        const centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),
-            this.centerRadius));
+        const centerCircle = this.svgUtil.drawCircle(new CircleCoordinate((center),  this.centerCircleConfig.size));
         centerCircle.attr({
-            fill: this.speedRanges[0].color,
+            fill: centerBackgroundColor,
             opacity: this.roseOpacity
         });
         centerZeroSpeedGroup.add(centerCircle);
@@ -253,9 +257,11 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         if (textColor === 'auto') {
              textColor = ColorUtil.getTextColorBasedOnBackground(this.speedRanges[0].color);
         }
-        if (!isNaN(this.windRoseData.speedRangePercentages[0])) {
-            const centerText = this.svgUtil.drawText2(center.x, center.y, Math.round(this.windRoseData.speedRangePercentages[0]) + '%',
-                TextAttributes.windBarAttribute(textColor, 40, "middle", "middle"));
+        let text = undefined;
+        if (this.centerCircleConfig.enabled) {
+            text = this.templateParser.parse(this.centerCircleConfig.text!);
+            const centerText = this.svgUtil.drawText2(center.x, center.y, text,
+                TextAttributes.windBarAttribute(textColor, this.centerCircleConfig.textSize, "middle", "middle"));
             centerZeroSpeedGroup.add(centerText);
         }
         return centerZeroSpeedGroup;

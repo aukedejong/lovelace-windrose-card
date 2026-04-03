@@ -123,8 +123,7 @@ export class CardConfigWrapper {
           </tr>
       </table>`
                 },
-            },
-            log_level: GlobalConfig.defaultLogLevel
+            }
         };
     }
 
@@ -174,8 +173,8 @@ export class CardConfigWrapper {
     private checkCurrentDirection(): CurrentDirectionConfig {
         if (this.cardConfig.current_direction) {
             let centerCircleSize;
-            if (this.roseConfig.centerCalmPercentage) {
-                centerCircleSize = GlobalConfig.defaultCurrentDirectionCircleSizeCenterCalm;
+            if (this.roseConfig.centerCircleConfig.enabled) {
+                centerCircleSize = this.roseConfig.centerCircleConfig.size;
             } else {
                 centerCircleSize = ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize);
             }
@@ -273,13 +272,21 @@ export class CardConfigWrapper {
             throw new Error('windrose_draw_north_offset option on root level is moved to rose_config object.')
         }
         if (ConfigCheckUtils.checkHasProperty(cardConfig, 'center_calm_percentage')) {
-            throw new Error('center_calm_percentage option on root level is moved to rose_config object.')
+            throw new Error('center_calm_percentage option is deprecated and replaced by rose_config.center_circle and rose_config.first_segment_in_leaves.')
         }
         if (ConfigCheckUtils.checkHasProperty(cardConfig, 'cirlce_count')) {
             throw new Error('cirlce_count option on root level is moved to rose_config object.')
         }
         if (ConfigCheckUtils.checkHasProperty(cardConfig, 'outer_circle_percentage')) {
             throw new Error('outer_circle_percentage option on root level is moved to rose_config object.')
+        }
+
+        if (ConfigCheckUtils.checkHasProperty(cardConfig, 'rose_config') &&
+            ConfigCheckUtils.checkHasProperty(cardConfig.rose_config, 'center_calm_percentage') &&
+            (ConfigCheckUtils.checkHasProperty(cardConfig.rose_config, 'center_circle') ||
+            ConfigCheckUtils.checkHasProperty(cardConfig.rose_config, 'first_segment_in_leaves'))) {
+
+            throw new Error("when using rose_config.center_circle or first_segment_in_leaves properties, center_calm_percentage should be removed.");
         }
     }
 }

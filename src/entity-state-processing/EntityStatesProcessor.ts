@@ -53,7 +53,8 @@ export class EntityStatesProcessor {
 
         const entitiesTop = TemplateParser.findEntityPlaceholders(cardConfig.textBlocks?.top?.text);
         const entitiesBottom = TemplateParser.findEntityPlaceholders(cardConfig.textBlocks?.bottom?.text);
-        this.textBlockStates = entitiesTop.concat(entitiesBottom);
+        const entitiesCenterCircle = TemplateParser.findEntityPlaceholders(cardConfig?.roseConfig?.centerCircleConfig?.text);
+        this.textBlockStates = entitiesTop.concat(entitiesBottom).concat(entitiesCenterCircle);
 
         this.cornerInfoStates = [this.cornerTopLeftState, this.cornerTopRightState, this.cornerBottomLeftState, this.cornerBottomRightState];
         this.entityStates = [this.windDirectionState, this.compassDirectionState].concat(this.windSpeedStates).concat(this.cornerInfoStates).concat(this.textBlockStates);

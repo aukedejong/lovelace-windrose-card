@@ -1,11 +1,11 @@
 import {CardConfigWrapper} from "../config/CardConfigWrapper";
 import {CornerInfo} from "../config/CornerInfo";
 import {HomeAssistant} from "../util/HomeAssistant";
-import {WindSpeedEntity} from "../config/WindSpeedEntity";
 import {WindSpeedConvertFunctionFactory} from "../converter/WindSpeedConvertFunctionFactory";
 import {Log} from "../util/Log";
 import {TextBlock} from "../config/TextBlock";
 import {TemplateParser} from "../textblocks/TemplateParser";
+import {CenterCircleConfig} from "../config/CenterCircleConfig";
 
 export class EntityChecker {
 
@@ -17,7 +17,7 @@ export class EntityChecker {
         for (const entity of cardConfig.windspeedEntities) {
             this.checkEntity(entity.entity, entity.attribute, entity.useStatistics, hass);
             if (entity.speedUnit === 'auto') {
-                entity.speedUnit = this.determineAutoSppedUnit(entity, hass);
+                entity.speedUnit = this.determineAutoSppedUnit(entity.entity, hass);
             }
         }
 
@@ -32,19 +32,8 @@ export class EntityChecker {
 
         this.checkTextBlock(cardConfig?.textBlocks?.top, hass);
         this.checkTextBlock(cardConfig?.textBlocks?.bottom, hass);
-    }
 
-    private determineAutoSppedUnit(entity: WindSpeedEntity, hass: HomeAssistant): string {
-        let speedUnit = hass.states[entity.entity].attributes.unit_of_measurement as string;
-        if (speedUnit === undefined) {
-            speedUnit = hass.states[entity.entity].attributes.wind_speed_unit;
-        }
-        speedUnit = speedUnit?.toLowerCase();
-        if (new WindSpeedConvertFunctionFactory().speedUnitRecognized(speedUnit)) {
-            Log.info(`Recognized speed unit ${speedUnit} for entity ${entity.entity}`);
-            return speedUnit;
-        }
-        throw new Error(`Entity ${entity.entity} speed unit (${speedUnit}) could not be auto determined, please configure the unit.`)
+        this.checkCenterCircleTemplate(cardConfig?.roseConfig?.centerCircleConfig, hass);
     }
 
     private checkCornerInfo(cornerInfo: CornerInfo, hass: HomeAssistant) {
@@ -53,7 +42,23 @@ export class EntityChecker {
             if (cornerInfo.precision === undefined) {
                 cornerInfo.precision = hass.entities[cornerInfo.entity]?.display_precision;
             }
+            if (cornerInfo.outputUnit && cornerInfo.inputUnit === undefined) {
+                cornerInfo.inputUnit = this.determineAutoSppedUnit(cornerInfo.entity, hass);
+            }
         }
+    }
+
+    private determineAutoSppedUnit(entity: string, hass: HomeAssistant): string {
+        let speedUnit = hass.states[entity].attributes.unit_of_measurement as string;
+        if (speedUnit === undefined) {
+            speedUnit = hass.states[entity].attributes.wind_speed_unit;
+        }
+        speedUnit = speedUnit?.toLowerCase();
+        if (new WindSpeedConvertFunctionFactory().speedUnitRecognized(speedUnit)) {
+            Log.info(`Recognized speed unit ${speedUnit} for entity ${entity}`);
+            return speedUnit;
+        }
+        throw new Error(`Entity ${entity} speed unit (${speedUnit}) could not be auto determined, please configure the unit.`)
     }
 
     private checkTextBlock(textBlock: TextBlock | undefined, hass: HomeAssistant) {
@@ -61,6 +66,16 @@ export class EntityChecker {
             return;
         }
         const entities = TemplateParser.findEntityPlaceholders(textBlock.text);
+        for (const entity of entities) {
+            this.checkEntity(entity.entity!, entity.attribute, false, hass);
+        }
+    }
+
+    private checkCenterCircleTemplate(centerCircleConfig: CenterCircleConfig, hass: HomeAssistant) {
+        if (!centerCircleConfig) {
+            return;
+        }
+        const entities = TemplateParser.findEntityPlaceholders(centerCircleConfig.text);
         for (const entity of entities) {
             this.checkEntity(entity.entity!, entity.attribute, false, hass);
         }

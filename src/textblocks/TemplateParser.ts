@@ -4,7 +4,6 @@ import {MatchUtils} from "../matcher/MatchUtils";
 import {Measurement} from "../measurement-provider/Measurement";
 import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
 import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
-import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
 import {EntityState} from "../entity-state-processing/EntityState";
 import {Period} from "../config/buttons/Period";
 
@@ -12,7 +11,7 @@ export class TemplateParser {
 
     templateValues: TemplateValue[] = [];
 
-    constructor(private readonly entityStatesProcessor: EntityStatesProcessor) {}
+    constructor() {}
 
     public clearValues() {
         this.templateValues = [];
@@ -29,7 +28,9 @@ export class TemplateParser {
     }
 
     public addWindRoseDataValues(windRoseData: WindRoseData): void {
-        this.addOrUpdateValue("calm-percentage", Math.round(windRoseData.speedRangePercentages[0]));
+        if (!isNaN(windRoseData.speedRangePercentages[0])) {
+            this.addOrUpdateValue("calm-percentage", Math.round(windRoseData.speedRangePercentages[0]));
+        }
     }
 
     public addMeasurementValues(measurementHolder: MeasurementHolder): void {

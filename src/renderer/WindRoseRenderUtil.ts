@@ -44,12 +44,12 @@ export class WindRoseRenderUtil {
         this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
 
-        this.centerRadius = 60;
+        this.centerRadius = config.roseConfig.centerCircleConfig.size;
         this.roseCenter = this.dimensionCalculator.roseCenter();
     }
 
     public drawBackgroundImage(): Element {
-         let backgroundElement = this.svg.image(this.roseConfig.backgroundImage)
+        let backgroundElement = this.svg.image(this.roseConfig.backgroundImage)
             .size(1000, 1000)
             .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500)
             .back();
@@ -58,7 +58,7 @@ export class WindRoseRenderUtil {
                 .move(this.dimensionCalculator.roseCenter().x - 500, this.dimensionCalculator.roseCenter().y - 500));
             backgroundElement = backgroundElement.clipWith(clipper);
         }
-        return backgroundElement;;
+        return backgroundElement;
     }
 
     public calcLeaveArc(windDirectionCount: number): number {
