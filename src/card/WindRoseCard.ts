@@ -30,7 +30,7 @@ import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINROSE-CARD  %c Version 2.4.0 `,
+    `%c  WINDROSE-CARD  %c Version 2.4.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
