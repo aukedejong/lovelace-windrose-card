@@ -1,12 +1,16 @@
+### v2.4.1
+Fix:
+- When switching the wind speed sensor used for the windrose, also use the speed range colors configured for that sensor.
+
 
 -------
-### ### v2.4.0
+### v2.4.0
 Feature:
 - Center circle, where the calm percentage normally is displayed, can now be configured to show other values. Fixed #78
 
 Fixes:
 - Fixed situations where a lot of log message where logged. Thanks 2bitoperations
-- Auto determining input speed unit when used in corner info. Fixes #203
+- Auto determining input speed unit when used in corner info. Fixes #203]()
 
 Other:
 - Switched from rollup to esbuild.

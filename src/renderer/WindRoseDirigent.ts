@@ -1,34 +1,34 @@
-import {WindRoseRendererStandaard} from "./WindRoseRendererStandaard";
-import {WindBarRenderer} from "../render-bar/WindBarRenderer";
-import {PercentageCalculator} from "./PercentageCalculator";
-import {WindSpeedConverter} from "../converter/WindSpeedConverter";
-import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {MeasurementCounter} from "../counter/MeasurementCounter";
-import {WindRoseData} from "./WindRoseData";
-import {WindRoseRendererCenterCalm} from "./WindRoseRendererCenterCalm";
-import {PercentageCalculatorCenterCalm} from "./PercentageCalculatorCenterCalm";
-import {WindRoseRenderer} from "./WindRoseRenderer";
-import {CurrentDirectionRenderer} from "./CurrentDirectionRenderer";
-import {DegreesCalculator} from "./DegreesCalculator";
-import {Log2} from "../util/Log2";
-import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
-import {InfoCornersRenderer} from "./InfoCornersRenderer";
-import {Element, Svg} from "@svgdotjs/svg.js";
-import {TouchFacesRenderer} from "./TouchFacesRenderer";
-import {SpeedUnit} from "../converter/SpeedUnit";
-import {SpeedUnits} from "../converter/SpeedUnits";
-import {SpeedRangeService} from "../speed-range/SpeedRangeService";
-import {HAMeasurementProvider} from "../measurement-provider/HAMeasurementProvider";
-import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
-import {MeasurementMatcher} from "../matcher/MeasurementMatcher";
-import {CurrentSpeedRenderer} from "./CurrentSpeedRenderer";
-import {DimensionCalculator} from "../dimensions/DimensionCalculator";
-import {DimensionCalculatorBarHidden} from "../dimensions/DimensionCalculatorBarHidden";
-import {SvgUtil} from "./SvgUtil";
-import {DimensionCalculatorBarRight} from "../dimensions/DimensionCalculatorBarRight";
-import {DimensionCalculatorBarBottom} from "../dimensions/DimensionCalculatorBarBottom";
-import {TemplateParser} from "../textblocks/TemplateParser";
-import {HtmlRenderer} from "../html-renderer/HtmlRenderer";
+import { WindRoseRendererStandaard } from "./WindRoseRendererStandaard";
+import { WindBarRenderer } from "../render-bar/WindBarRenderer";
+import { PercentageCalculator } from "./PercentageCalculator";
+import { WindSpeedConverter } from "../converter/WindSpeedConverter";
+import { CardConfigWrapper } from "../config/CardConfigWrapper";
+import { MeasurementCounter } from "../counter/MeasurementCounter";
+import { WindRoseData } from "./WindRoseData";
+import { WindRoseRendererCenterCalm } from "./WindRoseRendererCenterCalm";
+import { PercentageCalculatorCenterCalm } from "./PercentageCalculatorCenterCalm";
+import { WindRoseRenderer } from "./WindRoseRenderer";
+import { CurrentDirectionRenderer } from "./CurrentDirectionRenderer";
+import { DegreesCalculator } from "./DegreesCalculator";
+import { Log2 } from "../util/Log2";
+import { EntityStatesProcessor } from "../entity-state-processing/EntityStatesProcessor";
+import { InfoCornersRenderer } from "./InfoCornersRenderer";
+import { Element, Svg } from "@svgdotjs/svg.js";
+import { TouchFacesRenderer } from "./TouchFacesRenderer";
+import { SpeedUnit } from "../converter/SpeedUnit";
+import { SpeedUnits } from "../converter/SpeedUnits";
+import { SpeedRangeService } from "../speed-range/SpeedRangeService";
+import { HAMeasurementProvider } from "../measurement-provider/HAMeasurementProvider";
+import { MeasurementHolder } from "../measurement-provider/MeasurementHolder";
+import { MeasurementMatcher } from "../matcher/MeasurementMatcher";
+import { CurrentSpeedRenderer } from "./CurrentSpeedRenderer";
+import { DimensionCalculator } from "../dimensions/DimensionCalculator";
+import { DimensionCalculatorBarHidden } from "../dimensions/DimensionCalculatorBarHidden";
+import { SvgUtil } from "./SvgUtil";
+import { DimensionCalculatorBarRight } from "../dimensions/DimensionCalculatorBarRight";
+import { DimensionCalculatorBarBottom } from "../dimensions/DimensionCalculatorBarBottom";
+import { TemplateParser } from "../textblocks/TemplateParser";
+import { HtmlRenderer } from "../html-renderer/HtmlRenderer";
 
 export class WindRoseDirigent {
     //Util
@@ -121,9 +121,9 @@ export class WindRoseDirigent {
         }
 
         if (this.cardConfig.roseConfig.centerCircleConfig.enabled) {
-            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator, this.templateParser);
+            this.windRoseRenderer = new WindRoseRendererCenterCalm(cardConfig, this.dimensionCalculator, this.svg, this.degreesCalculator, this.templateParser);
         } else {
-            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionCalculator, this.speedRangeServices[0], this.svg, this.degreesCalculator);
+            this.windRoseRenderer = new WindRoseRendererStandaard(cardConfig, this.dimensionCalculator, this.svg, this.degreesCalculator);
         }
 
         if (this.cardConfig.currentDirection.showArrow) {
@@ -207,7 +207,7 @@ export class WindRoseDirigent {
         setTimeout(() => {
             this.windRoseRenderer.removeGraphs();
             this.log.debug('renderGraphs()', this.svg, this.windRoseData, this.windBarRenderers);
-            this.windRoseRenderer.drawWindRose(this.windRoseData[activeSpeedEntityIndex], animate);
+            this.windRoseRenderer.drawWindRose(this.windRoseData[activeSpeedEntityIndex], this.speedRangeServices[activeSpeedEntityIndex], animate);
             for (let i = 0; i < this.windBarRenderers.length; i++) {
                 this.windBarRenderers[i].drawWindBar(this.windRoseData[i], animate);
             }
