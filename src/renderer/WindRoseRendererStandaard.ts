@@ -1,18 +1,18 @@
-import {DrawUtil} from "../util/DrawUtil";
-import {SpeedRange} from "../speed-range/SpeedRange";
-import {WindRoseData} from "./WindRoseData";
-import {TextAttributes} from "./TextAttributes";
-import {SvgUtil} from "./SvgUtil";
-import {Coordinate} from "./Coordinate";
-import {DegreesCalculator} from "./DegreesCalculator";
-import SVG, {Element, PathArray, Svg} from "@svgdotjs/svg.js";
-import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {CardColors} from "../config/CardColors";
-import {SpeedRangeService} from "../speed-range/SpeedRangeService";
-import {WindRoseRenderUtil} from "./WindRoseRenderUtil";
-import {DimensionCalculator} from "../dimensions/DimensionCalculator";
-import {WindRoseRenderer} from "./WindRoseRenderer";
-import {Log2} from "../util/Log2";
+import { DrawUtil } from "../util/DrawUtil";
+import { SpeedRange } from "../speed-range/SpeedRange";
+import { WindRoseData } from "./WindRoseData";
+import { TextAttributes } from "./TextAttributes";
+import { SvgUtil } from "./SvgUtil";
+import { Coordinate } from "./Coordinate";
+import { DegreesCalculator } from "./DegreesCalculator";
+import SVG, { Element, PathArray, Svg } from "@svgdotjs/svg.js";
+import { CardConfigWrapper } from "../config/CardConfigWrapper";
+import { CardColors } from "../config/CardColors";
+import { SpeedRangeService } from "../speed-range/SpeedRangeService";
+import { WindRoseRenderUtil } from "./WindRoseRenderUtil";
+import { DimensionCalculator } from "../dimensions/DimensionCalculator";
+import { WindRoseRenderer } from "./WindRoseRenderer";
+import { Log2 } from "../util/Log2";
 
 export class WindRoseRendererStandaard implements WindRoseRenderer {
 
@@ -25,7 +25,6 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
     private readonly dimensionCalculator: DimensionCalculator;
     private readonly windRoseRenderUtil: WindRoseRenderUtil;
     private readonly degreesCalculator: DegreesCalculator;
-    private readonly speedRangeService: SpeedRangeService;
     private readonly leaveArc: number;
     private readonly roseOpacity: number;
     svgUtil!: SvgUtil;
@@ -43,12 +42,10 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
 
     constructor(config: CardConfigWrapper,
                 imensionCalculator: DimensionCalculator,
-                speedRangeService: SpeedRangeService,
                 svg: Svg,
                 degreesCalculator: DegreesCalculator) {
         this.cardColors = config.cardColor;
         this.circleLegendTextSize = config.roseConfig.circleLegendTextSize;
-        this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.degreesCalculator = degreesCalculator;
         this.svgUtil = new SvgUtil(svg);
@@ -83,7 +80,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         return this.windRoseRenderUtil.drawBackgroundImage();
     }
 
-    drawWindRose(windRoseData: WindRoseData, animate: boolean): void {
+    drawWindRose(windRoseData: WindRoseData, speedRangeService: SpeedRangeService, animate: boolean): void {
         if (windRoseData === undefined) {
             this.log.error('drawWindRose', 'Can\'t draw, no windrose data.');
             return;
@@ -94,7 +91,7 @@ export class WindRoseRendererStandaard implements WindRoseRenderer {
         this.log.method('drawWindRose', 'windRoseData', windRoseData);
         this.roseDrawn = true;
         this.windRoseData = windRoseData;
-        this.speedRanges = this.speedRangeService.getSpeedRanges();
+        this.speedRanges = speedRangeService.getSpeedRanges();
 
         this.roseCircles = this.windRoseRenderUtil.drawCirlces(windRoseData, false);
         this.leavesGroup = this.drawWindDirections();

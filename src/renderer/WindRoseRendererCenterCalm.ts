@@ -1,22 +1,22 @@
-import {DrawUtil} from "../util/DrawUtil";
-import {SpeedRange} from "../speed-range/SpeedRange";
-import {WindRoseData} from "./WindRoseData";
-import {SvgUtil} from "./SvgUtil";
-import {TextAttributes} from "./TextAttributes";
-import {CircleCoordinate} from "./CircleCoordinate";
-import {Coordinate} from "./Coordinate";
-import {ColorUtil} from "../util/ColorUtil";
-import {DegreesCalculator} from "./DegreesCalculator";
-import SVG, {Element, Svg} from "@svgdotjs/svg.js";
-import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {CardColors} from "../config/CardColors";
-import {SpeedRangeService} from "../speed-range/SpeedRangeService";
-import {WindRoseRenderUtil} from "./WindRoseRenderUtil";
-import {DimensionCalculator} from "../dimensions/DimensionCalculator";
-import {WindRoseRenderer} from "./WindRoseRenderer";
-import {Log2} from "../util/Log2";
-import {CenterCircleConfig} from "../config/CenterCircleConfig";
-import {TemplateParser} from "../textblocks/TemplateParser";
+import { DrawUtil } from "../util/DrawUtil";
+import { SpeedRange } from "../speed-range/SpeedRange";
+import { WindRoseData } from "./WindRoseData";
+import { SvgUtil } from "./SvgUtil";
+import { TextAttributes } from "./TextAttributes";
+import { CircleCoordinate } from "./CircleCoordinate";
+import { Coordinate } from "./Coordinate";
+import { ColorUtil } from "../util/ColorUtil";
+import { DegreesCalculator } from "./DegreesCalculator";
+import SVG, { Element, Svg } from "@svgdotjs/svg.js";
+import { CardConfigWrapper } from "../config/CardConfigWrapper";
+import { CardColors } from "../config/CardColors";
+import { SpeedRangeService } from "../speed-range/SpeedRangeService";
+import { WindRoseRenderUtil } from "./WindRoseRenderUtil";
+import { DimensionCalculator } from "../dimensions/DimensionCalculator";
+import { WindRoseRenderer } from "./WindRoseRenderer";
+import { Log2 } from "../util/Log2";
+import { CenterCircleConfig } from "../config/CenterCircleConfig";
+import { TemplateParser } from "../textblocks/TemplateParser";
 
 export class WindRoseRendererCenterCalm implements WindRoseRenderer {
 
@@ -29,7 +29,6 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
     private readonly dimensionCalculator: DimensionCalculator;
     private readonly windRoseRenderUtil: WindRoseRenderUtil;
     private readonly degreesCalculator: DegreesCalculator;
-    private readonly speedRangeService: SpeedRangeService;
     private readonly templateParser: TemplateParser;
     private readonly leaveArc: number;
     private readonly centerCircleConfig: CenterCircleConfig;
@@ -51,14 +50,12 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
 
     constructor(config: CardConfigWrapper,
                 dimensionCalculator: DimensionCalculator,
-                speedRangeService: SpeedRangeService,
                 svg: Svg,
                 degreesCalculator: DegreesCalculator,
                 templateParser: TemplateParser) {
         this.cardColors = config.cardColor;
         this.circleLegendTextSize = config.roseConfig.circleLegendTextSize;
         this.centerCircleConfig = config.roseConfig.centerCircleConfig;
-        this.speedRangeService = speedRangeService;
         this.svg = svg;
         this.svgUtil = new SvgUtil(svg);
         this.dimensionCalculator = dimensionCalculator;
@@ -94,7 +91,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         return this.windRoseRenderUtil.drawBackgroundImage();
     }
 
-    drawWindRose(windRoseData: WindRoseData, animate: boolean): void {
+    drawWindRose(windRoseData: WindRoseData, speedRangeService: SpeedRangeService, animate: boolean): void {
         if (windRoseData === undefined) {
             this.log.error('drawWindRose', 'Can\'t draw, no windrose data.');
             return;
@@ -105,7 +102,7 @@ export class WindRoseRendererCenterCalm implements WindRoseRenderer {
         this.log.method('drawWindRose', 'windRoseData', windRoseData);
         this.roseDrawn = true;
         this.windRoseData = windRoseData;
-        this.speedRanges = this.speedRangeService.getSpeedRanges();
+        this.speedRanges = speedRangeService.getSpeedRanges();
 
         this.roseCircles = this.windRoseRenderUtil.drawCirlces(windRoseData, true);
         this.leavesGroup = this.drawWindDirections();

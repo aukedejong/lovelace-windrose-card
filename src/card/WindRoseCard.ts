@@ -1,25 +1,25 @@
-import {HomeAssistant} from "../util/HomeAssistant";
-import {css, CSSResultGroup, html, LitElement, PropertyValues, TemplateResult} from "lit";
-import {customElement, query} from "lit/decorators.js"
-import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {CardConfig} from "./CardConfig";
-import {Log} from "../util/Log";
-import {WindRoseDirigent} from "../renderer/WindRoseDirigent";
-import {EntityChecker} from "../entity-checker/EntityChecker";
-import {Svg, SVG} from "@svgdotjs/svg.js";
-import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
-import {Log2} from "../util/Log2";
-import {HAMeasurementProvider} from "../measurement-provider/HAMeasurementProvider";
-import {HAWebservice} from "../measurement-provider/HAWebservice";
-import {repeat} from 'lit/directives/repeat.js';
-import {TextBlock} from "../config/TextBlock";
-import {ButtonsConfig} from "../config/buttons/ButtonsConfig";
-import {PeriodSelectorButton} from "../config/buttons/types/PeriodSelectorButton";
-import {ButtonInterface} from "../config/buttons/ButtonInterface";
-import {PeriodShiftButton} from "../config/buttons/types/PeriodShiftButton";
-import {WindRoseSpeedSelectButton} from "../config/buttons/types/WindRoseSpeedSelectButton";
-import {PeriodShiftPlayButton} from "../config/buttons/types/PeriodShiftPlayButton";
-import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
+import { HomeAssistant } from "../util/HomeAssistant";
+import { css, CSSResultGroup, html, LitElement, PropertyValues, TemplateResult } from "lit";
+import { customElement, query } from "lit/decorators.js"
+import { CardConfigWrapper } from "../config/CardConfigWrapper";
+import { CardConfig } from "./CardConfig";
+import { Log } from "../util/Log";
+import { WindRoseDirigent } from "../renderer/WindRoseDirigent";
+import { EntityChecker } from "../entity-checker/EntityChecker";
+import { Svg, SVG } from "@svgdotjs/svg.js";
+import { EntityStatesProcessor } from "../entity-state-processing/EntityStatesProcessor";
+import { Log2 } from "../util/Log2";
+import { HAMeasurementProvider } from "../measurement-provider/HAMeasurementProvider";
+import { HAWebservice } from "../measurement-provider/HAWebservice";
+import { repeat } from 'lit/directives/repeat.js';
+import { TextBlock } from "../config/TextBlock";
+import { ButtonsConfig } from "../config/buttons/ButtonsConfig";
+import { PeriodSelectorButton } from "../config/buttons/types/PeriodSelectorButton";
+import { ButtonInterface } from "../config/buttons/ButtonInterface";
+import { PeriodShiftButton } from "../config/buttons/types/PeriodShiftButton";
+import { WindRoseSpeedSelectButton } from "../config/buttons/types/WindRoseSpeedSelectButton";
+import { PeriodShiftPlayButton } from "../config/buttons/types/PeriodShiftPlayButton";
+import { MeasurementHolder } from "../measurement-provider/MeasurementHolder";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -30,7 +30,7 @@ import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINDROSE-CARD  %c Version 2.4.0 `,
+    `%c  WINDROSE-CARD  %c Version 2.4.1 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
