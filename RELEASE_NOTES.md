@@ -1,7 +1,10 @@
+### v2.4.2
+Fix:
+- Support Home Assistant locale and date/time format settings. Fixes #215 #217
+
 ### v2.4.1
 Fix:
 - When switching the wind speed sensor used for the windrose, also use the speed range colors configured for that sensor.
-
 
 -------
 ### v2.4.0

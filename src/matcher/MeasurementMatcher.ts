@@ -1,25 +1,27 @@
-import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
-import {MatchedMeasurements} from "./MatchedMeasurements";
-import {MatchStrategy} from "./strategy/MatchStrategy";
-import {SpeedFirstMatcher} from "./strategy/SpeedFirstMatcher";
-import {DirectionFirstMatcher} from "./strategy/DirectionFirstMatcher";
-import {TimeFrameMatcher} from "./strategy/TimeFrameMatcher";
-import {FullTimeMatcher} from "./strategy/FullTimeMatcher";
-import {Log} from "../util/Log";
+import { CardConfigWrapper } from "../config/CardConfigWrapper";
+import { MeasurementHolder } from "../measurement-provider/MeasurementHolder";
+import { MatchedMeasurements } from "./MatchedMeasurements";
+import { MatchStrategy } from "./strategy/MatchStrategy";
+import { SpeedFirstMatcher } from "./strategy/SpeedFirstMatcher";
+import { DirectionFirstMatcher } from "./strategy/DirectionFirstMatcher";
+import { TimeFrameMatcher } from "./strategy/TimeFrameMatcher";
+import { FullTimeMatcher } from "./strategy/FullTimeMatcher";
+import { Log } from "../util/Log";
+import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 export class MeasurementMatcher {
 
     private matcher: MatchStrategy;
 
-    constructor(private readonly cardConfig: CardConfigWrapper) {
+    constructor(private readonly cardConfig: CardConfigWrapper,
+                private readonly dateTimeFormatter: DateTimeFormatter) {
 
         if (this.cardConfig.matchingStrategy.name === 'speed-first') {
             this.matcher = new SpeedFirstMatcher();
         } else if (this.cardConfig.matchingStrategy.name === 'direction-first') {
             this.matcher = new DirectionFirstMatcher();
         } else if (this.cardConfig.matchingStrategy.name === 'time-frame') {
-            this.matcher = new TimeFrameMatcher(this.cardConfig.matchingStrategy.timeInterval);
+            this.matcher = new TimeFrameMatcher(this.cardConfig.matchingStrategy.timeInterval, this.dateTimeFormatter);
         } else if (this.cardConfig.matchingStrategy.name === 'full-time') {
             this.matcher = new FullTimeMatcher();
         } else {

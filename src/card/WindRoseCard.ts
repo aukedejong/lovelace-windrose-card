@@ -30,7 +30,7 @@ import { MeasurementHolder } from "../measurement-provider/MeasurementHolder";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINDROSE-CARD  %c Version 2.4.1 `,
+    `%c  WINDROSE-CARD  %c Version 2.4.2 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -111,7 +111,7 @@ export class WindRoseCard extends LitElement {
         try {
             this.entityChecker.checkEntities(this.cardConfig, this._hass);
             this.measurementProvider = new HAMeasurementProvider(new HAWebservice(this._hass), this.cardConfig);
-            this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor);
+            this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor, this._hass);
             this.entityStateProcessor.init(this.cardConfig)
             this.refreshMeasurements(!this.cardConfig.disableAnimations);
         } catch(e) {

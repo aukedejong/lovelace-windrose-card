@@ -1,12 +1,14 @@
-import {MatchStrategy} from "./MatchStrategy";
-import {Measurement} from "../../measurement-provider/Measurement";
-import {MatchedMeasurements} from "../MatchedMeasurements";
-import {MatchUtils} from "../MatchUtils";
-import {Log} from "../../util/Log";
+import { MatchStrategy } from "./MatchStrategy";
+import { Measurement } from "../../measurement-provider/Measurement";
+import { MatchedMeasurements } from "../MatchedMeasurements";
+import { MatchUtils } from "../MatchUtils";
+import { Log } from "../../util/Log";
+import { DateTimeFormatter } from "../../formatter/DateTimeFormatter";
 
 export class TimeFrameMatcher implements MatchStrategy {
 
-    constructor(private readonly periodSeconds: number) {
+    constructor(private readonly periodSeconds: number,
+                private readonly dateTimeFormatter: DateTimeFormatter) {
     }
 
     match(directionMeasurements: Measurement[], speedMeasurements: Measurement[]): MatchedMeasurements {
@@ -19,10 +21,10 @@ export class TimeFrameMatcher implements MatchStrategy {
             let speed = MatchUtils.findMeasurementAtTime(end, speedMeasurements);
 
             if (!direction) {
-                Log.warn("No direction found for timestamp " + MatchUtils.cleanDate(end));
+                Log.warn("No direction found for timestamp " + this.dateTimeFormatter.formatTimestampDate(end));
             }
             if (!speed) {
-                Log.warn("No speed found for timestamp " + MatchUtils.cleanDate(end));
+                Log.warn("No speed found for timestamp " + this.dateTimeFormatter.formatTimestampDate(end));
             }
             if (direction && speed) {
                 matchedMeasurements.add(direction.value, +speed.value, speed.startTime);

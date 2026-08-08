@@ -29,6 +29,8 @@ import { DimensionCalculatorBarRight } from "../dimensions/DimensionCalculatorBa
 import { DimensionCalculatorBarBottom } from "../dimensions/DimensionCalculatorBarBottom";
 import { TemplateParser } from "../textblocks/TemplateParser";
 import { HtmlRenderer } from "../html-renderer/HtmlRenderer";
+import { HomeAssistant } from "../util/HomeAssistant";
+import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 export class WindRoseDirigent {
     //Util
@@ -50,6 +52,7 @@ export class WindRoseDirigent {
     private speedRangeServices: SpeedRangeService[] = [];
 
     //Rendering
+    private dateTimeFormatter!: DateTimeFormatter;
     private degreesCalculator!: DegreesCalculator;
     private dimensionCalculator!: DimensionCalculator;
     private windRoseRenderer!: WindRoseRenderer;
@@ -78,17 +81,20 @@ export class WindRoseDirigent {
 
     init(cardConfig: CardConfigWrapper,
          measurementProvider: HAMeasurementProvider,
-         entityStatesProcessor: EntityStatesProcessor): void {
+         entityStatesProcessor: EntityStatesProcessor,
+         hass: HomeAssistant): void {
 
         this.log.method("init");
         this.initReady = true;
         this.measurementsReady = false;
         this.cardConfig = cardConfig;
         this.measurementProvider = measurementProvider;
-        this.measurementMatcher = new MeasurementMatcher(cardConfig);
         this.svgUtil = new SvgUtil(this.svg);
         this.entityStatesProcessor = entityStatesProcessor;
-        this.templateParser = new TemplateParser();
+
+        this.dateTimeFormatter = new DateTimeFormatter(hass.locale, hass.config.time_zone)
+        this.measurementMatcher = new MeasurementMatcher(cardConfig, this.dateTimeFormatter);
+        this.templateParser = new TemplateParser(this.dateTimeFormatter);
         this.htmlRenderer = new HtmlRenderer(cardConfig, this.templateParser);
 
         for (const windSpeedEntity of this.cardConfig.windspeedEntities) {

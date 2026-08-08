@@ -1,27 +1,29 @@
-import {TemplateValue} from "./TemplateValue";
-import {WindRoseData} from "../renderer/WindRoseData";
-import {MatchUtils} from "../matcher/MatchUtils";
-import {Measurement} from "../measurement-provider/Measurement";
-import {MeasurementHolder} from "../measurement-provider/MeasurementHolder";
-import {MatchedMeasurements} from "../matcher/MatchedMeasurements";
-import {EntityState} from "../entity-state-processing/EntityState";
-import {Period} from "../config/buttons/Period";
+import { TemplateValue } from "./TemplateValue";
+import { WindRoseData } from "../renderer/WindRoseData";
+import { Measurement } from "../measurement-provider/Measurement";
+import { MeasurementHolder } from "../measurement-provider/MeasurementHolder";
+import { MatchedMeasurements } from "../matcher/MatchedMeasurements";
+import { EntityState } from "../entity-state-processing/EntityState";
+import { Period } from "../config/buttons/Period";
+import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 export class TemplateParser {
 
     templateValues: TemplateValue[] = [];
 
-    constructor() {}
+    constructor(
+        private readonly dateTimeFormatter: DateTimeFormatter
+    ) {}
 
     public clearValues() {
         this.templateValues = [];
     }
 
     public addPeriodData(period: Period): void {
-        this.addOrUpdateValue("start-time", period.startTime.toLocaleTimeString());
-        this.addOrUpdateValue("end-time", period.endTime.toLocaleTimeString());
-        this.addOrUpdateValue("start-date", period.startTime.toLocaleDateString());
-        this.addOrUpdateValue("end-date", period.endTime.toLocaleDateString());
+        this.addOrUpdateValue("start-time", this.dateTimeFormatter.formatTime(period.startTime));
+        this.addOrUpdateValue("end-time", this.dateTimeFormatter.formatTime(period.endTime));
+        this.addOrUpdateValue("start-date", this.dateTimeFormatter.formatDate(period.startTime));
+        this.addOrUpdateValue("end-date", this.dateTimeFormatter.formatDate(period.endTime));
         const minutes = Math.round((period.endTime.getTime() - period.startTime.getTime()) / 60000)
         this.addOrUpdateValue('period-hours', Math.round(minutes / 60));
         this.addOrUpdateValue('period-minutes', minutes);
@@ -35,18 +37,18 @@ export class TemplateParser {
 
     public addMeasurementValues(measurementHolder: MeasurementHolder): void {
         if (measurementHolder.directionMeasurements.length > 0) {
-            this.addOrUpdateValue("time-first-direction", MatchUtils.cleanTime(measurementHolder.directionMeasurements[0].startTime));
-            this.addOrUpdateValue("time-last-direction", MatchUtils.cleanTime(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
-            this.addOrUpdateValue("date-first-direction", MatchUtils.cleanDate(measurementHolder.directionMeasurements[0].startTime));
-            this.addOrUpdateValue("date-last-direction", MatchUtils.cleanDate(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
+            this.addOrUpdateValue("time-first-direction", this.dateTimeFormatter.formatTimestampTime(measurementHolder.directionMeasurements[0].startTime));
+            this.addOrUpdateValue("time-last-direction", this.dateTimeFormatter.formatTimestampTime(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
+            this.addOrUpdateValue("date-first-direction", this.dateTimeFormatter.formatTimestampDate(measurementHolder.directionMeasurements[0].startTime));
+            this.addOrUpdateValue("date-last-direction", this.dateTimeFormatter.formatTimestampDate(measurementHolder.directionMeasurements[measurementHolder.directionMeasurements.length - 1].startTime));
         }
         this.addOrUpdateValue("direction-count", measurementHolder.directionMeasurements.length);
         measurementHolder.speedMeasurements.forEach((measurements: Measurement[], index: number) => {
             if (measurements.length > 0) {
-                this.addOrUpdateValue("time-first-speed-" + index, MatchUtils.cleanTime(measurements[0].startTime));
-                this.addOrUpdateValue("time-last-speed-" + index, MatchUtils.cleanTime(measurements[measurements.length - 1].startTime));
-                this.addOrUpdateValue("date-first-speed-" + index, MatchUtils.cleanDate(measurements[0].startTime));
-                this.addOrUpdateValue("date-last-speed-" + index, MatchUtils.cleanDate(measurements[measurements.length - 1].startTime));
+                this.addOrUpdateValue("time-first-speed-" + index,  this.dateTimeFormatter.formatTimestampTime(measurements[0].startTime));
+                this.addOrUpdateValue("time-last-speed-" + index,  this.dateTimeFormatter.formatTimestampTime(measurements[measurements.length - 1].startTime));
+                this.addOrUpdateValue("date-first-speed-" + index,  this.dateTimeFormatter.formatTimestampDate(measurements[0].startTime));
+                this.addOrUpdateValue("date-last-speed-" + index,  this.dateTimeFormatter.formatTimestampDate(measurements[measurements.length - 1].startTime));
             }
             this.addOrUpdateValue('speed-' + index  + '-count', measurements.length);
         });
@@ -58,10 +60,10 @@ export class TemplateParser {
         this.addOrUpdateValue('max-speed', Math.round(matchedMeasurements.maxSpeed));
         this.addOrUpdateValue('average-speed', Math.round(matchedMeasurements.getAverageSpeed()));
         if (matchedMeasurements.getMeasurementCount() > 0) {
-            this.addOrUpdateValue('time-first-match', MatchUtils.cleanTime(matchedMeasurements.firstDateTime));
-            this.addOrUpdateValue('date-first-match', MatchUtils.cleanDate(matchedMeasurements.firstDateTime));
-            this.addOrUpdateValue('time-last-match', MatchUtils.cleanTime(matchedMeasurements.lastDateTime));
-            this.addOrUpdateValue('date-last-match', MatchUtils.cleanDate(matchedMeasurements.lastDateTime));
+            this.addOrUpdateValue('time-first-match', this.dateTimeFormatter.formatTimestampTime(matchedMeasurements.firstDateTime));
+            this.addOrUpdateValue('time-last-match', this.dateTimeFormatter.formatTimestampTime(matchedMeasurements.lastDateTime));
+            this.addOrUpdateValue('date-first-match', this.dateTimeFormatter.formatTimestampDate(matchedMeasurements.firstDateTime,));
+            this.addOrUpdateValue('date-last-match', this.dateTimeFormatter.formatTimestampDate(matchedMeasurements.lastDateTime));
             const minutes = Math.round((matchedMeasurements.lastDateTime - matchedMeasurements.firstDateTime) / 60)
             this.addOrUpdateValue('match-period-hours', Math.round(minutes / 60));
             this.addOrUpdateValue('match-period-minutes', minutes);

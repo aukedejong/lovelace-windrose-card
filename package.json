@@ -43,8 +43,10 @@
   "dependencies": {
     "@lit-labs/scoped-registry-mixin": "^1.0.3",
     "@svgdotjs/svg.js": "^3.2.5",
+    "@vvo/tzdb": "github:vvo/tzdb",
     "date-fns": "^4.1.0",
     "home-assistant-js-websocket": "^9.6.0",
-    "lit": "^3.3.2"
+    "lit": "^3.3.2",
+    "memoize-one": "^6.0.0"
   }
 }
