@@ -1,13 +1,31 @@
-import {beforeEach, describe, expect, test} from "@jest/globals";
-import {TemplateParser} from "./TemplateParser";
-import {EntityStatesProcessor} from "../entity-state-processing/EntityStatesProcessor";
+import { beforeEach, describe, expect, test } from "@jest/globals";
+import { TemplateParser } from "./TemplateParser";
+import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
+import {
+    DateFormat,
+    FirstWeekday,
+    FrontendLocaleData,
+    NumberFormat,
+    TimeFormat,
+    TimeZone
+} from "../util/HomeAssistant";
 
 describe('TemplateParser', () => {
 
     let templateParser: TemplateParser;
+    let dateTimeFormatter: DateTimeFormatter;
 
     beforeEach(() => {
-        templateParser = new TemplateParser(new EntityStatesProcessor());
+        let frontendLocaleData: FrontendLocaleData = {
+            language: "nl",
+            number_format: NumberFormat.system,
+            time_format: TimeFormat.twenty_four,
+            date_format: DateFormat.YMD,
+            first_weekday: FirstWeekday.monday,
+            time_zone: TimeZone.local,
+        }
+        dateTimeFormatter = new DateTimeFormatter(frontendLocaleData, "America/New_York")
+        templateParser = new TemplateParser(dateTimeFormatter);
     });
 
 

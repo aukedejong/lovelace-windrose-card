@@ -1,5 +1,5 @@
-import {Measurement} from "./Measurement";
-import {MatchUtils} from "../matcher/MatchUtils";
+import { Measurement } from "./Measurement";
+import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 export class MeasurementHolder {
 
@@ -7,7 +7,7 @@ export class MeasurementHolder {
     public speedMeasurements: Measurement[][];
     public error: any | undefined;
 
-    constructor() {
+    constructor(private readonly dateTimeFormatter: DateTimeFormatter) {
         this.directionMeasurements = [];
         this.speedMeasurements = [];
 
@@ -30,7 +30,7 @@ export class MeasurementHolder {
          if (directionCount > 0) {
              const first = this.directionMeasurements[0].startTime;
              const last = this.directionMeasurements[this.directionMeasurements.length - 1].startTime;
-             info += ` - ${MatchUtils.cleanDateTime(first)} - ${MatchUtils.cleanDateTime(last)}\n`;
+             info += ` - ${this.dateTimeFormatter.formatTimestampDateTime(first)} - ${this.dateTimeFormatter.formatTimestampDateTime(last)}\n`;
          } else {
              info += "\n";
          }
@@ -47,7 +47,7 @@ export class MeasurementHolder {
         }
         const first = speedMeasurements[0].startTime;
         const last = speedMeasurements[speedCount - 1].startTime;
-        return `Speed:      ${speedCount} - ${MatchUtils.cleanDateTime(first)} - ${MatchUtils.cleanDateTime(last)}\n`;
+        return `Speed:      ${speedCount} - ${this.dateTimeFormatter.formatTimestampDateTime(first)} - ${this.dateTimeFormatter.formatTimestampDateTime(last)}\n`;
     }
 
 }

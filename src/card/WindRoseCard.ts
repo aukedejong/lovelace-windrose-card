@@ -20,6 +20,7 @@ import { PeriodShiftButton } from "../config/buttons/types/PeriodShiftButton";
 import { WindRoseSpeedSelectButton } from "../config/buttons/types/WindRoseSpeedSelectButton";
 import { PeriodShiftPlayButton } from "../config/buttons/types/PeriodShiftPlayButton";
 import { MeasurementHolder } from "../measurement-provider/MeasurementHolder";
+import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
@@ -30,7 +31,7 @@ import { MeasurementHolder } from "../measurement-provider/MeasurementHolder";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINDROSE-CARD  %c Version 2.4.2 `,
+    `%c  WINDROSE-CARD  %c Version 2.4.3 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -110,8 +111,9 @@ export class WindRoseCard extends LitElement {
         this.log.method('refreshCardConfig');
         try {
             this.entityChecker.checkEntities(this.cardConfig, this._hass);
-            this.measurementProvider = new HAMeasurementProvider(new HAWebservice(this._hass), this.cardConfig);
-            this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor, this._hass);
+            let dateTimeFormatter = new DateTimeFormatter(this._hass.locale, this._hass.config.time_zone)
+            this.measurementProvider = new HAMeasurementProvider(new HAWebservice(this._hass), dateTimeFormatter, this.cardConfig);
+            this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor, dateTimeFormatter, this._hass);
             this.entityStateProcessor.init(this.cardConfig)
             this.refreshMeasurements(!this.cardConfig.disableAnimations);
         } catch(e) {

@@ -82,6 +82,7 @@ export class WindRoseDirigent {
     init(cardConfig: CardConfigWrapper,
          measurementProvider: HAMeasurementProvider,
          entityStatesProcessor: EntityStatesProcessor,
+         dateTimeFormatter: DateTimeFormatter,
          hass: HomeAssistant): void {
 
         this.log.method("init");
@@ -91,8 +92,8 @@ export class WindRoseDirigent {
         this.measurementProvider = measurementProvider;
         this.svgUtil = new SvgUtil(this.svg);
         this.entityStatesProcessor = entityStatesProcessor;
+        this.dateTimeFormatter = dateTimeFormatter;
 
-        this.dateTimeFormatter = new DateTimeFormatter(hass.locale, hass.config.time_zone)
         this.measurementMatcher = new MeasurementMatcher(cardConfig, this.dateTimeFormatter);
         this.templateParser = new TemplateParser(this.dateTimeFormatter);
         this.htmlRenderer = new HtmlRenderer(cardConfig, this.templateParser);

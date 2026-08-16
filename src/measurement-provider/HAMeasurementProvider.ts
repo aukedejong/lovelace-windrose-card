@@ -1,10 +1,11 @@
-import {HAWebservice} from "./HAWebservice";
-import {MeasurementHolder} from "./MeasurementHolder";
-import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {Measurement} from "./Measurement";
-import {Log} from "../util/Log";
-import {WindDirectionEntity} from "../config/WindDirectionEntity";
-import {HARequestData} from "./HARequestData";
+import { HAWebservice } from "./HAWebservice";
+import { MeasurementHolder } from "./MeasurementHolder";
+import { CardConfigWrapper } from "../config/CardConfigWrapper";
+import { Measurement } from "./Measurement";
+import { Log } from "../util/Log";
+import { WindDirectionEntity } from "../config/WindDirectionEntity";
+import { HARequestData } from "./HARequestData";
+import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 export class HAMeasurementProvider {
 
@@ -12,6 +13,7 @@ export class HAMeasurementProvider {
     private readonly directionEntity: WindDirectionEntity;
 
     constructor(private readonly haWebservice: HAWebservice,
+                private readonly dateTimeFormatter: DateTimeFormatter,
                 cardConfig: CardConfigWrapper) {
 
         this.cardConfig = cardConfig;
@@ -32,7 +34,7 @@ export class HAMeasurementProvider {
 
         return Promise.all(requests).then(results => {
             Log.debug('WebSocket results: ', results);
-            const measurementHolder = new MeasurementHolder();
+            const measurementHolder = new MeasurementHolder(this.dateTimeFormatter);
             try {
                 if (directionRequestData.useStatistics) {
                     measurementHolder.directionMeasurements = HAMeasurementProvider.parseStatsMeasurements(

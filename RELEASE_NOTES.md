@@ -1,3 +1,7 @@
+### v2.4.3
+Fix:
+- Fix errors in introduced in previous build, related to date time formatting and the log_measurement_counts option. Fixes #219
+
 ### v2.4.2
 Fix:
 - Support Home Assistant locale and date/time format settings. Fixes #215 #217
