@@ -8,8 +8,8 @@
     "http-server": "http-server ./",
     "lint": "npx eslint .",
     "typecheck": "tsc --noEmit",
-    "esbuild": "esbuild src/card/WindRoseCard.ts --bundle --minify --outfile=build/windrose-card.js",
-    "esbuild-watch": "esbuild src/card/WindRoseCard.ts --bundle --minify --outfile=build/windrose-card.js --watch",
+    "esbuild": "esbuild src/card/WindRoseCard.ts --bundle --minify --target=es2017 --outfile=build/windrose-card.js",
+    "esbuild-watch": "esbuild src/card/WindRoseCard.ts --bundle --minify --target=es2017 --outfile=build/windrose-card.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
