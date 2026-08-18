@@ -1,3 +1,9 @@
+### v2.4.4
+Fix:
+- Adds target ES2017 to esbuld, to support older browsers. Fixes #222
+
+Thanks tikhdm for the PR
+
 ### v2.4.3
 Fix:
 - Fix errors in introduced in previous build, related to date time formatting and the log_measurement_counts option. Fixes #219

@@ -31,7 +31,7 @@ import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINDROSE-CARD  %c Version 2.4.3 `,
+    `%c  WINDROSE-CARD  %c Version 2.4.4 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
