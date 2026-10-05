@@ -5,6 +5,7 @@ import { Log } from "../../util/Log";
 import { ConfigCheckUtils } from "../ConfigCheckUtils";
 import { PresetPeriodHelper } from "../../util/PresetPeriodHelper";
 import { PeriodCodeHelper } from "../../util/PeriodCodeHelper";
+import { isFuture } from "date-fns";
 
 export class Period {
 
@@ -22,7 +23,8 @@ export class Period {
         public fromPeriodAgo: string | undefined,
         public toPeriodAgo: string | undefined,
         public initStartTime: Date | undefined,
-        public initEndTime: Date | undefined) {
+        public initEndTime: Date | undefined,
+        public readonly forecastPeriod: string | undefined) {
 
         this.calculateTimeRange();
     }
@@ -33,7 +35,7 @@ export class Period {
 
     clone(): Period {
         return new Period(this.type, this.useStatistics, this.statisticsPeriod, this.statisticsType, this.presetPeriod, this.periodBack, this.fromHourOfDay,
-            this.fromPeriodAgo, this.toPeriodAgo, undefined, undefined);
+            this.fromPeriodAgo, this.toPeriodAgo, undefined, undefined, this.forecastPeriod);
     }
 
     recalculateTimeRange(): void {
@@ -65,6 +67,9 @@ export class Period {
             }
             this.startTime.setHours(this.fromHourOfDay, 0, 0, 0);
             this.endTime = now;
+        } else if (this.forecastPeriod) {
+            this.startTime = new Date(now);
+            this.endTime = PeriodCodeHelper.move(this.forecastPeriod, new Date(now));
         } else {
             throw new Error("No data period config option available.");
         }
@@ -73,6 +78,7 @@ export class Period {
     }
 
     movePeriod(period: string): boolean {
+        if (this.forecastPeriod) { return false; }   // shifting a forecast window is not supported
         const endTime = PeriodCodeHelper.move(period, this.endTime);
         if (endTime > new Date()) {
             return false;
@@ -115,6 +121,13 @@ export class Period {
                 toDate = new Date(config.to_date);
                 optionsSet++;
             }
+            if (PeriodCodeHelper.check('forecast_period', config.forecast_period)) {
+                if (!isFuture(PeriodCodeHelper.move(config.forecast_period!, new Date()))) {
+                    throw new Error('WindRoseCard: forecast_period should point to a date in the future, e.g. +24h');
+                }
+                type = 'forecast';
+                optionsSet++;
+            }
             if (optionsSet === 0) {
                 throw new Error('No data period config options set.');
             }
@@ -122,7 +135,7 @@ export class Period {
                 throw new Error('Multiple period types set, use one type: preset-period, period_back, from_hours_of_day, time window, or date options.')
             }
             return new Period(type, useStatistics, statsPeriod, statsType, config.preset_period, config.period_back, config.from_hour_of_day, config.from_period_ago,
-                config.to_period_ago, fromDate, toDate);
+                config.to_period_ago, fromDate, toDate, config.forecast_period);
         }
         return undefined;
     }

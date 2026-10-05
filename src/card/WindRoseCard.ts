@@ -52,6 +52,7 @@ export class WindRoseCard extends LitElement {
 
     windRoseDirigent!: WindRoseDirigent;
     entityStateProcessor!: EntityStatesProcessor;
+    haWebservice!: HAWebservice;   
     measurementProvider!: HAMeasurementProvider;
     entityChecker!: EntityChecker;
 
@@ -96,6 +97,7 @@ export class WindRoseCard extends LitElement {
             this.refreshCardConfig();
         }
         this._hass = hass;
+        this.haWebservice?.updateHass(hass); 
         this.entityStateProcessor.updateHass(hass);
         if (this.entityStateProcessor.hasUpdates()) {
             this.windRoseDirigent.updateStateRender();
@@ -111,8 +113,9 @@ export class WindRoseCard extends LitElement {
         this.log.method('refreshCardConfig');
         try {
             this.entityChecker.checkEntities(this.cardConfig, this._hass);
+            this.haWebservice = new HAWebservice(this._hass);
             let dateTimeFormatter = new DateTimeFormatter(this._hass.locale, this._hass.config.time_zone)
-            this.measurementProvider = new HAMeasurementProvider(new HAWebservice(this._hass), dateTimeFormatter, this.cardConfig);
+            this.measurementProvider = new HAMeasurementProvider(this.haWebservice, dateTimeFormatter, this.cardConfig);
             this.windRoseDirigent.init(this.cardConfig, this.measurementProvider, this.entityStateProcessor, dateTimeFormatter, this._hass);
             this.entityStateProcessor.init(this.cardConfig)
             this.refreshMeasurements(!this.cardConfig.disableAnimations);

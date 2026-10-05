@@ -15,4 +15,6 @@ export interface CardConfigDataPeriod {
     to_date: string;
 
     period_back: string; //Old hours_to_show
+
+    forecast_period?: string;
 }

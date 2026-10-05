@@ -47,7 +47,7 @@ export class PeriodShiftPlayButton
         const endDate = PeriodCodeHelper.move(this.windowPeriod, this.period.startTime);
         return new Period('play', this.period.useStatistics, this.period.statisticsPeriod,
             this.period.statisticsType, undefined, undefined, undefined, undefined,
-            undefined, this.period.startTime, endDate);
+            undefined, this.period.startTime, endDate, this.period.forecastPeriod);
     }
 
 }

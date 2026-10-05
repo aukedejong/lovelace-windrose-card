@@ -7,6 +7,7 @@
 A Home Assistant Lovelace custom card to show wind speed and direction data in a Windrose diagram.
 
 It's developed for wind data, but it's not limited to wind data only. It is also used for solar winds and lightning data.
+Besides history, the card can also show a **forecast**: wind speed and direction values with future timestamps, read from an entity attribute. See [Forecast](#Forecast).
 If you miss a feature that would make this card more useful for other use-cases, please submit an issue on GitHub and let me know.
 
 Look here for example configurations with screepcapture: [examples](EXAMPLES.md)
@@ -141,6 +142,7 @@ rose_config:
 
 Only one of the options can be used at the same time.
 The statistics related properties overwrite the ones at the entity config level.
+The statistics related properties are ignored when `forecast_period` is used.
 
 | Name                                      |                      Type                      | Default | Required | Description                                                                                                                                                                                         |
 |-------------------------------------------|:----------------------------------------------:|:-------:|:--------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -154,6 +156,7 @@ The statistics related properties overwrite the ones at the entity config level.
 | to_period_ago (replace to_hours_ago)      | string [(period code)](#Period-code-explained) |         |    -     | Show winddata from the configured period from the from_period_ago value till this value.                                                                                                            |
 | from_date                                 |            string, ISO format date             |         |    -     | Show winddata from the configured date time till the to_date value.                                                                                                                                 |
 | to_date                                   |            string, ISO format date             |         |    -     | Show winddata from the configured from_date value till this value.                                                                                                                                  |
+| forecast_period                           | string [(period code)](#Period-code-explained) |         |    -     | Show a forecast instead of history: from now till the configured period ahead, for example `+24h`. Must point to the future. Needs [forecast_attribute](#Forecast) on the wind direction and wind speed entities. More info: [Forecast](#Forecast) |
 
 #### List of preset_period options.
 
@@ -187,6 +190,7 @@ More info and possible configuration options below.
 #### Button type period_selector
 Select a different time period. Uses the same configuration options as the data_period object.
 If you have an active button of this type, the data_period object is not needed.
+A period_selector button can also use `forecast_period`, for example to switch between history and a forecast. See [Forecast](#Forecast).
 
 | Name                       |              Type               | Default | Required | Description                                                           |
 |----------------------------|:-------------------------------:|:-------:|:--------:|-----------------------------------------------------------------------|
@@ -208,7 +212,7 @@ buttons_config:
 #### Button type period_shift
 Shifts the time period with the set hours. This works for all period types. So if you have period_back set, it moves that period keeping the period length the same.
 Pressing again on the period_select button, reset the time period.
-It's not possible to shift the time to the future.
+It's not possible to shift the time to the future. A forecast period can not be shifted, pressing a shift button while a forecast is shown does nothing.
 There are no animations used for the transition.
 
 | Name         |                      Type                      | Default | Required | Description                                                                    |
@@ -234,6 +238,7 @@ Animate the changes in de the windrose during a time period.
 The period configured in the data period properties is the time used for the animation.
 The period_hours configures the period use for the windrose.
 The step_hours moves the period forward in time, until it reached the and of the configured period.
+Forecast periods are not supported by this button.
 There are no animations used for the transition.
 
 | Name                       |                      Type                      | Default | Required | Description                                                                      |
@@ -376,6 +381,101 @@ Info about circular statistics: [https://en.wikipedia.org/wiki/Circular_mean](ht
 
 More info about Home Assistant statistics data: [https://data.home-assistant.io/docs/statistics/](https://data.home-assistant.io/docs/statistics/).
 
+### Forecast
+
+The card can show a forecast in the windrose, based on future values stored in an entity attribute.
+A forecast is selected with the `forecast_period` option, for example on a button, so you can switch between history and forecast.
+
+```yaml
+buttons_config:
+  buttons:
+    - type: period_selector
+      button_text: Last 24h
+      period_back: -24h
+      active: true
+    - type: period_selector
+      button_text: Next 24h
+      forecast_period: +24h
+```
+
+The period starts now and ends the configured time ahead. `forecast_period` uses the same [period code](#Period-code-explained) as the other period options, but it must point to the future, so use a plus: `+12h`, `+2d`.
+Only one period option can be used per period, so `forecast_period` can not be combined with for example `period_back`.
+
+#### Attribute format
+
+Both the wind direction and the wind speed entity need an attribute with a list of timestamped values:
+
+```yaml
+Data:
+  - datetime: '2026-10-02T11:00:00.000Z'
+    value: 7.4
+  - datetime: '2026-10-02T12:00:00.000Z'
+    value: 9.3
+  - datetime: '2026-10-02T13:00:00.000Z'
+    value: 9.3
+```
+
+- `datetime` is an ISO 8601 date and time. Entries do not have to be sorted.
+- `value` is a number. For the wind direction this is a direction in degrees.
+- A value is valid from its `datetime` until the next entry. The last entry is assumed to last as long as the previous interval.
+- Entries that are not valid, for example with an unparsable `datetime` or a non-numeric speed, are ignored. Set `log_level: INFO` to see which.
+- Only entries inside the forecast period are used.
+
+Configure the attribute name on every entity that is used:
+
+```yaml
+wind_direction_entity:
+  entity: sensor.wind_direction_azimuth
+  forecast_attribute: data
+windspeed_entities:
+  - entity: sensor.wind_speed
+    forecast_attribute: data
+    speed_unit: kph
+```
+
+#### Things to know
+
+- The format follows the approach of the [dwd_weather](https://github.com/FL550/dwd_weather) integration.
+- The forecast attribute must be on the same entity as the one used for history. If your forecast lives in a different entity, a template sensor can combine the two: the state carries the measured value, the attribute carries the forecast.
+- Set `speed_unit` explicitly. The automatic unit detection uses the unit of measurement of the entity, which does not describe the unit of an attribute list. The speed values are converted and compensated like history values (`output_speed_unit`, `speed_compensation_factor`, ...).
+- The forecast is read from the entity when the card refreshes, so it is as fresh as `refresh_interval` and as the entity itself.
+- Each forecast entry counts as one measurement with the `direction-first` and `speed-first` strategies, and as the time it is valid with `full-time`. Hourly forecasts therefore give every hour the same weight.
+- Forecast periods ignore `use_statistics` and `statistics_period`.
+
+#### Example: a template sensor that builds the attribute
+
+Weather entities do not always provide the forecast as an attribute, current Home Assistant versions use the `weather.get_forecasts` action. A trigger based template sensor can turn that into the format the card expects:
+
+```yaml
+template:
+  - trigger:
+      - trigger: time_pattern
+        minutes: "/30"
+      - trigger: homeassistant
+        event: start
+    action:
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.home
+        data:
+          type: hourly
+        response_variable: forecast
+    sensor:
+      - name: Wind speed with forecast
+        unique_id: wind_speed_with_forecast
+        unit_of_measurement: km/h
+        state: "{{ state_attr('weather.home', 'wind_speed') }}"
+        attributes:
+          forecast: >
+            {% set ns = namespace(items=[]) %}
+            {% for f in forecast['weather.home'].forecast %}
+              {% set ns.items = ns.items + [{'datetime': f.datetime, 'value': f.wind_speed}] %}
+            {% endfor %}
+            {{ ns.items }}
+```
+
+Use `f.wind_bearing` for the direction sensor. Adjust names and units to your weather integration.
+
 ### Object wind_direction_entity
 
 As of version 1.8.2 the direction unit is determined automatic.
@@ -389,7 +489,7 @@ When the state is numeric, a degree value is assumed. When the state is letters,
 | statistics_period      | string  | 5minute |    -     | Statistics period, possible options: 5minute, hour, day, week, month and year. More info about [data retention](#Home-Assistant-data-retention)                                                                                           |
 | direction_compensation | number  |    0    |    -     | Compensate the measured direction in degrees.                                                                                                                                                                                             |
 | direction_letters      | string  |  NESWX  |    -     | Only used when the state consists of letters. Some weather integrations use language specific letters. With this property you can change the default letters used. See https://en.wikipedia.org/wiki/Points_of_the_compass for more info. |
-
+| forecast_attribute     | string  |         |    -     | Name of the entity attribute that contains the forecast list. Only used with a `forecast_period`, then it is required. See [Forecast](#Forecast). |
 
 ### Object windspeed_entities
 
@@ -399,6 +499,7 @@ See [here](#Examples-using-custom-speed-ranges) for some example speed ragne con
 |------------------------------|:--------------------------------------:|:----------------------------:|:--------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | entity                       |                 string                 |                              |    x     | Wind speed entity.                                                                                                                                                                                   |
 | attribute                    |                 string                 |                              |    -     | If used, not the state but the attributtes value is deplayed.                                                                                                                                        |
+| forecast_attribute           |                 string                 |                              |    -     | Name of the entity attribute that contains the forecast list. Only used with a `forecast_period`, then it is required. See [Forecast](#Forecast).                                                    |
 | name                         |                 string                 |                              |    -     | Label, displayed with the windspeed bar.                                                                                                                                                             |
 | use_statistics               |                boolean                 |            false             |    -     | Use Home Assistant 5 minute statistics data, works only if available for this entity. Can make fetching data faster.                                                                                 |
 | statistics_period            |                 string                 |           5minute            |    -     | Statistics period, possible options: 5minute, hour, day, week, month and year. More info about [data retention](#Home-Assistant-data-retention)                                                      |
@@ -784,6 +885,8 @@ Available values:
 | p90-speed                                                                                     | 90th percentile for gusts (excludes the highest 10% outliers)                                                                                       |
 | wind-description                                                                              | Weather-style description using IQR                                                                                                                 |
 
+When a forecast period is shown, `start-time`, `start-date`, `end-time` and `end-date` show the period from now till the end of the forecast period.
+
 ### Example text-blocks yaml
 
 <img alt="Text block pevriew" src="https://raw.githubusercontent.com/aukedejong/ha-windrose-card/main/example/text-block-example.png?raw=true" width="412"/>
@@ -939,6 +1042,10 @@ Speed:      964 - 20/01/2025, 18:18:01 - 30/01/2025, 18:01:37
 Matches:    1213 - min: 0 - max: 67.3 - average: 24.972333 - strategy: direction-first
 ```
 
+### Strategies and forecasts
+
+Forecasts work with `direction-first`, `speed-first` and `full-time`.
+The `time-frame` strategy always counts back from the current time, so it can not be used with a forecast period. The card shows a configuration error when you combine them.
 
 ### Object colors
 For some values the theme variable --primary-text-color is used. This is needed if HA switches theme and light/dark mode.

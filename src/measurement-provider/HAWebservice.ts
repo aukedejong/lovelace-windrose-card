@@ -3,14 +3,28 @@ import { HARequestData } from "./HARequestData";
 
 export class HAWebservice {
 
-    constructor(private readonly hass: HomeAssistant) {
+    constructor(private hass: HomeAssistant) {
+    }
+
+    public updateHass(hass: HomeAssistant): void {
+      //Home Assistant hands the card a new hass object on every state change, without this the service would keep reading states from the first snapshot and the forecast would never refresh 
+      // (history is unaffected because callWS goes over the persistent connection).
+      this.hass = hass;
     }
 
     public getMeasurementData(startTime: Date, endTime: Date, requestData: HARequestData): Promise<any> {
+        if (requestData.useForecast) {
+            return this.getForecast(requestData);
+        }
         if (requestData.useStatistics) {
             return this.getStatistics(startTime, endTime, [requestData.entity], requestData.statisticsPeriod!, requestData.statisticsType!);
         }
         return this.getHistory(startTime, endTime, [requestData.entity], requestData.attribute !== undefined);
+    }
+
+    private getForecast(req: HARequestData): Promise<any> {
+        const data = this.hass.states[req.entity]?.attributes?.[req.attribute!];
+        return Promise.resolve({ [req.entity]: Array.isArray(data) ? data : [] });
     }
 
     private getHistory(startTime: Date, endTime: Date, entities: string[], attributes: boolean): Promise<any> {

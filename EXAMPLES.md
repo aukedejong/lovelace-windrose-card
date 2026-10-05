@@ -492,3 +492,77 @@ text_blocks:
     text_color: gray
     text_size: 14
 ```
+
+## Forecast
+
+Switch between history and the forecast of the next 24 hours.
+The wind direction and wind speed entities need an attribute with a list of `datetime` and `value` items, see [Forecast](README.md#Forecast).
+
+```yaml
+type: custom:windrose-card
+title: Wind, history and forecast
+refresh_interval: 300
+windspeed_bar_location: right
+buttons_config:
+  location: bottom
+  buttons:
+    - type: period_selector
+      button_text: Last 24h
+      period_back: -24h
+      active: true
+    - type: period_selector
+      button_text: Next 12h
+      forecast_period: +12h
+    - type: period_selector
+      button_text: Next 48h
+      forecast_period: +48h
+wind_direction_entity:
+  entity: sensor.wind_direction_with_forecast
+  forecast_attribute: data
+windspeed_entities:
+  - entity: sensor.wind_speed_with_forecast
+    name: Speed
+    speed_unit: kph
+    output_speed_unit: kph
+    forecast_attribute: forecast
+    speed_range_beaufort: true
+matching_strategy:
+  name: direction-first
+text_blocks:
+  top:
+    text: |-
+      <table>
+          <tr>
+              <td>Period start</td><td>${start-date} ${start-time}</td>
+          </tr>
+          <tr>
+              <td>Period end</td><td>${end-date} ${end-time}</td>
+          </tr>
+          <tr>
+              <td>Match count:</td><td>${match-count}</td>
+          </tr>
+      </table>
+    text_color: gray
+    text_size: 14
+```
+
+### Forecast only
+
+A card that always shows the forecast, without buttons.
+
+```yaml
+type: custom:windrose-card
+title: Wind forecast, next 24 hours
+data_period:
+  forecast_period: +24h
+wind_direction_entity:
+  entity: sensor.wind_direction_with_forecast
+  forecast_attribute: forecast
+windspeed_entities:
+  - entity: sensor.wind_speed_with_forecast
+    name: Speed
+    speed_unit: kph
+    forecast_attribute: forecast
+matching_strategy:
+  name: direction-first
+```

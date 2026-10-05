@@ -10,6 +10,7 @@ export class WindDirectionEntity {
         public readonly statisticsPeriod: string | undefined,
         public readonly directionCompensation: number,
         public readonly directionLetters: string | undefined,
+        public readonly forecastAttribute: string | undefined,
     ) {}
 
     static fromConfig(entityConfig: CardConfigWindDirectionEntity): WindDirectionEntity {
@@ -24,7 +25,7 @@ export class WindDirectionEntity {
             const directionCompensation = this.checkDirectionCompensation(entityConfig.direction_compensation);
             const directionLetters = this.checkDirectionLetters(entityConfig.direction_letters);
             this.checkAttribuutStatsCombi(useStatistics, entityConfig.attribute);
-            return new WindDirectionEntity(entity, entityConfig.attribute, useStatistics, statsPeriod, directionCompensation, directionLetters);
+            return new WindDirectionEntity(entity, entityConfig.attribute, useStatistics, statsPeriod, directionCompensation, directionLetters, entityConfig.forecast_attribute);
         }
         throw new Error("WindRoseCard: No wind_direction_entity configured.");
     }

@@ -15,6 +15,7 @@ import {ButtonsConfig} from "./buttons/ButtonsConfig";
 import {MatchingStrategy} from "./MatchingStrategy";
 import {Period} from "./buttons/Period";
 import {RoseConfig} from "./RoseConfig";
+import {PeriodSelectorButton} from "./buttons/types/PeriodSelectorButton";
 
 
 export class CardConfigWrapper {
@@ -143,6 +144,7 @@ export class CardConfigWrapper {
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
         this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels);
         this.matchingStrategy = MatchingStrategy.fromConfig(cardConfig.matching_strategy);
+        this.checkForecastConfig();
         this.filterEntitiesQueryParameter = this.createEntitiesQueryParameter();
         this.cardWidth = !cardConfig.card_width ? 4 : cardConfig.card_width;
         this.cardColor = CardColors.fromConfig(cardConfig.colors);
@@ -213,6 +215,30 @@ export class CardConfigWrapper {
         return GlobalConfig.defaultWindspeedBarLocation;
     }
 
+    private checkForecastConfig(): void {
+        const periods: Period[] = [];
+        if (this.dataPeriod) {
+            periods.push(this.dataPeriod);
+        }
+        for (const button of this.buttonsConfig?.buttons ?? []) {
+            if (button instanceof PeriodSelectorButton) {
+            periods.push(button.period);
+            }
+        }
+        if (!periods.some(p => p.forecastPeriod)) {
+            return;
+        }
+        if (this.matchingStrategy.name === 'time-frame') {
+            throw new Error('WindRoseCard: forecast periods do not work with matching_strategy time-frame (it assumes data up to now). Use direction-first, speed-first or full-time.');
+        }
+        const missing = [this.windDirectionEntity, ...this.windspeedEntities]
+            .filter(e => !e.forecastAttribute)
+            .map(e => e.entity);
+        if (missing.length > 0) {
+            // the matcher needs both direction and speed in forecast mode, so a partly configured forecast would produce an empty or broken rose.
+            throw new Error('WindRoseCard: forecast_attribute is required on every entity when a forecast_period is configured, missing for: ' + missing.join(', '));
+        }
+    }
     private createEntitiesQueryParameter() {
         return this.windDirectionEntity + ',' + this.windspeedEntities
             .map(config => config.entity)

@@ -10,6 +10,7 @@ export class WindSpeedEntity {
     constructor(
         public entity: string,
         public readonly attribute: string | undefined,
+        public readonly forecastAttribute: string | undefined,
         public readonly name: string,
         public readonly useStatistics: boolean,
         public readonly statisticsPeriod: string,
@@ -68,7 +69,7 @@ export class WindSpeedEntity {
         this.checkSpeedRangeCombi(speedRanges, speedRangeStep, speedRangeMax, dynamicSpeedRanges, speedRangeBeaufort);
         this.checkAttribuutStatsCombi(useStatistics, entityConfig.attribute);
 
-        return new WindSpeedEntity(entity, entityConfig.attribute, name, useStatistics, statsPeriod, statsType, barRenderScale,
+        return new WindSpeedEntity(entity, entityConfig.attribute, entityConfig.forecast_attribute, name, useStatistics, statsPeriod, statsType, barRenderScale,
             windspeedBarFull, inputSpeedUnit, outputSpeedUnit,  outputSpeedUnitLabel, speedRangeBeaufort,
             speedRangeStep, speedRangeMax, speedRanges, dynamicSpeedRanges, currentSpeedArrow, currentSpeedArrowSize,
             currentSpeedArrowLocation, barLabelTextSize, barSpeedTextSize, barPercentageTextSize, compensationFactor,
