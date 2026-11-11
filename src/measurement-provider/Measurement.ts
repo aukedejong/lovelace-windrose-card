@@ -15,21 +15,21 @@ export class Measurement {
 
     public static initStats(statData: StatisticsData) {
 
-        if (statData.min) {
+        if ("min" in statData) {
             Measurement.fromStats = (stat: StatisticsData) => {
                 return new Measurement(stat.start / 1000, stat.end / 1000, stat.min);
             };
             Measurement.getStatsValue = (stat: StatisticsData) => {
                 return stat.min;
             };
-        } else if (statData.max) {
+        } else if ("max" in statData) {
             Measurement.fromStats = (stat: StatisticsData) => {
                 return new Measurement(stat.start / 1000, stat.end / 1000, stat.max);
             };
             Measurement.getStatsValue = (stat: StatisticsData) => {
                 return stat.max
             };
-        } else if (statData.mean) {
+        } else if ("mean" in statData) {
             Measurement.fromStats = (stat: StatisticsData) => {
                 return new Measurement(stat.start / 1000, stat.end / 1000, stat.mean);
             };

@@ -31,7 +31,7 @@ import { DateTimeFormatter } from "../formatter/DateTimeFormatter";
 
 /* eslint no-console: 0 */
 console.info(
-    `%c  WINDROSE-CARD  %c Version 2.7.0 `,
+    `%c  WINDROSE-CARD  %c Version 2.8.0 `,
     'color: orange; font-weight: bold; background: black',
     'color: white; font-weight: bold; background: dimgray',
 );
@@ -250,6 +250,9 @@ export class WindRoseCard extends LitElement {
 
             this.updateInterval = setInterval(
                 () => {
+                    if (!this._hass || this.refreshCardConfigOnHass) {
+                        return;
+                    }
                     this.cardConfig.activePeriod.recalculateTimeRange();
                     this.refreshMeasurements(!this.cardConfig.disableAnimations)
                 }, this.cardConfig.refreshInterval * 1000);
@@ -327,6 +330,7 @@ export class WindRoseCard extends LitElement {
         super.disconnectedCallback();
         this.log.method('disconnectedCallback');
         clearInterval(this.updateInterval);
+        this.updateInterval = undefined;
     }
 
     getCardSize(): number {

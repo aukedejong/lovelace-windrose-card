@@ -1,20 +1,20 @@
-import {GlobalConfig} from "./GlobalConfig";
-import {CardConfig} from "../card/CardConfig";
-import {CardColors} from "./CardColors";
-import {Log} from "../util/Log";
-import {WindSpeedEntity} from "./WindSpeedEntity";
-import {WindDirectionEntity} from "./WindDirectionEntity";
-import {CompassConfig} from "./CompassConfig";
-import {CurrentDirectionConfig} from "./CurrentDirectionConfig";
-import {CornersInfo} from "./CornersInfo";
-import {ConfigCheckUtils} from "./ConfigCheckUtils";
-import {CardConfigActions} from "../card/CardConfigActions";
-import {DirectionLabels} from "./DirectionLabels";
-import {TextBlocks} from "./TextBlocks";
-import {ButtonsConfig} from "./buttons/ButtonsConfig";
-import {MatchingStrategy} from "./MatchingStrategy";
-import {Period} from "./buttons/Period";
-import {RoseConfig} from "./RoseConfig";
+import { GlobalConfig } from "./GlobalConfig";
+import { CardConfig } from "../card/CardConfig";
+import { CardColors } from "./CardColors";
+import { Log } from "../util/Log";
+import { WindSpeedEntity } from "./WindSpeedEntity";
+import { WindDirectionEntity } from "./WindDirectionEntity";
+import { CompassConfig } from "./CompassConfig";
+import { CurrentDirectionConfig } from "./CurrentDirectionConfig";
+import { CornersInfo } from "./CornersInfo";
+import { ConfigCheckUtils } from "./ConfigCheckUtils";
+import { CardConfigActions } from "../card/CardConfigActions";
+import { DirectionLabels } from "./DirectionLabels";
+import { TextBlocks } from "./TextBlocks";
+import { ButtonsConfig } from "./buttons/ButtonsConfig";
+import { MatchingStrategy } from "./MatchingStrategy";
+import { Period } from "./buttons/Period";
+import { RoseConfig } from "./RoseConfig";
 
 
 export class CardConfigWrapper {
@@ -138,7 +138,7 @@ export class CardConfigWrapper {
         this.windDirectionEntity = WindDirectionEntity.fromConfig(cardConfig.wind_direction_entity);
         this.windspeedEntities = this.checkWindspeedEntities();
         this.roseConfig = RoseConfig.fromConfig(cardConfig.rose_config);
-        this.currentDirection = this.checkCurrentDirection()
+        this.currentDirection = CurrentDirectionConfig.fromConfig(cardConfig.current_direction, this.roseConfig);
         this.disableAnimations = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.disable_animations);
         this.hideWindspeedBar = ConfigCheckUtils.checkBooleanDefaultFalse(cardConfig.hide_windspeed_bar);
         this.directionLabels = DirectionLabels.fromConfig(cardConfig.direction_labels);
@@ -168,24 +168,6 @@ export class CardConfigWrapper {
             return this.cardConfig.refresh_interval;
         }
         return GlobalConfig.defaultRefreshInterval;
-    }
-
-    private checkCurrentDirection(): CurrentDirectionConfig {
-        if (this.cardConfig.current_direction) {
-            let centerCircleSize;
-            if (this.roseConfig.centerCircleConfig.enabled) {
-                centerCircleSize = this.roseConfig.centerCircleConfig.size;
-            } else {
-                centerCircleSize = ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.center_circle_size, GlobalConfig.defaultCurrentDirectionCircleSize);
-            }
-            return new CurrentDirectionConfig(
-                ConfigCheckUtils.checkBooleanDefaultFalse(this.cardConfig.current_direction.show_arrow),
-                ConfigCheckUtils.checkNummerOrDefault(this.cardConfig.current_direction.arrow_size, GlobalConfig.defaultCurrentDirectionArrowSize),
-                centerCircleSize,
-                ConfigCheckUtils.checkNumberOrUndefined('hide_direction_below_speed', this.cardConfig.current_direction.hide_direction_below_speed)
-            )
-        }
-        return new CurrentDirectionConfig(false, undefined, undefined, 0);
     }
 
     private checkWindspeedEntities(): WindSpeedEntity[] {

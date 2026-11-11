@@ -1,9 +1,16 @@
+### 2.8.0
+
+Features:
+- New current winddirection arrow options, to render the arrow different. Fixes #230
+
+Fixes:
+- Fix with statistics data, when the first values are 0. Fixes #228
+
 ### 2.7.0
 
 Fix, feature change statistics type config:
-- Type min and mix is not supported by wind direction sensors, removed config options. Type mean is always used.
+- Type min and max is not supported by wind direction sensors, removed config options. Type mean is always used.
   More info, see readme paragraph Home Assistant data retention
-
 
 ### v2.6.0
 Feature:

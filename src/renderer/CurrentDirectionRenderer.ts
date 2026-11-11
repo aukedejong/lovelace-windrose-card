@@ -1,10 +1,10 @@
-import {SvgUtil} from "./SvgUtil";
-import {Coordinate} from "./Coordinate";
-import {Log} from "../util/Log";
-import {CircleCoordinate} from "./CircleCoordinate";
-import SVG, {Svg} from "@svgdotjs/svg.js";
-import {CardConfigWrapper} from "../config/CardConfigWrapper";
-import {DimensionCalculator} from "../dimensions/DimensionCalculator";
+import { SvgUtil } from "./SvgUtil";
+import { Coordinate } from "./Coordinate";
+import { Log } from "../util/Log";
+import { CircleCoordinate } from "./CircleCoordinate";
+import SVG, { Svg } from "@svgdotjs/svg.js";
+import { CardConfigWrapper } from "../config/CardConfigWrapper";
+import { DimensionCalculator } from "../dimensions/DimensionCalculator";
 
 export class CurrentDirectionRenderer {
 
@@ -39,10 +39,20 @@ export class CurrentDirectionRenderer {
             Log.debug("Cur No direction, show circle", this.arrowElement, this.centerElement);
 
         } else {
+            let drawDirection = currentWindDirection;
+            if (this.config.currentDirection.arrowLocation === "to") {
+                if (currentWindDirection >= 180) {
+                    drawDirection = currentWindDirection - 180;
+                } else {
+                    drawDirection = currentWindDirection + 180;
+                }
+            }
+
             this.arrowElement!.attr({ visibility: "visible" });
             this.centerElement!.attr({ visibility: "hidden" });
+
             this.arrowElement!.animate(700, 0, 'now')
-                .transform({ rotate: currentWindDirection, originX: this.roseCenter.x, originY: this.roseCenter.y})
+                .transform({ rotate: drawDirection, originX: this.roseCenter.x, originY: this.roseCenter.y})
                 .ease('<>');
         }
     }
@@ -55,7 +65,12 @@ export class CurrentDirectionRenderer {
         const x = this.roseCenter.x;
         const y = this.roseCenter.y - this.dimensionCalculator.roseRadius - 1;
 
-        this.arrowElement = this.svgUtil.drawArrowDown(x, y, this.config.currentDirection.arrowSize!);
+        if (this.config.currentDirection.arrowDirection === "in") {
+            this.arrowElement = this.svgUtil.drawArrowDown(x, y, this.config.currentDirection.arrowSize!);
+        } else { // out
+            this.arrowElement = this.svgUtil.drawArrowUp(x, y - this.config.currentDirection.arrowSize! , this.config.currentDirection.arrowSize!);
+        }
+
         this.arrowElement.attr({
             stroke: this.config.cardColor.roseCurrentDirectionArrow,
             fill: this.config.cardColor.roseCurrentDirectionArrow
