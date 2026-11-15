@@ -33,7 +33,7 @@ export class Period {
 
     clone(): Period {
         return new Period(this.type, this.useStatistics, this.statisticsPeriod, this.statisticsType, this.presetPeriod, this.periodBack, this.fromHourOfDay,
-            this.fromPeriodAgo, this.toPeriodAgo, undefined, undefined);
+            this.fromPeriodAgo, this.toPeriodAgo, this.initStartTime, this.initEndTime);
     }
 
     recalculateTimeRange(): void {
